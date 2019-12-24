@@ -24,21 +24,13 @@ public class ParseProcessor {
 
     public void process() {
         DriverManager driverManager = new DriverManager();
-        driver =driverManager.initiateDriver(false);
+        driver = driverManager.initiateDriver(false);
+        wait = new WebDriverWait(driver, 5);
         try {
-            wait = new WebDriverWait(driver, 5);
-            // 1) log in - if need bets
-            // 2) click on live bets
-            // 3) click on football
-
             List<String> countryLinks = findCountryLinks();
-            Document document;
-
-            System.out.println();
-            countryLinks.forEach(System.out::println);
 
             driver.navigate().to("http://ballchockdee.com" + countryLinks.get(1));
-            document = Jsoup.parse(driver.getPageSource());
+            Document document = Jsoup.parse(driver.getPageSource());
 
             waitElementWithId("bu:od:go:mt:2").click();
 
@@ -49,7 +41,6 @@ public class ParseProcessor {
     //                    System.out.println("fuck yeah");
     //                }
             }
-
         } catch (IOException e) {
                 e.printStackTrace();
         } finally {
@@ -57,7 +48,7 @@ public class ParseProcessor {
         }
     }
 
-    private static List<String> findCountryLinks() throws IOException {
+    private List<String> findCountryLinks() throws IOException {
         List<String> countryLinks = new ArrayList<>();
         Document document = Jsoup.connect("http://ballchockdee.com/ru-ru/euro/ставки-live/футбол")
                 .userAgent("Chrome/4.0.249.0 Safari/532.5")
@@ -68,17 +59,15 @@ public class ParseProcessor {
         return countryLinks;
     }
 
-    private static WebElement waitElementWithId(String id) {
+    private WebElement waitElementWithId(String id) {
         wait.ignoring(StaleElementReferenceException.class)
                 .until(ExpectedConditions.presenceOfElementLocated(By.id(id)));
         return driver.findElement(By.id(id));
     }
 
-    private static List<WebElement> waitElementsWithClassName(String className) {
+    private List<WebElement> waitElementsWithClassName(String className) {
         wait.ignoring(StaleElementReferenceException.class)
                 .until(ExpectedConditions.presenceOfElementLocated(By.className(className)));
         return driver.findElements(By.className(className));
     }
-
-
 }
