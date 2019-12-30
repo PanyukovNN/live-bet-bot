@@ -13,7 +13,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,14 +58,14 @@ public class ParseProcessor {
             Elements markets = document.select("table.Hdp > tbody > tr");
             System.out.println(markets.size());
             for (Element market : markets) {
-//                Element dateTimeText = market.selectFirst("div.DateTimeTxt");
-//                if (dateTimeText.text().contains("Перерыв")) {
-//                    System.out.println("fuck yeah");
-//                }
-                String firstTeam = market.selectFirst("td > a.OddsTabL > span.OddsL").text();
-                String secondTeam = market.selectFirst("td > a.OddsTabR > span.OddsL").text();
-                String gameLink = market.selectFirst("td.Icons > a.IconMarkets").attr("href");
-                games.add(new Game(LocalDate.now(), firstTeam, secondTeam, gameLink));
+                Element dateTimeText = market.selectFirst("div.DateTimeTxt");
+                if (dateTimeText.text().contains("Перерыв")) {
+                    String firstTeam = market.selectFirst("td > a.OddsTabL > span.OddsL").text();
+                    String secondTeam = market.selectFirst("td > a.OddsTabR > span.OddsL").text();
+                    String gameLink = market.selectFirst("td.Icons > a.IconMarkets").attr("href");
+                    games.add(new Game(LocalDate.now(), firstTeam, secondTeam, gameLink));
+                }
+
             }
         }
         return games;
