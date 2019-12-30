@@ -1,6 +1,7 @@
 package com.zylex.livebetbot.service;
 
 import com.zylex.livebetbot.DriverManager;
+import com.zylex.livebetbot.model.Game;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,6 +14,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,41 +24,52 @@ public class ParseProcessor {
 
     private static WebDriver driver;
 
+    private CountryParser countryParser;
+
+    private DriverManager driverManager;
+
+    public ParseProcessor(DriverManager driverManager, CountryParser countryParser) {
+        this.driverManager = driverManager;
+        this.countryParser = countryParser;
+    }
+
     public void process() {
-        DriverManager driverManager = new DriverManager();
-        driver = driverManager.initiateDriver(false);
-        wait = new WebDriverWait(driver, 5);
+        List<String> countryLinks = countryParser.parse();
         try {
-            List<String> countryLinks = findCountryLinks();
-
-            driver.navigate().to("http://ballchockdee.com" + countryLinks.get(1));
-            Document document = Jsoup.parse(driver.getPageSource());
-
-            waitElementWithId("bu:od:go:mt:2").click();
-
-            Elements markets = document.select("table.Hdp > tbody > tr");
-            for (Element market : markets) {
-                Element dateTimeText = market.selectFirst("div.DateTimeTxt");
-    //                if (dateTimeText.text().contains("Перерыв")) {
-    //                    System.out.println("fuck yeah");
-    //                }
-            }
-        } catch (IOException e) {
-                e.printStackTrace();
+            initDriver();
+            List<Game> games = parseGames(countryLinks);
+            games.forEach(System.out::println);
         } finally {
             driverManager.quitDriver();
         }
     }
 
-    private List<String> findCountryLinks() throws IOException {
-        List<String> countryLinks = new ArrayList<>();
-        Document document = Jsoup.connect("http://ballchockdee.com/ru-ru/euro/ставки-live/футбол")
-                .userAgent("Chrome/4.0.249.0 Safari/532.5")
-                .referrer("http://www.google.com")
-                .get();
-        Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
-        elements.forEach(element -> countryLinks.add(element.attr("href")));
-        return countryLinks;
+    private void initDriver() {
+        driver = driverManager.initiateDriver(false);
+        wait = new WebDriverWait(driver, 5);
+    }
+
+    private List<Game> parseGames(List<String> countryLinks) {
+        List<Game> games = new ArrayList<>();
+        for (String countryLink : countryLinks) {
+            driver.navigate().to("http://ballchockdee.com" + countryLink);
+            waitElementWithId("bu:od:go:mt:2").click(); // click on gandicap
+            waitElementsWithClassName("Hdp");
+            Document document = Jsoup.parse(driver.getPageSource());
+            Elements markets = document.select("table.Hdp > tbody > tr");
+            System.out.println(markets.size());
+            for (Element market : markets) {
+//                Element dateTimeText = market.selectFirst("div.DateTimeTxt");
+//                if (dateTimeText.text().contains("Перерыв")) {
+//                    System.out.println("fuck yeah");
+//                }
+                String firstTeam = market.selectFirst("td > a.OddsTabL > span.OddsL").text();
+                String secondTeam = market.selectFirst("td > a.OddsTabR > span.OddsL").text();
+                String gameLink = market.selectFirst("td.Icons > a.IconMarkets").attr("href");
+                games.add(new Game(LocalDate.now(), firstTeam, secondTeam, gameLink));
+            }
+        }
+        return games;
     }
 
     private WebElement waitElementWithId(String id) {

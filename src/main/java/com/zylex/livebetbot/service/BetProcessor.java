@@ -21,13 +21,13 @@ public class BetProcessor {
 
     public void process() {
         DriverManager driverManager = new DriverManager();
-        driver = driverManager.initiateDriver(false);
+        driver = driverManager.initiateDriver(true);
         wait = new WebDriverWait(driver, 5);
         try {
             driver.navigate().to("http://ballchockdee.com");
             logIn();
             Thread.sleep(5000);
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         } finally {
             driverManager.quitDriver();
@@ -44,7 +44,6 @@ public class BetProcessor {
             driver.navigate().to(property.getProperty("logHash") + ".ballchockdee.com/ru-ru/euro/");
         }
     }
-
 
     private WebElement waitElementWithId(String id) {
         wait.ignoring(StaleElementReferenceException.class)
