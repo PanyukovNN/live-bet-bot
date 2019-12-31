@@ -21,7 +21,7 @@ public class Goal {
 
     @Override
     public String toString() {
-        return "Scores{" +
+        return "Goals{" +
                 "homeGoals=" + homeGoals +
                 ", awayGoals=" + awayGoals +
                 '}';

@@ -15,6 +15,8 @@ public class Game {
 
     private Goal finalGoal;
 
+    private TotalMoreLess totalMoreLess;
+
     private String link;
 
     public Game(LocalDate date, String firstTeam, String secondTeam, String link) {
@@ -56,6 +58,14 @@ public class Game {
         this.finalGoal = finalGoal;
     }
 
+    public TotalMoreLess getTotalMoreLess() {
+        return totalMoreLess;
+    }
+
+    public void setTotalMoreLess(TotalMoreLess totalMoreLess) {
+        this.totalMoreLess = totalMoreLess;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -80,6 +90,7 @@ public class Game {
                 ", secondTeam='" + secondTeam + '\'' +
                 ", breakGoals=" + breakGoals +
                 ", finalGoal=" + finalGoal +
+                ", totalMoreLess=" + totalMoreLess +
                 ", link='" + link + '\'' +
                 '}';
     }

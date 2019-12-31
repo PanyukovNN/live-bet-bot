@@ -38,6 +38,7 @@ public class ParseProcessor {
         try {
             initDriver();
             List<Game> breakGames = findBreakGames(countryLinks);
+            System.out.println();
             breakGames.forEach(System.out::println);
         } finally {
             driverManager.quitDriver();
@@ -56,18 +57,18 @@ public class ParseProcessor {
             waitElementWithId("bu:od:go:mt:2").click(); // click on gandicap
             waitElementsWithClassName("Hdp");
             Document document = Jsoup.parse(driver.getPageSource());
-            Elements markets = document.select("table.Hdp > tbody > tr");
-            for (Element market : markets) {
+            Elements gameElements = document.select("table.Hdp > tbody > tr");
+            for (Element gameElement : gameElements) {
 //                Element dateTimeText = market.selectFirst("div.DateTimeTxt");
 //                if (dateTimeText.text().contains("Перерыв")) {
                     // TODO check NPE
-                    String firstTeam = market.selectFirst("td > a.OddsTabL > span.OddsL").text();
-                    String secondTeam = market.selectFirst("td > a.OddsTabR > span.OddsL").text();
-                    String gameLink = market.selectFirst("td.Icons > a.IconMarkets").attr("href");
+                    String firstTeam = gameElement.selectFirst("td > a.OddsTabL > span.OddsL").text();
+                    String secondTeam = gameElement.selectFirst("td > a.OddsTabR > span.OddsL").text();
+                    String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
                     Game game = new Game(LocalDate.now(), firstTeam, secondTeam, gameLink);
-                    Goal goal = findGoal(game);
-                    game.setBreakGoals(goal);
                     if (!games.contains(game)) {
+                        Goal goal = findGoal(game);
+                        game.setBreakGoals(goal);
                         games.add(game);
                     }
 //                }

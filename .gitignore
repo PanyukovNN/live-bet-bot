@@ -7,3 +7,4 @@ target
 **.csv
 **.zip
 src\main\resources
+**Rule.java
