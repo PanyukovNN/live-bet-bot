@@ -36,7 +36,7 @@ class GameParser {
     void parse(Game game) {
         driver.navigate().to("http://ballchockdee.com" + game.getLink());
         game.setBreakGoals(findGoal());
-        game.setTotalMoreLessList(findTotalMoreLess());
+        game.setTmlList(findTotalMoreLess());
     }
 
     private Goal findGoal() {

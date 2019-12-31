@@ -118,7 +118,7 @@
                     <archive>
                         <manifest>
                             <mainClass>${main-class-path}</mainClass>
-                            <packageName>com.zylex.betbot</packageName>
+                            <packageName>com.zylex.livebetbot</packageName>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>

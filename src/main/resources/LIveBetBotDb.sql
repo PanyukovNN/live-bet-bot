@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS game;
 CREATE TABLE IF NOT EXISTS game (
-    id                SERIAL NOT NULL PRIMARY KEY,
-    date_time         TIMESTAMP NOT NULL,
+    id                BIGSERIAL NOT NULL PRIMARY KEY,
+    date_time         DATE NOT NULL,
     first_team        VARCHAR(50) NOT NULL,
     second_team       VARCHAR(50) NOT NULL,
     home_goal_break   INT NOT NULL,
@@ -15,9 +15,9 @@ CREATE TABLE IF NOT EXISTS game (
 DROP TABLE IF EXISTS tml;
 CREATE TABLE IF NOT EXISTS tml (
     id          SERIAL NOT NULL PRIMARY KEY,
-    game_id     INT NOT NULL,
+    game_id     BIGINT NOT NULL,
     more_less   VARCHAR(20),
     size        FLOAT,
-    FOREIGN KEY (game_id) REFERENCES game(id)
+    FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE
 );
 

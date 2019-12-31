@@ -8,15 +8,17 @@ import java.util.Objects;
 
 public class Game {
 
+    private long id;
+
     private LocalDate date;
 
     private String firstTeam;
 
     private String secondTeam;
 
-    private Goal breakGoals;
+    private Goal breakGoals = new Goal(-1, -1);
 
-    private Goal finalGoal;
+    private Goal finalGoal = new Goal(-1, -1);
 
     private List<Tml> tmlList;
 
@@ -24,11 +26,15 @@ public class Game {
 
     private RuleNumber ruleNumber;
 
-    public Game(LocalDate date, String firstTeam, String secondTeam, String link) {
+    public Game(long id, LocalDate date, String firstTeam, String secondTeam, String link) {
+        this.id = id;
         this.date = date;
         this.firstTeam = firstTeam;
         this.secondTeam = secondTeam;
         this.link = link;
+    }
+
+    public Game() {
     }
 
     public LocalDate getDate() {
@@ -47,7 +53,7 @@ public class Game {
         return link;
     }
 
-    public Goal getBreakGoals() {
+    public Goal getBreakGoal() {
         return breakGoals;
     }
 
@@ -63,11 +69,11 @@ public class Game {
         this.finalGoal = finalGoal;
     }
 
-    public List<Tml> getTotalMoreLessList() {
+    public List<Tml> getTmlList() {
         return tmlList;
     }
 
-    public void setTotalMoreLessList(List<Tml> TmlList) {
+    public void setTmlList(List<Tml> TmlList) {
         this.tmlList = TmlList;
     }
 
@@ -77,6 +83,14 @@ public class Game {
 
     public void setRuleNumber(RuleNumber ruleNumber) {
         this.ruleNumber = ruleNumber;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     @Override
