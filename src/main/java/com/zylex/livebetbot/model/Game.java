@@ -1,5 +1,7 @@
 package com.zylex.livebetbot.model;
 
+import com.zylex.livebetbot.service.rule.RuleNumber;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -16,9 +18,11 @@ public class Game {
 
     private Goal finalGoal;
 
-    private List<Tml> TmlList;
+    private List<Tml> tmlList;
 
     private String link;
+
+    private RuleNumber ruleNumber;
 
     public Game(LocalDate date, String firstTeam, String secondTeam, String link) {
         this.date = date;
@@ -60,11 +64,19 @@ public class Game {
     }
 
     public List<Tml> getTotalMoreLessList() {
-        return TmlList;
+        return tmlList;
     }
 
     public void setTotalMoreLessList(List<Tml> TmlList) {
-        this.TmlList = TmlList;
+        this.tmlList = TmlList;
+    }
+
+    public RuleNumber getRuleNumber() {
+        return ruleNumber;
+    }
+
+    public void setRuleNumber(RuleNumber ruleNumber) {
+        this.ruleNumber = ruleNumber;
     }
 
     @Override
@@ -91,8 +103,9 @@ public class Game {
                 ", secondTeam='" + secondTeam + '\'' +
                 ", breakGoals=" + breakGoals +
                 ", finalGoal=" + finalGoal +
-                ", totalMoreLessList=" + TmlList +
+                ", TmlList=" + tmlList +
                 ", link='" + link + '\'' +
+                ", ruleNumber=" + ruleNumber +
                 '}';
     }
 }
