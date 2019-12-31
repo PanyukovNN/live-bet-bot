@@ -22,6 +22,7 @@ public class CallableGameParser implements Callable<List<Game>> {
     public List<Game> call() throws Exception {
         return null;
     }
+
 //
 //    private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 //

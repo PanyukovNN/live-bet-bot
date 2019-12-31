@@ -1,6 +1,7 @@
 package com.zylex.livebetbot.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Game {
 
@@ -10,13 +11,9 @@ public class Game {
 
     private String secondTeam;
 
-    private int homeGoalsOnBreak;
+    private Goal breakGoals;
 
-    private int awayGoalsOnBreak;
-
-    private int homeGoalsFinal;
-
-    private int awayGoalsFinal;
+    private Goal finalGoal;
 
     private String link;
 
@@ -43,51 +40,47 @@ public class Game {
         return link;
     }
 
-    public int getHomeGoalsOnBreak() {
-        return homeGoalsOnBreak;
+    public Goal getBreakGoals() {
+        return breakGoals;
     }
 
-    public void setHomeGoalsOnBreak(int homeGoalsOnBreak) {
-        this.homeGoalsOnBreak = homeGoalsOnBreak;
+    public void setBreakGoals(Goal breakGoals) {
+        this.breakGoals = breakGoals;
     }
 
-    public int getAwayGoalsOnBreak() {
-        return awayGoalsOnBreak;
+    public Goal getFinalGoal() {
+        return finalGoal;
     }
 
-    public void setAwayGoalsOnBreak(int awayGoalsOnBreak) {
-        this.awayGoalsOnBreak = awayGoalsOnBreak;
+    public void setFinalGoal(Goal finalGoal) {
+        this.finalGoal = finalGoal;
     }
 
-    public int getHomeGoalsFinal() {
-        return homeGoalsFinal;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Game game = (Game) o;
+        return Objects.equals(date, game.date) &&
+                Objects.equals(firstTeam, game.firstTeam) &&
+                Objects.equals(secondTeam, game.secondTeam) &&
+                Objects.equals(link, game.link);
     }
 
-    public void setHomeGoalsFinal(int homeGoalsFinal) {
-        this.homeGoalsFinal = homeGoalsFinal;
+    @Override
+    public int hashCode() {
+        return Objects.hash(date, firstTeam, secondTeam, link);
     }
 
-    public int getAwayGoalsFinal() {
-        return awayGoalsFinal;
-    }
-
-    public void setAwayGoalsFinal(int awayGoalsFinal) {
-        this.awayGoalsFinal = awayGoalsFinal;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public void setFirstTeam(String firstTeam) {
-        this.firstTeam = firstTeam;
-    }
-
-    public void setSecondTeam(String secondTeam) {
-        this.secondTeam = secondTeam;
-    }
-
-    public void setLink(String link) {
-        this.link = link;
+    @Override
+    public String toString() {
+        return "Game{" +
+                "date=" + date +
+                ", firstTeam='" + firstTeam + '\'' +
+                ", secondTeam='" + secondTeam + '\'' +
+                ", breakGoals=" + breakGoals +
+                ", finalGoal=" + finalGoal +
+                ", link='" + link + '\'' +
+                '}';
     }
 }
