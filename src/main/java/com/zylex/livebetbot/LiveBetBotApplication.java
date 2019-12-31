@@ -12,8 +12,7 @@ public class LiveBetBotApplication {
 //        BetProcessor betProcessor = new BetProcessor();
 //        betProcessor.process();
         new ParseProcessor(
-            new DriverManager(),
-            new CountryParser()
+            new DriverManager()
         ).process();
         /*
         1 шаг - найти все игры на перерыве, их счет и ссылки на них
