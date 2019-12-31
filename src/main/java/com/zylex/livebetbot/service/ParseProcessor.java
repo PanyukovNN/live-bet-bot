@@ -3,6 +3,8 @@ package com.zylex.livebetbot.service;
 import com.zylex.livebetbot.DriverManager;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.Goal;
+import com.zylex.livebetbot.model.MoreLess;
+import com.zylex.livebetbot.model.TotalMoreLess;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,6 +19,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ParseProcessor {
 
@@ -67,8 +70,9 @@ public class ParseProcessor {
                     String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
                     Game game = new Game(LocalDate.now(), firstTeam, secondTeam, gameLink);
                     if (!games.contains(game)) {
-                        Goal goal = findGoal(game);
-                        game.setBreakGoals(goal);
+                        driver.navigate().to("http://ballchockdee.com" + game.getLink());
+                        game.setBreakGoals(findGoal());
+                        game.setTotalMoreLessList(findTotalMoreLess());
                         games.add(game);
                     }
 //                }
@@ -77,13 +81,39 @@ public class ParseProcessor {
         return games;
     }
 
-    private Goal findGoal(Game game) {
-        driver.navigate().to("http://ballchockdee.com" + game.getLink());
+    private Goal findGoal() {
         WebElement scoreElement = waitElementWithClassName("Score");
         String[] scores = scoreElement.getText().split(":");
         int homeGoals = Integer.parseInt(scores[0]);
         int awayGoals = Integer.parseInt(scores[1]);
         return new Goal(homeGoals, awayGoals);
+    }
+
+    private List<TotalMoreLess> findTotalMoreLess() {
+        waitElementsWithClassName("MarketT");
+        Document document = Jsoup.parse(driver.getPageSource());
+        Elements marketElements = document.select("div.MarketT");
+        List<Element> totalMoreLessMarketElements = marketElements.stream()
+                .filter(market -> {
+                    String header = market.select("div.SubHead > span").text();
+                    return header.contains("тотал") || header.contains("Тотал");
+                })
+                .collect(Collectors.toList());
+        List<TotalMoreLess> totalMoreLessList = new ArrayList<>();
+        for (Element marketElement : totalMoreLessMarketElements) {
+            Elements totalMoreLessElements = marketElement.select("table > tbody > tr");
+            System.out.println(totalMoreLessElements.size());
+            for (Element totalMoreLessElement : totalMoreLessElements) {
+                double moreSize = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
+                double moreCoefficient = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
+                totalMoreLessList.add(new TotalMoreLess(MoreLess.MORE, moreSize, moreCoefficient));
+
+                double lessSize = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
+                double lessCoefficient = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
+                totalMoreLessList.add(new TotalMoreLess(MoreLess.LESS, lessSize, lessCoefficient));
+            }
+        }
+        return totalMoreLessList;
     }
 
     private WebElement waitElementWithId(String id) {
