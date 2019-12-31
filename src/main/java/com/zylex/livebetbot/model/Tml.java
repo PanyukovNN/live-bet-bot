@@ -1,6 +1,9 @@
 package com.zylex.livebetbot.model;
 
-public class TotalMoreLess {
+/**
+ * Total-more-less model.
+ */
+public class Tml {
 
     private MoreLess moreLess;
 
@@ -8,7 +11,7 @@ public class TotalMoreLess {
 
     private double coefficient;
 
-    public TotalMoreLess(MoreLess moreLess, double size, double coefficient) {
+    public Tml(MoreLess moreLess, double size, double coefficient) {
         this.moreLess = moreLess;
         this.size = size;
         this.coefficient = coefficient;

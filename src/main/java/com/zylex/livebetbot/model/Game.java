@@ -16,7 +16,7 @@ public class Game {
 
     private Goal finalGoal;
 
-    private List<TotalMoreLess> totalMoreLessList;
+    private List<Tml> TmlList;
 
     private String link;
 
@@ -59,12 +59,12 @@ public class Game {
         this.finalGoal = finalGoal;
     }
 
-    public List<TotalMoreLess> getTotalMoreLessList() {
-        return totalMoreLessList;
+    public List<Tml> getTotalMoreLessList() {
+        return TmlList;
     }
 
-    public void setTotalMoreLessList(List<TotalMoreLess> totalMoreLessList) {
-        this.totalMoreLessList = totalMoreLessList;
+    public void setTotalMoreLessList(List<Tml> TmlList) {
+        this.TmlList = TmlList;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class Game {
                 ", secondTeam='" + secondTeam + '\'' +
                 ", breakGoals=" + breakGoals +
                 ", finalGoal=" + finalGoal +
-                ", totalMoreLessList=" + totalMoreLessList +
+                ", totalMoreLessList=" + TmlList +
                 ", link='" + link + '\'' +
                 '}';
     }

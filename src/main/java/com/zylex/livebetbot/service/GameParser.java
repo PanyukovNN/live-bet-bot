@@ -3,7 +3,7 @@ package com.zylex.livebetbot.service;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.Goal;
 import com.zylex.livebetbot.model.MoreLess;
-import com.zylex.livebetbot.model.TotalMoreLess;
+import com.zylex.livebetbot.model.Tml;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -47,7 +47,7 @@ class GameParser {
         return new Goal(homeGoals, awayGoals);
     }
 
-    private List<TotalMoreLess> findTotalMoreLess() {
+    private List<Tml> findTotalMoreLess() {
         waitElementWithClassName("MarketT");
         Document document = Jsoup.parse(driver.getPageSource());
         Elements marketElements = document.select("div.MarketT");
@@ -57,20 +57,20 @@ class GameParser {
                     return header.contains("тотал") || header.contains("Тотал");
                 })
                 .collect(Collectors.toList());
-        List<TotalMoreLess> totalMoreLessList = new ArrayList<>();
+        List<Tml> TmlList = new ArrayList<>();
         for (Element marketElement : totalMoreLessMarketElements) {
             Elements totalMoreLessElements = marketElement.select("table > tbody > tr");
             for (Element totalMoreLessElement : totalMoreLessElements) {
                 double moreSize = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
                 double moreCoefficient = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
-                totalMoreLessList.add(new TotalMoreLess(MoreLess.MORE, moreSize, moreCoefficient));
+                TmlList.add(new Tml(MoreLess.MORE, moreSize, moreCoefficient));
 
                 double lessSize = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
                 double lessCoefficient = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
-                totalMoreLessList.add(new TotalMoreLess(MoreLess.LESS, lessSize, lessCoefficient));
+                TmlList.add(new Tml(MoreLess.LESS, lessSize, lessCoefficient));
             }
         }
-        return totalMoreLessList;
+        return TmlList;
     }
 
     private WebElement waitElementWithClassName(String className) {
