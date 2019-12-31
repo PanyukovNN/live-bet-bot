@@ -9,7 +9,6 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -53,9 +52,7 @@ public class CountryParser {
     private List<Game> findBreakGames(List<String> countryLinks) {
         List<Game> games = new ArrayList<>();
         for (String countryLink : countryLinks) {
-            driver.navigate().to("http://ballchockdee.com" + countryLink);
-            waitElementWithId("bu:od:go:mt:2").click(); // click on gandicap
-            waitElementsWithClassName("Hdp");
+            prepareWebpage(countryLink);
             Document document = Jsoup.parse(driver.getPageSource());
             Elements gameElements = document.select("table.Hdp > tbody > tr");
             for (Element gameElement : gameElements) {
@@ -75,15 +72,12 @@ public class CountryParser {
         return games;
     }
 
-    private WebElement waitElementWithId(String id) {
+    private void prepareWebpage(String countryLink) {
+        driver.navigate().to("http://ballchockdee.com" + countryLink);
         wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(By.id(id)));
-        return driver.findElement(By.id(id));
-    }
-
-    private List<WebElement> waitElementsWithClassName(String className) {
+                .until(ExpectedConditions.presenceOfElementLocated(By.id("bu:od:go:mt:2")));
+        driver.findElement(By.id("bu:od:go:mt:2")).click();
         wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(By.className(className)));
-        return driver.findElements(By.className(className));
+                .until(ExpectedConditions.presenceOfElementLocated(By.className("Hdp")));
     }
 }

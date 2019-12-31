@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * Thread for parsing one league link.
  */
-public class GameParser {
+class GameParser {
 
     private WebDriver driver;
 
@@ -33,11 +33,10 @@ public class GameParser {
         this.wait = new WebDriverWait(driver, 5);
     }
 
-    public Game parse(Game game) {
+    void parse(Game game) {
         driver.navigate().to("http://ballchockdee.com" + game.getLink());
         game.setBreakGoals(findGoal());
         game.setTotalMoreLessList(findTotalMoreLess());
-        return null;
     }
 
     private Goal findGoal() {
@@ -61,7 +60,6 @@ public class GameParser {
         List<TotalMoreLess> totalMoreLessList = new ArrayList<>();
         for (Element marketElement : totalMoreLessMarketElements) {
             Elements totalMoreLessElements = marketElement.select("table > tbody > tr");
-            System.out.println(totalMoreLessElements.size());
             for (Element totalMoreLessElement : totalMoreLessElements) {
                 double moreSize = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
                 double moreCoefficient = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
