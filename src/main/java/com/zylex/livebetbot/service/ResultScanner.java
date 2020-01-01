@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
-public class BetProcessor {
+public class ResultScanner {
 
     private static WebDriverWait wait;
 
