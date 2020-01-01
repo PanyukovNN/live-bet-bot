@@ -1,6 +1,8 @@
 package com.zylex.livebetbot.service;
 
 import com.zylex.livebetbot.DriverManager;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -21,13 +23,16 @@ public class ResultScanner {
 
     public void process() {
         DriverManager driverManager = new DriverManager();
-        driver = driverManager.initiateDriver(true);
+        driver = driverManager.initiateDriver(false);
         wait = new WebDriverWait(driver, 5);
         try {
             driver.navigate().to("http://ballchockdee.com");
             logIn();
-            Thread.sleep(5000);
-        } catch (InterruptedException | IOException e) {
+            driver.navigate().to("73s76i74d04n.asia.ballchockdee.com/web-root/restricted/result/results-more.aspx");
+            waitElementsWithClassName("ContentTable");
+            Document document = Jsoup.parse(driver.getPageSource());
+            System.out.println(document.html());
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             driverManager.quitDriver();
@@ -41,7 +46,8 @@ public class ResultScanner {
             waitElementWithId("username").sendKeys(property.getProperty("LiveBetBot.login"));
             waitElementWithId("password").sendKeys(property.getProperty("LiveBetBot.password"));
             waitElementWithClassName("sign-in").click();
-            driver.navigate().to(property.getProperty("logHash") + ".ballchockdee.com/ru-ru/euro/");
+            System.out.println(property.getProperty("LiveBetBot.logHash") + ".ballchockdee.com/ru-ru/euro/");
+            driver.navigate().to(property.getProperty("LiveBetBot.logHash") + ".ballchockdee.com/ru-ru/euro/");
         }
     }
 
