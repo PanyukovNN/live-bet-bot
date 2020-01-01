@@ -17,15 +17,21 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 public class CountryParser {
 
     private WebDriver driver;
 
     private WebDriverWait wait;
 
-    CountryParser(WebDriver driver) {
+    private List<Game> noResultGames;
+
+    CountryParser(WebDriver driver, List<Game> noResultGames) {
         this.driver = driver;
         wait = new WebDriverWait(driver, 5);
+        this.noResultGames = noResultGames;
+        System.out.println("\nNo result games: ");
+        noResultGames.forEach(System.out::println);
     }
 
     List<Game> parse() {
@@ -59,12 +65,18 @@ public class CountryParser {
 //                Element dateTimeText = market.selectFirst("div.DateTimeTxt");
 //                if (dateTimeText.text().contains("Перерыв")) {
                 // TODO check NPE
-                String firstTeam = gameElement.selectFirst("td > a.OddsTabL > span.OddsL").text();
-                String secondTeam = gameElement.selectFirst("td > a.OddsTabR > span.OddsL").text();
-                String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
-                Game game = new Game(0, LocalDate.now(), firstTeam, secondTeam, gameLink);
-                if (!games.contains(game)) {
+                try {
+                    String firstTeam = gameElement.selectFirst("td > a.OddsTabL > span.OddsL").text();
+                    String secondTeam = gameElement.selectFirst("td > a.OddsTabR > span.OddsL").text();
+                    String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
+                    Game game = new Game(0, LocalDate.now(), firstTeam, secondTeam, gameLink);
+                    //TODO check game date
+                    if (noResultGames.contains(game) || games.contains(game)) {
+                        continue;
+                    }
                     games.add(game);
+                } catch (NullPointerException e) {
+                    System.out.println("Exception when parsing this: " + gameElement.text() + "; page link: http://ballchockdee.com" + countryLink);
                 }
 //                }
             }

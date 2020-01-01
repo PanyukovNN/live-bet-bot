@@ -19,14 +19,15 @@ public class LiveBetBotApplication {
 
     public static void main(String[] args) {
         try (Connection connection = getConnection()) {
+            GameDao gameDao = new GameDao(connection);
             Map<RuleNumber, List<Game>> ruleGames =
                 new RuleProcessor(
                     new ParseProcessor(
-                        new DriverManager()
+                        new DriverManager(),
+                        gameDao
                     )).process();
             System.out.println();
             ruleGames.forEach((k, v) -> v.forEach(System.out::println));
-            GameDao gameDao = new GameDao(connection);
             ruleGames.forEach((k, v) -> v.forEach(gameDao::save));
         } catch (SQLException e) {
             throw new LiveBetBotException(e.getMessage(), e);

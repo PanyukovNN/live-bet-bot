@@ -19,9 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Thread for parsing one league link.
- */
 class GameParser {
 
     private WebDriver driver;
@@ -30,13 +27,13 @@ class GameParser {
 
     GameParser(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, 5);
+        this.wait = new WebDriverWait(driver, 15);
     }
 
     void parse(Game game) {
         driver.navigate().to("http://ballchockdee.com" + game.getLink());
         game.setBreakGoals(findGoal());
-        game.setTmlList(findTotalMoreLess());
+        game.setTmlList(findTml());
     }
 
     private Goal findGoal() {
@@ -47,27 +44,34 @@ class GameParser {
         return new Goal(homeGoals, awayGoals);
     }
 
-    private List<Tml> findTotalMoreLess() {
+    private List<Tml> findTml() {
         waitElementWithClassName("MarketT");
         Document document = Jsoup.parse(driver.getPageSource());
         Elements marketElements = document.select("div.MarketT");
-        List<Element> totalMoreLessMarketElements = marketElements.stream()
+        List<Element> tmlMarketElements = marketElements.stream()
                 .filter(market -> {
                     String header = market.select("div.SubHead > span").text();
-                    return header.contains("тотал") || header.contains("Тотал");
+                    return header.contains("Первая половина: тотал (больше/меньше)") || header.contains("Тотал (больше/меньше)");
                 })
                 .collect(Collectors.toList());
         List<Tml> TmlList = new ArrayList<>();
-        for (Element marketElement : totalMoreLessMarketElements) {
-            Elements totalMoreLessElements = marketElement.select("table > tbody > tr");
-            for (Element totalMoreLessElement : totalMoreLessElements) {
-                double moreSize = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
-                double moreCoefficient = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
-                TmlList.add(new Tml(MoreLess.MORE, moreSize, moreCoefficient));
+        for (Element marketElement : tmlMarketElements) {
+            Elements tmlElements = marketElement.select("table > tbody > tr");
+            for (Element tmlElement : tmlElements) {
+                if (tmlElement.className().equals("OddsClosed")) {
+                    continue;
+                }
+                try {
+                    double moreSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
+                    double moreCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
+                    TmlList.add(new Tml(0, 0, MoreLess.MORE, moreSize, moreCoefficient));
 
-                double lessSize = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
-                double lessCoefficient = Double.parseDouble(totalMoreLessElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
-                TmlList.add(new Tml(MoreLess.LESS, lessSize, lessCoefficient));
+                    double lessSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
+                    double lessCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
+                    TmlList.add(new Tml(0, 0, MoreLess.LESS, lessSize, lessCoefficient));
+                } catch (NullPointerException e) {
+                    System.out.println("Exception when parsing this: " + tmlElement + "; on page: " + driver.getCurrentUrl());
+                }
             }
         }
         return TmlList;
