@@ -62,7 +62,7 @@ public class CountryParser {
                 String firstTeam = gameElement.selectFirst("td > a.OddsTabL > span.OddsL").text();
                 String secondTeam = gameElement.selectFirst("td > a.OddsTabR > span.OddsL").text();
                 String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
-                Game game = new Game(LocalDate.now(), firstTeam, secondTeam, gameLink);
+                Game game = new Game(0, LocalDate.now(), firstTeam, secondTeam, gameLink);
                 if (!games.contains(game)) {
                     games.add(game);
                 }

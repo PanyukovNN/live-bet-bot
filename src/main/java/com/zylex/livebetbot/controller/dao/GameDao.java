@@ -14,22 +14,11 @@ public class GameDao {
 
     private final TmlDao tmlDao;
 
-    public GameDao(final Connection connection, final TmlDao tmlDao) {
+    public GameDao(final Connection connection) {
         this.connection = connection;
-        this.tmlDao = tmlDao;
+        this.tmlDao = new TmlDao(connection);
     }
 
-
-//        id                BIGSERIAL NOT NULL PRIMARY KEY,
-//        date_time         TIMESTAMP NOT NULL,
-//        first_team        VARCHAR(50) NOT NULL,
-//        second_team       VARCHAR(50) NOT NULL,
-//        home_goal_break   INT NOT NULL,
-//        away_goal_break   INT NOT NULL,
-//        home_goal_final   INT,
-//        away_goal_final   INT,
-//        rule_number       VARCHAR(100),
-//        link              VARCHAR(500)
     public Game get(Game game) {
         try (PreparedStatement statement = connection.prepareStatement(SQLGame.GET.QUERY)) {
             statement.setDate(1, Date.valueOf(game.getDate()));

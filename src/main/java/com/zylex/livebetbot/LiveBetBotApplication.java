@@ -1,5 +1,6 @@
 package com.zylex.livebetbot;
 
+import com.zylex.livebetbot.controller.dao.GameDao;
 import com.zylex.livebetbot.exception.LiveBetBotException;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.ParseProcessor;
@@ -25,6 +26,8 @@ public class LiveBetBotApplication {
                     )).process();
             System.out.println();
             ruleGames.forEach((k, v) -> v.forEach(System.out::println));
+            GameDao gameDao = new GameDao(connection);
+            ruleGames.forEach((k, v) -> v.forEach(gameDao::save));
         } catch (SQLException e) {
             throw new LiveBetBotException(e.getMessage(), e);
         }
