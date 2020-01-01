@@ -30,8 +30,6 @@ public class CountryParser {
         this.driver = driver;
         wait = new WebDriverWait(driver, 5);
         this.noResultGames = noResultGames;
-        System.out.println("\nNo result games: ");
-        noResultGames.forEach(System.out::println);
     }
 
     List<Game> parse() {

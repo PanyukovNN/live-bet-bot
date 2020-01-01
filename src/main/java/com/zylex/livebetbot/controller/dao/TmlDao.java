@@ -1,6 +1,6 @@
 package com.zylex.livebetbot.controller.dao;
 
-import com.zylex.livebetbot.exception.GameDaoException;
+import com.zylex.livebetbot.exception.TmlDaoException;
 import com.zylex.livebetbot.model.MoreLess;
 import com.zylex.livebetbot.model.Tml;
 
@@ -28,7 +28,7 @@ public class TmlDao {
             }
             return new Tml();
         } catch (SQLException e) {
-            throw new GameDaoException(e.getMessage(), e);
+            throw new TmlDaoException(e.getMessage(), e);
         }
     }
 
@@ -42,7 +42,7 @@ public class TmlDao {
             }
             return tmlList;
         } catch (SQLException e) {
-            throw new GameDaoException(e.getMessage(), e);
+            throw new TmlDaoException(e.getMessage(), e);
         }
     }
 
@@ -75,7 +75,7 @@ public class TmlDao {
                 }
             }
         } catch (SQLException e) {
-            throw new GameDaoException(e.getMessage(), e);
+            throw new TmlDaoException(e.getMessage(), e);
         }
     }
 
