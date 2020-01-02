@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS game (
     home_goal_final   INT,
     away_goal_final   INT,
     rule_number       VARCHAR(100),
-    link              VARCHAR(500)
+    link              VARCHAR(500),
+    append_time       TIMESTAMP
 );
 
 DROP TABLE IF EXISTS tml CASCADE;

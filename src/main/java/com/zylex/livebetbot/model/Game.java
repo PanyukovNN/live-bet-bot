@@ -121,8 +121,6 @@ public class Game {
                 breakGoal.getAwayGoals(),
                 finalGoal.getHomeGoals(),
                 finalGoal.getAwayGoals(),
-                (ruleNumber == null
-                        ? " (NO RULE) "
-                        : " (" + ruleNumber.toString() + ") "));
+                ruleNumber.toString());
     }
 }

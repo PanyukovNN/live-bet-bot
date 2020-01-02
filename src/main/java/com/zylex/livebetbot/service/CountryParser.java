@@ -61,8 +61,8 @@ public class CountryParser {
 //                Element dateTimeText = market.selectFirst("div.DateTimeTxt");
 //                if (dateTimeText.text().contains("Перерыв")) {
                 try {
-                    String firstTeam = gameElement.selectFirst("td > a.OddsTabL > span.OddsL").text();
-                    String secondTeam = gameElement.selectFirst("td > a.OddsTabR > span.OddsL").text();
+                    String firstTeam = gameElement.selectFirst("span.OddsL").text();
+                    String secondTeam = gameElement.selectFirst("span.OddsL").text();
                     String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
                     Game game = new Game(0, LocalDate.now(), firstTeam, secondTeam, gameLink);
                     if (noResultGames.contains(game) || games.contains(game)) {

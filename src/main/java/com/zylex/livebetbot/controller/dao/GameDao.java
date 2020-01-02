@@ -7,6 +7,7 @@ import com.zylex.livebetbot.service.rule.RuleNumber;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,6 +86,9 @@ public class GameDao {
             statement.setInt(7, game.getFinalGoal().getAwayGoals());
             statement.setString(8, game.getRuleNumber().toString());
             statement.setString(9, game.getLink());
+            if (sqlRequest == SQLGame.INSERT) {
+                statement.setTimestamp(10, Timestamp.valueOf(LocalDateTime.now()));
+            }
             if (sqlRequest == SQLGame.UPDATE) {
                 statement.setLong(10, game.getId());
             }
@@ -105,7 +109,7 @@ public class GameDao {
     enum SQLGame {
         GET("SELECT * FROM game WHERE date_time = (?) AND first_team = (?) AND second_team = (?) AND rule_number = (?)"),
         GET_WITH_NO_RESULT("SELECT * FROM game WHERE home_goal_final = -1 AND away_goal_final = -1"),
-        INSERT("INSERT INTO game (id, date_time, first_team, second_team, home_goal_break, away_goal_break, home_goal_final, away_goal_final, rule_number, link) VALUES (DEFAULT, (?), (?), (?), (?), (?), (?), (?), (?), (?))"),
+        INSERT("INSERT INTO game (id, date_time, first_team, second_team, home_goal_break, away_goal_break, home_goal_final, away_goal_final, rule_number, link, append_time) VALUES (DEFAULT, (?), (?), (?), (?), (?), (?), (?), (?), (?), (?))"),
         UPDATE("UPDATE game SET date_time = (?), first_team = (?), second_team = (?), home_goal_break = (?), away_goal_break = (?), home_goal_final = (?), away_goal_final = (?), rule_number = (?), link = (?) WHERE id = (?)");
 
         String QUERY;
