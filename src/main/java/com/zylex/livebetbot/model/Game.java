@@ -3,6 +3,7 @@ package com.zylex.livebetbot.model;
 import com.zylex.livebetbot.service.rule.RuleNumber;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,7 +17,7 @@ public class Game {
 
     private String secondTeam;
 
-    private Goal breakGoals = new Goal(-1, -1);
+    private Goal breakGoal = new Goal(-1, -1);
 
     private Goal finalGoal = new Goal(-1, -1);
 
@@ -54,11 +55,11 @@ public class Game {
     }
 
     public Goal getBreakGoal() {
-        return breakGoals;
+        return breakGoal;
     }
 
-    public void setBreakGoals(Goal breakGoals) {
-        this.breakGoals = breakGoals;
+    public void setBreakGoal(Goal breakGoal) {
+        this.breakGoal = breakGoal;
     }
 
     public Goal getFinalGoal() {
@@ -111,15 +112,18 @@ public class Game {
 
     @Override
     public String toString() {
-        return "Game{" +
-                "date=" + date +
-                ", firstTeam='" + firstTeam + '\'' +
-                ", secondTeam='" + secondTeam + '\'' +
-                ", breakGoals=" + breakGoals +
-                ", finalGoal=" + finalGoal +
-                ", TmlList=" + tmlList +
-                ", link='" + link + '\'' +
-                ", ruleNumber=" + ruleNumber +
-                '}';
+
+        DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
+        return DATE_FORMATTER.format(date)
+                      + firstTeam +
+                " - " + secondTeam +
+                " ("  + breakGoal.getHomeGoals() +
+                ":"   + breakGoal.getAwayGoals() +
+                ") (" + finalGoal.getHomeGoals() +
+                ":"   + finalGoal.getAwayGoals() +
+                ") "  +
+                (ruleNumber == null
+                        ? " (NO RULE) "
+                        : " (" + ruleNumber.toString() + ") ");
     }
 }

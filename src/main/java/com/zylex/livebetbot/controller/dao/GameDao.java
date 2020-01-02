@@ -64,7 +64,7 @@ public class GameDao {
         RuleNumber ruleNumber = RuleNumber.valueOf(resultSet.getString("rule_number"));
         String link = resultSet.getString("link");
         Game extractedGame = new Game(id, dateTime, firstTeam, secondTeam, link);
-        extractedGame.setBreakGoals(breakGoal);
+        extractedGame.setBreakGoal(breakGoal);
         extractedGame.setFinalGoal(finalGoal);
         extractedGame.setRuleNumber(ruleNumber);
         extractedGame.setTmlList(tmlDao.getByGameId(id));
