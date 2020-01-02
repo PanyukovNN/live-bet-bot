@@ -43,8 +43,15 @@ public abstract class ConsoleLogger {
         }
     }
 
-    public static void endMessage() {
-        writeInLine("\nBot work completed in " + computeTime(programStartTime.get()));
+    public static void endMessage(LogType type) {
+        if (type == LogType.BOT_END) {
+            String output = "\nBot work completed in " + computeTime(programStartTime.get())
+            + "\n" + StringUtils.repeat("*", 50);
+            writeInLine(output);
+        } else if (type == LogType.BLOCK_END) {
+            String output = "\n" + StringUtils.repeat("~", 50);
+            writeInLine(output);
+        }
     }
 
     private synchronized static void addToLog(String line) {

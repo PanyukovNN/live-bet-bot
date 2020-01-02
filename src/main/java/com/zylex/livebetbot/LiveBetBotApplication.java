@@ -2,6 +2,7 @@ package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.controller.dao.GameDao;
 import com.zylex.livebetbot.controller.logger.ConsoleLogger;
+import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.exception.LiveBetBotException;
 import com.zylex.livebetbot.service.DriverManager;
 
@@ -36,7 +37,7 @@ public class LiveBetBotApplication {
             throw new LiveBetBotException(e.getMessage(), e);
         } finally {
             driverManager.quitDriver();
-            ConsoleLogger.endMessage();
+            ConsoleLogger.endMessage(LogType.BOT_END);
             ConsoleLogger.writeToLogFile();
             System.exit(0);
         }

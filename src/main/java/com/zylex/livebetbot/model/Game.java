@@ -112,18 +112,17 @@ public class Game {
 
     @Override
     public String toString() {
-
         DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
-        return DATE_FORMATTER.format(date)
-                      + firstTeam +
-                " - " + secondTeam +
-                " ("  + breakGoal.getHomeGoals() +
-                ":"   + breakGoal.getAwayGoals() +
-                ") (" + finalGoal.getHomeGoals() +
-                ":"   + finalGoal.getAwayGoals() +
-                ") "  +
+        return String.format("%s %s - %s (%d:%d) (%d:%d) (%s)",
+                DATE_FORMATTER.format(date),
+                firstTeam,
+                secondTeam,
+                breakGoal.getHomeGoals(),
+                breakGoal.getAwayGoals(),
+                finalGoal.getHomeGoals(),
+                finalGoal.getAwayGoals(),
                 (ruleNumber == null
                         ? " (NO RULE) "
-                        : " (" + ruleNumber.toString() + ") ");
+                        : " (" + ruleNumber.toString() + ") "));
     }
 }

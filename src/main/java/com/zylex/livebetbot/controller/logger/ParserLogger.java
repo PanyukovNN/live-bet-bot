@@ -20,7 +20,7 @@ public class ParserLogger extends ConsoleLogger {
 
     public synchronized void startLogMessage(LogType type, Integer arg) {
         if (type == LogType.PARSING_START) {
-            writeInLine("\n    Parsing started at " + computeTime(System.currentTimeMillis()));
+            writeInLine("\nParsing started at " + computeTime(System.currentTimeMillis()));
             writeInLine("\nFinding countries: ...");
         } else if (type == LogType.COUNTRIES) {
             totalCountries = arg;
