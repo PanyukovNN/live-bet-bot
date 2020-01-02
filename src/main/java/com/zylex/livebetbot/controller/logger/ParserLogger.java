@@ -20,7 +20,7 @@ public class ParserLogger extends ConsoleLogger {
 
     public synchronized void startLogMessage(LogType type, Integer arg) {
         if (type == LogType.PARSING_START) {
-            writeInLine("\nParsing started.");
+            writeInLine("\n    Parsing started at " + computeTime(System.currentTimeMillis()));
             writeInLine("\nFinding countries: ...");
         } else if (type == LogType.COUNTRIES) {
             totalCountries = arg;
@@ -37,6 +37,7 @@ public class ParserLogger extends ConsoleLogger {
     public void logCountriesFound() {
         String output = "Finding countries: complete";
         writeInLine(StringUtils.repeat("\b", output.length()) + output);
+        writeLineSeparator();
     }
 
     public synchronized void logCountry() {
@@ -57,8 +58,8 @@ public class ParserLogger extends ConsoleLogger {
                 new DecimalFormat("#0.0").format(((double) processedGames.get() / (double) totalGames) * 100).replace(",", "."));
         writeInLine(StringUtils.repeat("\b", output.length()) + output);
         if (processedGames.get() == totalGames) {
-            parsingComplete();
             writeLineSeparator();
+            parsingComplete();
         }
     }
 
