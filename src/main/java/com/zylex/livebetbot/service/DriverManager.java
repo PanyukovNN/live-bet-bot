@@ -1,4 +1,4 @@
-package com.zylex.livebetbot;
+package com.zylex.livebetbot.service;
 
 import com.zylex.livebetbot.controller.logger.DriverConsoleLogger;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -21,18 +21,17 @@ public class DriverManager {
     private WebDriver driver;
 
     public WebDriver getDriver() {
+        if (driver == null) {
+            initiateDriver(false);
+        }
         return driver;
     }
 
     /**
      * Initiate web driver and return it.
      * @param headless - flag for headless driver.
-     * @return - instance of web driver.
      */
-    public WebDriver initiateDriver(boolean headless) {
-        if (driver != null) {
-            return driver;
-        }
+    public void initiateDriver(boolean headless) {
         WebDriverManager.chromedriver().setup();
         setUpLogging();
         driver = headless
@@ -40,7 +39,6 @@ public class DriverManager {
                 : new ChromeDriver();
         manageDriver();
         logger.logDriver();
-        return driver;
     }
 
     private void manageDriver() {

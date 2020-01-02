@@ -62,19 +62,17 @@ public class CountryParser {
             for (Element gameElement : gameElements) {
 //                Element dateTimeText = market.selectFirst("div.DateTimeTxt");
 //                if (dateTimeText.text().contains("Перерыв")) {
-                // TODO check NPE
                 try {
                     String firstTeam = gameElement.selectFirst("td > a.OddsTabL > span.OddsL").text();
                     String secondTeam = gameElement.selectFirst("td > a.OddsTabR > span.OddsL").text();
                     String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
                     Game game = new Game(0, LocalDate.now(), firstTeam, secondTeam, gameLink);
-                    //TODO check game date
                     if (noResultGames.contains(game) || games.contains(game)) {
                         continue;
                     }
                     games.add(game);
                 } catch (NullPointerException e) {
-                    System.out.println("Exception when parsing this: " + gameElement.text() + "; page link: http://ballchockdee.com" + countryLink);
+                    System.out.println("Exception when parsing this: " + gameElement.html() + "; page link: http://ballchockdee.com" + countryLink);
                 }
 //                }
             }

@@ -1,6 +1,5 @@
 package com.zylex.livebetbot.service;
 
-import com.zylex.livebetbot.DriverManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
@@ -23,7 +22,7 @@ public class ResultScanner {
 
     public void process() {
         DriverManager driverManager = new DriverManager();
-        driver = driverManager.initiateDriver(false);
+        driver = driverManager.getDriver();
         wait = new WebDriverWait(driver, 5);
         try {
             driver.navigate().to("http://ballchockdee.com");
@@ -34,8 +33,6 @@ public class ResultScanner {
             System.out.println(document.html());
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            driverManager.quitDriver();
         }
     }
 
