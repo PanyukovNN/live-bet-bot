@@ -1,5 +1,7 @@
 package com.zylex.livebetbot.service;
 
+import com.zylex.livebetbot.controller.logger.LogType;
+import com.zylex.livebetbot.controller.logger.ParserLogger;
 import com.zylex.livebetbot.exception.CountryParserException;
 import com.zylex.livebetbot.model.Game;
 import org.jsoup.Jsoup;
@@ -26,36 +28,32 @@ public class CountryParser {
 
     private List<Game> noResultGames;
 
-    CountryParser(WebDriver driver, List<Game> noResultGames) {
+    private ParserLogger logger;
+
+    CountryParser(WebDriver driver, List<Game> noResultGames, ParserLogger logger) {
         this.driver = driver;
         wait = new WebDriverWait(driver, 5);
         this.noResultGames = noResultGames;
+        this.logger = logger;
     }
 
     List<Game> parse() {
         try {
-            return findBreakGames(
-                    parseCountryLinks()
-            );
+            List<String> countryLinks = parseCountryLinks();
+            logger.logCountriesFound();
+            logger.startLogMessage(LogType.COUNTRIES, countryLinks.size());
+            List<Game> breakGames = findBreakGames(countryLinks);
+            logger.startLogMessage(LogType.GAMES, breakGames.size());
+            return breakGames;
         } catch (IOException e) {
             throw new CountryParserException(e.getMessage(), e);
         }
     }
 
-    private List<String> parseCountryLinks() throws IOException {
-        Document document = Jsoup.connect("http://ballchockdee.com/ru-ru/euro/ставки-live/футбол")
-                .userAgent("Chrome/4.0.249.0 Safari/532.5")
-                .referrer("http://www.google.com")
-                .get();
-        Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
-        List<String> countryLinks = new ArrayList<>();
-        elements.forEach(element -> countryLinks.add(element.attr("href")));
-        return countryLinks;
-    }
-
     private List<Game> findBreakGames(List<String> countryLinks) {
         List<Game> games = new ArrayList<>();
         for (String countryLink : countryLinks) {
+            logger.logCountry();
             prepareWebpage(countryLink);
             Document document = Jsoup.parse(driver.getPageSource());
             Elements gameElements = document.select("table.Hdp > tbody > tr");
@@ -78,6 +76,17 @@ public class CountryParser {
             }
         }
         return games;
+    }
+
+    private List<String> parseCountryLinks() throws IOException {
+        Document document = Jsoup.connect("http://ballchockdee.com/ru-ru/euro/ставки-live/футбол")
+                .userAgent("Chrome/4.0.249.0 Safari/532.5")
+                .referrer("http://www.google.com")
+                .get();
+        Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
+        List<String> countryLinks = new ArrayList<>();
+        elements.forEach(element -> countryLinks.add(element.attr("href")));
+        return countryLinks;
     }
 
     private void prepareWebpage(String countryLink) {

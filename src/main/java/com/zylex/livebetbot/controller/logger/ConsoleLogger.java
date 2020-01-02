@@ -3,10 +3,7 @@ package com.zylex.livebetbot.controller.logger;
 import com.zylex.livebetbot.exception.ConsoleLoggerException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;

@@ -1,5 +1,6 @@
 package com.zylex.livebetbot.service;
 
+import com.zylex.livebetbot.controller.logger.ParserLogger;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.Goal;
 import com.zylex.livebetbot.model.MoreLess;
@@ -25,12 +26,16 @@ class GameParser {
 
     private WebDriverWait wait;
 
-    GameParser(WebDriver driver) {
+    private ParserLogger logger;
+
+    GameParser(WebDriver driver, ParserLogger logger) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, 15);
+        this.logger = logger;
     }
 
     void parse(Game game) {
+        logger.logGame();
         driver.navigate().to("http://ballchockdee.com" + game.getLink());
         game.setBreakGoals(findGoal());
         game.setTmlList(findTml());

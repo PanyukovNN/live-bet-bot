@@ -27,10 +27,12 @@ public class LiveBetBotApplication {
                     driverManager
             );
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleAtFixedRate(st, 0, 1, TimeUnit.MINUTES);
+            scheduler.scheduleAtFixedRate(st, 0, 10, TimeUnit.MINUTES);
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            //noinspection StatementWithEmptyBody
             while (!reader.readLine().equals("exit")) {
             }
+            System.exit(0);
         } catch (SQLException | IOException e) {
             throw new LiveBetBotException(e.getMessage(), e);
         } finally {

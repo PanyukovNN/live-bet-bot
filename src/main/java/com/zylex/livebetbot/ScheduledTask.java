@@ -8,8 +8,8 @@ import com.zylex.livebetbot.service.rule.RuleProcessor;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.TimerTask;
 
+@SuppressWarnings("WeakerAccess")
 public class ScheduledTask implements Runnable {
 
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm a");
@@ -25,7 +25,6 @@ public class ScheduledTask implements Runnable {
 
     @Override
     public void run() {
-        System.out.print("\nScanning (" + LocalDateTime.now().format(formatter) + ")");
         new Saver(
             new RuleProcessor(
                 new ParseProcessor(
