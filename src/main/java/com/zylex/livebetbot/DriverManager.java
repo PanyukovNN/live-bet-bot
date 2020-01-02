@@ -20,6 +20,10 @@ public class DriverManager {
 
     private WebDriver driver;
 
+    public WebDriver getDriver() {
+        return driver;
+    }
+
     /**
      * Initiate web driver and return it.
      * @param headless - flag for headless driver.

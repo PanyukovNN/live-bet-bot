@@ -1,18 +1,16 @@
 package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.controller.dao.GameDao;
+import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.exception.LiveBetBotException;
-import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.ParseProcessor;
-import com.zylex.livebetbot.service.rule.RuleNumber;
+import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.rule.RuleProcessor;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 public class LiveBetBotApplication {
@@ -20,17 +18,18 @@ public class LiveBetBotApplication {
     public static void main(String[] args) {
         try (Connection connection = getConnection()) {
             GameDao gameDao = new GameDao(connection);
-            Map<RuleNumber, List<Game>> ruleGames =
+            new Saver(
                 new RuleProcessor(
                     new ParseProcessor(
                         new DriverManager(),
                         gameDao
-                    )).process();
-            System.out.println();
-            ruleGames.forEach((k, v) -> v.forEach(System.out::println));
-            ruleGames.forEach((k, v) -> v.forEach(gameDao::save));
+                    )),
+                gameDao
+            ).save();
         } catch (SQLException e) {
             throw new LiveBetBotException(e.getMessage(), e);
+        } finally {
+            ConsoleLogger.writeToLogFile();
         }
     }
 

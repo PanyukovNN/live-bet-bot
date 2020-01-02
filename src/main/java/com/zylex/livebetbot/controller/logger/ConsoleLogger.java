@@ -22,11 +22,12 @@ public abstract class ConsoleLogger {
     static AtomicLong programStartTime = new AtomicLong(System.currentTimeMillis());
 
     static {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd hh:mm a");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm a");
         LocalDateTime startDateTime = LocalDateTime.now();
-        logOutput = "\n\n" + StringUtils.repeat("-", 100) + "\n"
+        logOutput = StringUtils.repeat("*", 50) + "\n"
                 + String.format("Bot started at: %s", startDateTime.format(formatter))
-                + "\n" + StringUtils.repeat("-", 50) + "\n";
+                + "\n" + StringUtils.repeat("-", 50);
+        System.out.print(logOutput);
     }
 
     /**
