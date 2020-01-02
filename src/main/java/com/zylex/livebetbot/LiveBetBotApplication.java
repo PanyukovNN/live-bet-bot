@@ -32,12 +32,13 @@ public class LiveBetBotApplication {
             //noinspection StatementWithEmptyBody
             while (!reader.readLine().equals("exit")) {
             }
-            System.exit(0);
         } catch (SQLException | IOException e) {
             throw new LiveBetBotException(e.getMessage(), e);
         } finally {
             driverManager.quitDriver();
+            ConsoleLogger.endMessage();
             ConsoleLogger.writeToLogFile();
+            System.exit(0);
         }
     }
 

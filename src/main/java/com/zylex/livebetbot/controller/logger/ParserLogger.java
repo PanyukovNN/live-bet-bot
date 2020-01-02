@@ -4,8 +4,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.DecimalFormat;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ParserLogger extends ConsoleLogger {
+
+    private AtomicLong parsingStartTime = new AtomicLong(System.currentTimeMillis());
 
     private int totalCountries;
 
@@ -26,7 +29,7 @@ public class ParserLogger extends ConsoleLogger {
             totalGames = arg;
             writeInLine(String.format("\nProcessing games: 0/%d (0.0%%)", arg));
             if (totalGames == 0) {
-                parsingComlete();
+                parsingComplete();
             }
         }
     }
@@ -54,12 +57,13 @@ public class ParserLogger extends ConsoleLogger {
                 new DecimalFormat("#0.0").format(((double) processedGames.get() / (double) totalGames) * 100).replace(",", "."));
         writeInLine(StringUtils.repeat("\b", output.length()) + output);
         if (processedGames.get() == totalGames) {
-            parsingComlete();
+            parsingComplete();
             writeLineSeparator();
         }
     }
 
-    private void parsingComlete() {
-        writeInLine(String.format("\nParsing completed in %s", computeTime(programStartTime.get())));
+    private void parsingComplete() {
+        writeInLine(String.format("\nParsing completed in %s", computeTime(parsingStartTime.get())));
+        writeLineSeparator();
     }
 }

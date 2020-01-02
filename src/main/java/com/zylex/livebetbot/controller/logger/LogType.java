@@ -6,5 +6,5 @@ package com.zylex.livebetbot.controller.logger;
 public enum LogType {
     PARSING_START,
     COUNTRIES,
-    GAMES;
+    GAMES
 }
