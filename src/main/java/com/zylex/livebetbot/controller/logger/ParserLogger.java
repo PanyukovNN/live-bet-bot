@@ -3,6 +3,8 @@ package com.zylex.livebetbot.controller.logger;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -20,7 +22,8 @@ public class ParserLogger extends ConsoleLogger {
 
     public synchronized void startLogMessage(LogType type, Integer arg) {
         if (type == LogType.PARSING_START) {
-            writeInLine("\nParsing started at " + computeTime(System.currentTimeMillis()));
+            DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a dd.MM.yyyy");
+            writeInLine("\nParsing started at " + LocalDateTime.now().format(DATE_TIME_FORMATTER));
             writeInLine("\nFinding countries: ...");
         } else if (type == LogType.COUNTRIES) {
             totalCountries = arg;
