@@ -58,21 +58,20 @@ public class CountryParser {
             Document document = Jsoup.parse(driver.getPageSource());
             Elements gameElements = document.select("table.Hdp > tbody > tr");
             for (Element gameElement : gameElements) {
-//                Element dateTimeText = market.selectFirst("div.DateTimeTxt");
-//                if (dateTimeText.text().contains("Перерыв")) {
-                try {
-                    String firstTeam = gameElement.selectFirst("span.OddsL").text();
-                    String secondTeam = gameElement.selectFirst("span.OddsL").text();
+                Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
+                if (dateTimeText.text().contains("Перерыв")) {
+                    Element firstTeamElement = gameElement.selectFirst("td > a.OddsTabL > span.OddsL");
+                    Element secondTeamElement = gameElement.selectFirst("td > a.OddsTabR > span.OddsL");
+                    if (firstTeamElement == null || secondTeamElement == null) {
+                        continue;
+                    }
                     String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
-                    Game game = new Game(0, LocalDate.now(), firstTeam, secondTeam, gameLink);
+                    Game game = new Game(0, LocalDate.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
                     if (noResultGames.contains(game) || games.contains(game)) {
                         continue;
                     }
                     games.add(game);
-                } catch (NullPointerException e) {
-                    System.out.println("Exception when parsing this: " + gameElement.html() + "; page link: http://ballchockdee.com" + countryLink);
                 }
-//                }
             }
         }
         return games;

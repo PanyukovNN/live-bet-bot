@@ -25,7 +25,7 @@ public class Game {
 
     private String link;
 
-    private RuleNumber ruleNumber;
+    private RuleNumber ruleNumber = null;
 
     public Game(long id, LocalDate date, String firstTeam, String secondTeam, String link) {
         this.id = id;
@@ -112,7 +112,7 @@ public class Game {
 
     @Override
     public String toString() {
-        DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
+        DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         return String.format("%s %s - %s (%d:%d) (%d:%d) (%s)",
                 DATE_FORMATTER.format(date),
                 firstTeam,

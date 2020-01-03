@@ -66,17 +66,13 @@ class GameParser {
                 if (tmlElement.className().equals("OddsClosed")) {
                     continue;
                 }
-                try {
-                    double moreSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
-                    double moreCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
-                    TmlList.add(new Tml(0, 0, MoreLess.MORE, moreSize, moreCoefficient));
+                double moreSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
+                double moreCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
+                TmlList.add(new Tml(0, 0, MoreLess.MORE, moreSize, moreCoefficient));
 
-                    double lessSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
-                    double lessCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
-                    TmlList.add(new Tml(0, 0, MoreLess.LESS, lessSize, lessCoefficient));
-                } catch (NullPointerException e) {
-                    System.out.println("Exception when parsing this: " + tmlElement + "; on page: " + driver.getCurrentUrl());
-                }
+                double lessSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
+                double lessCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
+                TmlList.add(new Tml(0, 0, MoreLess.LESS, lessSize, lessCoefficient));
             }
         }
         return TmlList;
