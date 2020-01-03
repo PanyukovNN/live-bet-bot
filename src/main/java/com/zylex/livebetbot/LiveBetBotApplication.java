@@ -22,14 +22,14 @@ public class LiveBetBotApplication {
     public static void main(String[] args) {
         DriverManager driverManager = new DriverManager();
         driverManager.initiateDriver(true);
-        try (Connection connection = getConnection()) {
+        try (Connection connection = getConnection();
+             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             ScheduledTask st = new ScheduledTask(
                     new GameDao(connection),
                     driverManager
             );
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
             scheduler.scheduleAtFixedRate(st, 0, 10, TimeUnit.MINUTES);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             //noinspection StatementWithEmptyBody
             while (!reader.readLine().equals("exit")) {
             }

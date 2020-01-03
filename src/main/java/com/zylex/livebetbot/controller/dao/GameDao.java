@@ -82,7 +82,7 @@ public class GameDao {
             statement.setString(3, game.getSecondTeam());
             statement.setInt(4, game.getBreakGoal().getHomeGoals());
             statement.setInt(5, game.getBreakGoal().getAwayGoals());
-            statement.setInt(6, game.getFinalGoal().getAwayGoals());
+            statement.setInt(6, game.getFinalGoal().getHomeGoals());
             statement.setInt(7, game.getFinalGoal().getAwayGoals());
             statement.setString(8, game.getRuleNumber().toString());
             statement.setString(9, game.getLink());

@@ -50,6 +50,17 @@ public class CountryParser {
         }
     }
 
+    private List<String> parseCountryLinks() throws IOException {
+        Document document = Jsoup.connect("http://ballchockdee.com/ru-ru/euro/ставки-live/футбол")
+                .userAgent("Chrome/4.0.249.0 Safari/532.5")
+                .referrer("http://www.google.com")
+                .get();
+        Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
+        List<String> countryLinks = new ArrayList<>();
+        elements.forEach(element -> countryLinks.add(element.attr("href")));
+        return countryLinks;
+    }
+
     private List<Game> findBreakGames(List<String> countryLinks) {
         List<Game> games = new ArrayList<>();
         for (String countryLink : countryLinks) {
@@ -75,17 +86,6 @@ public class CountryParser {
             }
         }
         return games;
-    }
-
-    private List<String> parseCountryLinks() throws IOException {
-        Document document = Jsoup.connect("http://ballchockdee.com/ru-ru/euro/ставки-live/футбол")
-                .userAgent("Chrome/4.0.249.0 Safari/532.5")
-                .referrer("http://www.google.com")
-                .get();
-        Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
-        List<String> countryLinks = new ArrayList<>();
-        elements.forEach(element -> countryLinks.add(element.attr("href")));
-        return countryLinks;
     }
 
     private void prepareWebpage(String countryLink) {

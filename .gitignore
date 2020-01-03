@@ -8,3 +8,4 @@ target
 **.zip
 src\main\resources
 **Rule.java
+**.log

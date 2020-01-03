@@ -20,6 +20,6 @@ public class SaverLogger extends ConsoleLogger {
                 writeInLine(String.format("\n%d) %s", ++i, game));
             }
         }
-        endMessage(LogType.BLOCK_END);
+        writeLineSeparator();
     }
 }

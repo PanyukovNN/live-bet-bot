@@ -38,6 +38,14 @@ public class Game {
     public Game() {
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public LocalDate getDate() {
         return date;
     }
@@ -84,14 +92,6 @@ public class Game {
 
     public void setRuleNumber(RuleNumber ruleNumber) {
         this.ruleNumber = ruleNumber;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     @Override
