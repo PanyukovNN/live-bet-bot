@@ -4,6 +4,7 @@ import com.zylex.livebetbot.controller.dao.GameDao;
 import com.zylex.livebetbot.exception.LiveBetBotException;
 import com.zylex.livebetbot.service.DriverManager;
 import com.zylex.livebetbot.service.ParseProcessor;
+import com.zylex.livebetbot.service.ResultScanner;
 import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.rule.RuleProcessor;
 
@@ -30,6 +31,10 @@ public class ScheduledTask implements Runnable {
                     )),
                 gameDao
             ).save();
+            new ResultScanner(
+                driverManager,
+                gameDao
+            ).scan();
         } catch (Exception e) {
             throw new LiveBetBotException(e.getMessage(), e);
         }
