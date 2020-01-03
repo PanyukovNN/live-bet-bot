@@ -6,13 +6,8 @@ import com.zylex.livebetbot.service.ParseProcessor;
 import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.rule.RuleProcessor;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 @SuppressWarnings("WeakerAccess")
 public class ScheduledTask implements Runnable {
-
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm a");
 
     private GameDao gameDao;
 
