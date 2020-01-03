@@ -4,6 +4,7 @@ import com.zylex.livebetbot.controller.dao.GameDao;
 import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ResultScannerLogger;
+import com.zylex.livebetbot.exception.ResultScannerException;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.Goal;
 import org.jsoup.Jsoup;
@@ -40,35 +41,34 @@ public class ResultScanner {
         this.gameDao = gameDao;
     }
 
-    public void scan() throws IOException {
-        logger.startLogMessage();
-        List<Game> noResultGames = gameDao.getNoResultGames();
-        if (noResultGames.isEmpty()) {
+    public void scan() {
+        try {
+            logger.startLogMessage();
+            List<Game> noResultGames = gameDao.getNoResultGames();
+            if (!noResultGames.isEmpty()) {
+                initDriver();
+                String userHash = logIn();
+                processResults(noResultGames, userHash);
+            }
+        } catch (IOException e) {
+            throw new ResultScannerException(e.getMessage(), e);
+        } finally {
             logger.endLogMessage();
             ConsoleLogger.endMessage(LogType.BLOCK_END);
-            return;
         }
-        initDriver();
-        driver.navigate().to("http://ballchockdee.com");
-        String userHash = logIn();
+    }
+
+    private void processResults(List<Game> noResultGames, String userHash) {
         navigateToResultTab(userHash);
         findingResults(noResultGames);
         navigateToYesterdayResultTab();
         findingResults(noResultGames);
-        logger.endLogMessage();
-        ConsoleLogger.endMessage(LogType.BLOCK_END);
-    }
-
-    private void navigateToYesterdayResultTab() {
-        wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(By.name("Yesterday")));
-        driver.findElement(By.name("Yesterday")).click();
-        waitElementWithClassName("ContentTable");
     }
 
     private void initDriver() {
         driver = driverManager.getDriver();
         wait = new WebDriverWait(driver, 5);
+        driver.navigate().to("http://ballchockdee.com");
     }
 
     private String logIn() throws IOException {
@@ -90,11 +90,18 @@ public class ResultScanner {
         waitElementWithClassName("ContentTable");
     }
 
+    private void navigateToYesterdayResultTab() {
+        wait.ignoring(StaleElementReferenceException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(By.name("Yesterday")));
+        driver.findElement(By.name("Yesterday")).click();
+        waitElementWithClassName("ContentTable");
+    }
+
     private void findingResults(List<Game> noResultGames) {
-        noResultGames = removeGameWithResults(noResultGames);
         if (noResultGames.isEmpty()) {
             return;
         }
+        noResultGames = removeGameWithResults(noResultGames);
         Document document = Jsoup.parse(driver.getPageSource());
         Elements gameElements = document.select("table.ContentTable > tbody > tr.tr_odd, table.ContentTable > tbody > tr.tr_even");
         for (Element gameElement : gameElements) {
