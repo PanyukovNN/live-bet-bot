@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS game CASCADE;
 CREATE TABLE IF NOT EXISTS game (
     id                BIGSERIAL NOT NULL PRIMARY KEY,
-    date_time         DATE NOT NULL,
+    date_time         TIMESTAMP NOT NULL,
     first_team        VARCHAR(50) NOT NULL,
     second_team       VARCHAR(50) NOT NULL,
     home_goal_break   INT NOT NULL,
@@ -9,8 +9,7 @@ CREATE TABLE IF NOT EXISTS game (
     home_goal_final   INT,
     away_goal_final   INT,
     rule_number       VARCHAR(100),
-    link              VARCHAR(500),
-    append_time       TIMESTAMP
+    link              VARCHAR(500)
 );
 
 DROP TABLE IF EXISTS tml CASCADE;

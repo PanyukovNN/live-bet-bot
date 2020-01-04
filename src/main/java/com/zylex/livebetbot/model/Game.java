@@ -2,7 +2,7 @@ package com.zylex.livebetbot.model;
 
 import com.zylex.livebetbot.service.rule.RuleNumber;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -11,7 +11,7 @@ public class Game {
 
     private long id;
 
-    private LocalDate date;
+    private LocalDateTime dateTime;
 
     private String firstTeam;
 
@@ -27,9 +27,9 @@ public class Game {
 
     private RuleNumber ruleNumber = null;
 
-    public Game(long id, LocalDate date, String firstTeam, String secondTeam, String link) {
+    public Game(long id, LocalDateTime dateTime, String firstTeam, String secondTeam, String link) {
         this.id = id;
-        this.date = date;
+        this.dateTime = dateTime;
         this.firstTeam = firstTeam;
         this.secondTeam = secondTeam;
         this.link = link;
@@ -46,8 +46,8 @@ public class Game {
         this.id = id;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
     public String getFirstTeam() {
@@ -99,7 +99,7 @@ public class Game {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Game game = (Game) o;
-        return Objects.equals(date, game.date) &&
+        return Objects.equals(dateTime, game.dateTime) &&
                 Objects.equals(firstTeam, game.firstTeam) &&
                 Objects.equals(secondTeam, game.secondTeam) &&
                 Objects.equals(link, game.link);
@@ -107,14 +107,14 @@ public class Game {
 
     @Override
     public int hashCode() {
-        return Objects.hash(date, firstTeam, secondTeam, link);
+        return Objects.hash(dateTime, firstTeam, secondTeam, link);
     }
 
     @Override
     public String toString() {
-        DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a yyyy.MM.dd");
         return String.format("%s %s - %s (%d:%d) (%d:%d) (%s)",
-                DATE_FORMATTER.format(date),
+                DATE_FORMATTER.format(dateTime),
                 firstTeam,
                 secondTeam,
                 breakGoal.getHomeGoals(),
