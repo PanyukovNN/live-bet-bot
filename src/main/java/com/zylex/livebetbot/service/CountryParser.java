@@ -15,7 +15,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,8 +77,8 @@ public class CountryParser {
                         continue;
                     }
                     String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
-                    Game game = new Game(0, LocalDate.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
-                    if (noResultGames.contains(game) || games.contains(game)) {
+                    Game game = new Game(0, LocalDateTime.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
+                    if (noResultGames.contains(game) | games.contains(game)) {
                         continue;
                     }
                     games.add(game);

@@ -7,6 +7,7 @@ import com.zylex.livebetbot.model.Game;
 import org.openqa.selenium.WebDriver;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ParseProcessor {
 
@@ -27,6 +28,7 @@ public class ParseProcessor {
         List<Game> breakGames = new CountryParser(driver, gameDao.getNoResultGames(), logger).parse();
         GameParser gameParser = new GameParser(driver, logger);
         breakGames.forEach(gameParser::parse);
+        AtomicInteger i = new AtomicInteger();
         return breakGames;
     }
 }

@@ -20,6 +20,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -45,6 +48,7 @@ public class ResultScanner {
         try {
             logger.startLogMessage();
             List<Game> noResultGames = gameDao.getNoResultGames();
+            noResultGames = removeOldGames(noResultGames);
             if (!noResultGames.isEmpty()) {
                 initDriver();
                 String userHash = logIn();
@@ -56,6 +60,12 @@ public class ResultScanner {
             logger.endLogMessage();
             ConsoleLogger.endMessage(LogType.BLOCK_END);
         }
+    }
+
+    private List<Game> removeOldGames(List<Game> noResultGames) {
+        return noResultGames.stream()
+                .filter(game -> game.getDateTime().isAfter(LocalDateTime.of(LocalDate.now().minusDays(2), LocalTime.of(0,0))))
+                .collect(Collectors.toList());
     }
 
     private void processResults(List<Game> noResultGames, String userHash) {
