@@ -1,7 +1,7 @@
 package com.zylex.livebetbot.service.rule;
 
 import com.zylex.livebetbot.model.Game;
-import com.zylex.livebetbot.service.ParseProcessor;
+import com.zylex.livebetbot.service.parser.ParseProcessor;
 
 import java.util.LinkedHashMap;
 import java.util.List;

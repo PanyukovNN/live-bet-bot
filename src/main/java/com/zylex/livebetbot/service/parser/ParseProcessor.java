@@ -1,9 +1,10 @@
-package com.zylex.livebetbot.service;
+package com.zylex.livebetbot.service.parser;
 
 import com.zylex.livebetbot.controller.dao.GameDao;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ParserLogger;
 import com.zylex.livebetbot.model.Game;
+import com.zylex.livebetbot.service.DriverManager;
 import org.openqa.selenium.WebDriver;
 
 import java.util.List;

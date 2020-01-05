@@ -1,4 +1,4 @@
-package com.zylex.livebetbot.service;
+package com.zylex.livebetbot.service.parser;
 
 import com.zylex.livebetbot.controller.logger.ParserLogger;
 import com.zylex.livebetbot.model.Game;
