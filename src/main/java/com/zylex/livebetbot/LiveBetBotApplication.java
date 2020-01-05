@@ -25,8 +25,8 @@ public class LiveBetBotApplication {
         try (Connection connection = getConnection();
              BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             ScheduledTask st = new ScheduledTask(
-                    new GameDao(connection),
-                    driverManager
+                new GameDao(connection),
+                driverManager
             );
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
             scheduler.scheduleAtFixedRate(st, 0, 10, TimeUnit.MINUTES);

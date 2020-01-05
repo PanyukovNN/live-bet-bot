@@ -68,6 +68,10 @@ public class CountryParser {
             prepareWebpage(countryLink);
             Document document = Jsoup.parse(driver.getPageSource());
             Elements gameElements = document.select("table.Hdp > tbody > tr");
+            //TODO check NPE
+            if (gameElements == null) {
+                continue;
+            }
             for (Element gameElement : gameElements) {
                 Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
                 if (dateTimeText.text().contains("Перерыв")) {

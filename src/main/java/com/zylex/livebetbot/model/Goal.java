@@ -21,9 +21,6 @@ public class Goal {
 
     @Override
     public String toString() {
-        return "Goals{" +
-                "homeGoals=" + homeGoals +
-                ", awayGoals=" + awayGoals +
-                '}';
+        return String.format("%d:%d",homeGoals, awayGoals);
     }
 }
