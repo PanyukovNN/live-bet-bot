@@ -23,16 +23,16 @@ public class ScheduledTask implements Runnable {
     public void run() {
         try {
             new Saver(
-                    new RuleProcessor(
-                            new ParseProcessor(
-                                    driverManager,
-                                    gameDao
-                            )),
-                    gameDao
+                new RuleProcessor(
+                    new ParseProcessor(
+                        driverManager,
+                        gameDao
+                    )),
+                gameDao
             ).save();
             new ResultScanner(
-                    driverManager,
-                    gameDao
+                driverManager,
+                gameDao
             ).scan();
         } catch (Throwable t) {
             t.printStackTrace();

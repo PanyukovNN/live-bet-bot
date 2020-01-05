@@ -35,6 +35,18 @@ public class Game {
         this.link = link;
     }
 
+    public Game(Game oldGame) {
+        this.id = oldGame.getId();
+        this.dateTime = oldGame.getDateTime();
+        this.firstTeam = oldGame.getFirstTeam();
+        this.secondTeam = oldGame.getSecondTeam();
+        this.breakGoal = oldGame.getBreakGoal();
+        this.finalGoal = oldGame.getFinalGoal();
+        this.tmlList = oldGame.tmlList;
+        this.link = oldGame.link;
+        this.ruleNumber = oldGame.ruleNumber;
+    }
+
     public Game() {
     }
 
@@ -100,11 +112,6 @@ public class Game {
         if (o == null || getClass() != o.getClass()) return false;
         Game game = (Game) o;
         return Objects.equals(link, game.link);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(link);
     }
 
     @Override

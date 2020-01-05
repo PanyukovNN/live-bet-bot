@@ -51,10 +51,8 @@ public class GameDao {
 
     private Game get(Game game) {
         try (PreparedStatement statement = connection.prepareStatement(SQLGame.GET.QUERY)) {
-            statement.setTimestamp(1, Timestamp.valueOf(game.getDateTime()));
-            statement.setString(2, game.getFirstTeam());
-            statement.setString(3, game.getSecondTeam());
-            statement.setString(4, game.getRuleNumber().toString());
+            statement.setString(1, game.getRuleNumber().toString());
+            statement.setString(2, game.getLink());
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return extractGame(resultSet);
@@ -135,7 +133,7 @@ public class GameDao {
     }
 
     enum SQLGame {
-        GET("SELECT * FROM game WHERE date_time = (?) AND first_team = (?) AND second_team = (?) AND rule_number = (?)"),
+        GET("SELECT * FROM game WHERE rule_number = (?) AND link = (?)"),
         GET_ALL("SELECT * FROM game"),
         GET_BY_DATE("SELECT * FROM game WHERE date_time >= (?) AND date_time <= (?)"),
         GET_WITH_NO_RESULT("SELECT * FROM game WHERE final_score IS NULL OR final_score = '-1:-1'"),
