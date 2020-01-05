@@ -34,6 +34,21 @@ public class GameDao {
         }
     }
 
+    public List<Game> getByDate(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        try (PreparedStatement statement = connection.prepareStatement(SQLGame.GET_BY_DATE.QUERY)) {
+            statement.setTimestamp(1, Timestamp.valueOf(startDateTime));
+            statement.setTimestamp(2, Timestamp.valueOf(endDateTime));
+            ResultSet resultSet = statement.executeQuery();
+            List<Game> games = new ArrayList<>();
+            while (resultSet.next()) {
+                games.add(extractGame(resultSet));
+            }
+            return games;
+        } catch (SQLException e) {
+            throw new GameDaoException(e.getMessage(), e);
+        }
+    }
+
     private Game get(Game game) {
         try (PreparedStatement statement = connection.prepareStatement(SQLGame.GET.QUERY)) {
             statement.setTimestamp(1, Timestamp.valueOf(game.getDateTime()));
@@ -122,6 +137,7 @@ public class GameDao {
     enum SQLGame {
         GET("SELECT * FROM game WHERE date_time = (?) AND first_team = (?) AND second_team = (?) AND rule_number = (?)"),
         GET_ALL("SELECT * FROM game"),
+        GET_BY_DATE("SELECT * FROM game WHERE date_time >= (?) AND date_time <= (?)"),
         GET_WITH_NO_RESULT("SELECT * FROM game WHERE final_score IS NULL OR final_score = '-1:-1'"),
         INSERT("INSERT INTO game (id, date_time, first_team, second_team, break_score, final_score, rule_number, link) VALUES (DEFAULT, (?), (?), (?), (?), (?), (?), (?))"),
         UPDATE("UPDATE game SET date_time = (?), first_team = (?), second_team = (?), break_score = (?), final_score = (?), rule_number = (?), link = (?) WHERE id = (?)");

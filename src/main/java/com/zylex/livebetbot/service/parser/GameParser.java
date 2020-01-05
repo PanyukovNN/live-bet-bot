@@ -9,10 +9,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -48,8 +45,7 @@ class GameParser {
             int homeGoals = Integer.parseInt(scores[0]);
             int awayGoals = Integer.parseInt(scores[1]);
             return new Goal(homeGoals, awayGoals);
-        } catch (StaleElementReferenceException e) {
-            e.printStackTrace();
+        } catch (StaleElementReferenceException | TimeoutException e) {
             return new Goal(-1, -1);
         } catch (Exception e) {
             e.printStackTrace();
