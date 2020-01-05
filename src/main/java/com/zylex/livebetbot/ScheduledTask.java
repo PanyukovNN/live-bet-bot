@@ -1,7 +1,6 @@
 package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.controller.dao.GameDao;
-import com.zylex.livebetbot.exception.LiveBetBotException;
 import com.zylex.livebetbot.service.DriverManager;
 import com.zylex.livebetbot.service.ParseProcessor;
 import com.zylex.livebetbot.service.ResultScanner;
@@ -22,21 +21,17 @@ public class ScheduledTask implements Runnable {
 
     @Override
     public void run() {
-        try {
-            new Saver(
-                new RuleProcessor(
-                    new ParseProcessor(
-                        driverManager,
-                        gameDao
-                    )),
-                gameDao
-            ).save();
-            new ResultScanner(
-                driverManager,
-                gameDao
-            ).scan();
-        } catch (Exception e) {
-            throw new LiveBetBotException(e.getMessage(), e);
-        }
+        new Saver(
+            new RuleProcessor(
+                new ParseProcessor(
+                    driverManager,
+                    gameDao
+                )),
+            gameDao
+        ).save();
+        new ResultScanner(
+            driverManager,
+            gameDao
+        ).scan();
     }
 }

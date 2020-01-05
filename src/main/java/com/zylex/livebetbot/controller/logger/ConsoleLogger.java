@@ -77,9 +77,9 @@ public abstract class ConsoleLogger {
         writeInLine(line);
     }
 
-    void writeErrorMessage(String line) {
-        System.err.print(line);
-        addToLog(line);
+    public static void writeErrorMessage(String line) {
+        System.err.print("\n" + line);
+        addToLog("\n" + line);
     }
 
     static synchronized void writeInLine(String line) {
