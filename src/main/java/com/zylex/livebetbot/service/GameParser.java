@@ -42,40 +42,54 @@ class GameParser {
     }
 
     private Goal findGoal() {
-        WebElement scoreElement = waitElementWithClassName("Score");
-        String[] scores = scoreElement.getText().split(":");
-        int homeGoals = Integer.parseInt(scores[0]);
-        int awayGoals = Integer.parseInt(scores[1]);
-        return new Goal(homeGoals, awayGoals);
+        try {
+            WebElement scoreElement = waitElementWithClassName("Score");
+            String[] scores = scoreElement.getText().split(":");
+            int homeGoals = Integer.parseInt(scores[0]);
+            int awayGoals = Integer.parseInt(scores[1]);
+            return new Goal(homeGoals, awayGoals);
+        } catch (Exception e) {
+            //TODO remove when exception will be found
+            System.out.print("\nПроизошла ошибка при сканировании счёта игры: " + e.getMessage());
+            e.printStackTrace();
+            return new Goal(-1, -1);
+        }
     }
 
     private List<Tml> findTml() {
-        waitElementWithClassName("MarketT");
-        Document document = Jsoup.parse(driver.getPageSource());
-        Elements marketElements = document.select("div.MarketT");
-        List<Element> tmlMarketElements = marketElements.stream()
-                .filter(market -> {
-                    String header = market.select("div.SubHead > span").text();
-                    return header.contains("Первая половина: тотал (больше/меньше)") || header.contains("Тотал (больше/меньше)");
-                })
-                .collect(Collectors.toList());
-        List<Tml> TmlList = new ArrayList<>();
-        for (Element marketElement : tmlMarketElements) {
-            Elements tmlElements = marketElement.select("table > tbody > tr");
-            for (Element tmlElement : tmlElements) {
-                if (tmlElement.className().equals("OddsClosed")) {
-                    continue;
-                }
-                double moreSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
-                double moreCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
-                TmlList.add(new Tml(0, 0, MoreLess.MORE, moreSize, moreCoefficient));
+        try {
+            waitElementWithClassName("MarketT");
+            Document document = Jsoup.parse(driver.getPageSource());
+            Elements marketElements = document.select("div.MarketT");
+            List<Element> tmlMarketElements = marketElements.stream()
+                    .filter(market -> {
+                        String header = market.select("div.SubHead > span").text();
+                        return header.contains("Первая половина: тотал (больше/меньше)") || header.contains("Тотал (больше/меньше)");
+                    })
+                    .collect(Collectors.toList());
+            List<Tml> TmlList = new ArrayList<>();
+            for (Element marketElement : tmlMarketElements) {
+                Elements tmlElements = marketElement.select("table > tbody > tr");
+                for (Element tmlElement : tmlElements) {
+                    if (tmlElement.className().equals("OddsClosed")) {
+                        continue;
+                    }
+                    double moreSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
+                    double moreCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
+                    TmlList.add(new Tml(0, 0, MoreLess.MORE, moreSize, moreCoefficient));
 
-                double lessSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
-                double lessCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
-                TmlList.add(new Tml(0, 0, MoreLess.LESS, lessSize, lessCoefficient));
+                    double lessSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
+                    double lessCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
+                    TmlList.add(new Tml(0, 0, MoreLess.LESS, lessSize, lessCoefficient));
+                }
             }
+            return TmlList;
+        } catch (Exception e) {
+            //TODO remove when exception will be found
+            System.out.print("\nПроизошла ошибка при сканировании тоталов игры: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
         }
-        return TmlList;
     }
 
     private WebElement waitElementWithClassName(String className) {

@@ -99,15 +99,12 @@ public class Game {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Game game = (Game) o;
-        return Objects.equals(dateTime, game.dateTime) &&
-                Objects.equals(firstTeam, game.firstTeam) &&
-                Objects.equals(secondTeam, game.secondTeam) &&
-                Objects.equals(link, game.link);
+        return Objects.equals(link, game.link);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(dateTime, firstTeam, secondTeam, link);
+        return Objects.hash(link);
     }
 
     @Override

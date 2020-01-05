@@ -21,7 +21,7 @@ public class LiveBetBotApplication {
 
     public static void main(String[] args) {
         DriverManager driverManager = new DriverManager();
-        driverManager.initiateDriver(false);
+        driverManager.initiateDriver(true);
         try (Connection connection = getConnection();
              BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             ScheduledTask st = new ScheduledTask(
