@@ -104,6 +104,12 @@ public class ResultScanner {
         wait.ignoring(StaleElementReferenceException.class)
                 .until(ExpectedConditions.presenceOfElementLocated(By.name("Yesterday")));
         driver.findElement(By.name("Yesterday")).click();
+        //TODO find better way
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         waitElementWithClassName("ContentTable");
     }
 
@@ -113,13 +119,20 @@ public class ResultScanner {
         }
         noResultGames = removeGameWithResults(noResultGames);
         Document document = Jsoup.parse(driver.getPageSource());
-        Elements gameElements = document.select("table.ContentTable > tbody > tr.tr_odd, table.ContentTable > tbody > tr.tr_even");
+        Elements gameElements = document.select("tr.tr_odd, tr.tr_even");
         for (Element gameElement : gameElements) {
             Elements cells = gameElement.select("td");
             Elements teams = cells.get(1).select("span");
             String firstTeam = teams.get(0).text();
-            int t = teams.size() > 2 ? 1 : 0;
-            String secondTeam = teams.get(1 + t).text();
+            teams.remove(0);
+            String secondTeam = "";
+            //TODO simplify
+            for (Element teamElement : teams) {
+                if (!teamElement.text().isEmpty()) {
+                    secondTeam = teamElement.text();
+                    break;
+                }
+            }
             String[] finalScores = cells.get(3).text().split(" : ");
             if (finalScores[0].equals("-")) {
                 continue;
@@ -128,7 +141,7 @@ public class ResultScanner {
                 if (game.getFinalGoal().getHomeGoals() >= 0) {
                     continue;
                 }
-                if (game.getFirstTeam().equals(firstTeam)  && game.getSecondTeam().equals(secondTeam)) {
+                if (game.getFirstTeam().equals(firstTeam) && game.getSecondTeam().equals(secondTeam)) {
                     int homeGoalFinal = Integer.parseInt(finalScores[0]);
                     int awayGoalFinal = Integer.parseInt(finalScores[1]);
                     game.setFinalGoal(new Goal(homeGoalFinal, awayGoalFinal));
