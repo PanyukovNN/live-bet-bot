@@ -21,6 +21,19 @@ public class GameDao {
         this.tmlDao = new TmlDao(connection);
     }
 
+    public List<Game> getAll() {
+        try (PreparedStatement statement = connection.prepareStatement(SQLGame.GET_ALL.QUERY)) {
+            ResultSet resultSet = statement.executeQuery();
+            List<Game> games = new ArrayList<>();
+            while (resultSet.next()) {
+                games.add(extractGame(resultSet));
+            }
+            return games;
+        } catch (SQLException e) {
+            throw new GameDaoException(e.getMessage(), e);
+        }
+    }
+
     private Game get(Game game) {
         try (PreparedStatement statement = connection.prepareStatement(SQLGame.GET.QUERY)) {
             statement.setTimestamp(1, Timestamp.valueOf(game.getDateTime()));
@@ -55,17 +68,13 @@ public class GameDao {
         LocalDateTime dateTime = resultSet.getTimestamp("date_time").toLocalDateTime();
         String firstTeam = resultSet.getString("first_team");
         String secondTeam = resultSet.getString("second_team");
-        int homeGoalBreak = resultSet.getInt("home_goal_break");
-        int awayGoalBreak = resultSet.getInt("away_goal_break");
-        Goal breakGoal = new Goal(homeGoalBreak, awayGoalBreak);
-        int homeGoalFinal = resultSet.getInt("home_goal_final");
-        int awayGoalFinal = resultSet.getInt("away_goal_final");
-        Goal finalGoal = new Goal(homeGoalFinal, awayGoalFinal);
+        Goal breakScore = stringToGoal(resultSet.getString("break_score"));
+        Goal finalScore = stringToGoal(resultSet.getString("final_score"));
         RuleNumber ruleNumber = RuleNumber.valueOf(resultSet.getString("rule_number"));
         String link = resultSet.getString("link");
         Game extractedGame = new Game(id, dateTime, firstTeam, secondTeam, link);
-        extractedGame.setBreakGoal(breakGoal);
-        extractedGame.setFinalGoal(finalGoal);
+        extractedGame.setBreakGoal(breakScore);
+        extractedGame.setFinalGoal(finalScore);
         extractedGame.setRuleNumber(ruleNumber);
         extractedGame.setTmlList(tmlDao.getByGameId(id));
         return extractedGame;
@@ -79,14 +88,12 @@ public class GameDao {
             statement.setTimestamp(1, Timestamp.valueOf(game.getDateTime()));
             statement.setString(2, game.getFirstTeam());
             statement.setString(3, game.getSecondTeam());
-            statement.setInt(4, game.getBreakGoal().getHomeGoals());
-            statement.setInt(5, game.getBreakGoal().getAwayGoals());
-            statement.setInt(6, game.getFinalGoal().getHomeGoals());
-            statement.setInt(7, game.getFinalGoal().getAwayGoals());
-            statement.setString(8, game.getRuleNumber().toString());
-            statement.setString(9, game.getLink());
+            statement.setString(4, game.getBreakGoal().toString());
+            statement.setString(5, game.getFinalGoal().toString());
+            statement.setString(6, game.getRuleNumber().toString());
+            statement.setString(7, game.getLink());
             if (sqlRequest == SQLGame.UPDATE) {
-                statement.setLong(10, game.getId());
+                statement.setLong(8, game.getId());
             }
             statement.executeUpdate();
             if (sqlRequest == SQLGame.INSERT) {
@@ -102,11 +109,22 @@ public class GameDao {
         }
     }
 
+    private Goal stringToGoal(String input) {
+        if (input == null) {
+            return new Goal(-1, -1);
+        }
+        String[] goals = input.split(":");
+        int homeGoal = Integer.parseInt(goals[0]);
+        int awayGoal = Integer.parseInt(goals[1]);
+        return new Goal(homeGoal, awayGoal);
+    }
+
     enum SQLGame {
         GET("SELECT * FROM game WHERE date_time = (?) AND first_team = (?) AND second_team = (?) AND rule_number = (?)"),
-        GET_WITH_NO_RESULT("SELECT * FROM game WHERE home_goal_final = -1 AND away_goal_final = -1"),
-        INSERT("INSERT INTO game (id, date_time, first_team, second_team, home_goal_break, away_goal_break, home_goal_final, away_goal_final, rule_number, link) VALUES (DEFAULT, (?), (?), (?), (?), (?), (?), (?), (?), (?))"),
-        UPDATE("UPDATE game SET date_time = (?), first_team = (?), second_team = (?), home_goal_break = (?), away_goal_break = (?), home_goal_final = (?), away_goal_final = (?), rule_number = (?), link = (?) WHERE id = (?)");
+        GET_ALL("SELECT * FROM game"),
+        GET_WITH_NO_RESULT("SELECT * FROM game WHERE final_score IS NULL OR final_score = '-1:-1'"),
+        INSERT("INSERT INTO game (id, date_time, first_team, second_team, break_score, final_score, rule_number, link) VALUES (DEFAULT, (?), (?), (?), (?), (?), (?), (?))"),
+        UPDATE("UPDATE game SET date_time = (?), first_team = (?), second_team = (?), break_score = (?), final_score = (?), rule_number = (?), link = (?) WHERE id = (?)");
 
         String QUERY;
 

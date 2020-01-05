@@ -4,10 +4,8 @@ CREATE TABLE IF NOT EXISTS game (
     date_time         TIMESTAMP NOT NULL,
     first_team        VARCHAR(50) NOT NULL,
     second_team       VARCHAR(50) NOT NULL,
-    home_goal_break   INT NOT NULL,
-    away_goal_break   INT NOT NULL,
-    home_goal_final   INT,
-    away_goal_final   INT,
+    break_score       VARCHAR(20) NOT NULL,
+    final_score       VARCHAR(20),
     rule_number       VARCHAR(100),
     link              VARCHAR(500)
 );
@@ -21,4 +19,3 @@ CREATE TABLE IF NOT EXISTS tml (
     coefficient FLOAT,
     FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE
 );
-
