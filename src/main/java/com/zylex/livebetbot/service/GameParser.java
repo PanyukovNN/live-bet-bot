@@ -30,7 +30,7 @@ class GameParser {
 
     GameParser(WebDriver driver, ParserLogger logger) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, 15);
+        this.wait = new WebDriverWait(driver, 60);
         this.logger = logger;
     }
 
@@ -48,9 +48,10 @@ class GameParser {
             int homeGoals = Integer.parseInt(scores[0]);
             int awayGoals = Integer.parseInt(scores[1]);
             return new Goal(homeGoals, awayGoals);
+        } catch (StaleElementReferenceException e) {
+            e.printStackTrace();
+            return new Goal(-1, -1);
         } catch (Exception e) {
-            //TODO remove when exception will be found
-            System.out.print("\nПроизошла ошибка при сканировании счёта игры: " + e.getMessage());
             e.printStackTrace();
             return new Goal(-1, -1);
         }

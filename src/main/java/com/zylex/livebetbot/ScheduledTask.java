@@ -21,17 +21,21 @@ public class ScheduledTask implements Runnable {
 
     @Override
     public void run() {
-        new Saver(
-            new RuleProcessor(
-                new ParseProcessor(
+        try {
+            new Saver(
+                    new RuleProcessor(
+                            new ParseProcessor(
+                                    driverManager,
+                                    gameDao
+                            )),
+                    gameDao
+            ).save();
+            new ResultScanner(
                     driverManager,
                     gameDao
-                )),
-            gameDao
-        ).save();
-        new ResultScanner(
-            driverManager,
-            gameDao
-        ).scan();
+            ).scan();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 }

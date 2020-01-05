@@ -32,7 +32,7 @@ public class CountryParser {
 
     CountryParser(WebDriver driver, List<Game> noResultGames, ParserLogger logger) {
         this.driver = driver;
-        wait = new WebDriverWait(driver, 5);
+        wait = new WebDriverWait(driver, 60);
         this.noResultGames = noResultGames;
         this.logger = logger;
     }
@@ -63,31 +63,37 @@ public class CountryParser {
 
     private List<Game> findBreakGames(List<String> countryLinks) {
         List<Game> games = new ArrayList<>();
-        for (String countryLink : countryLinks) {
-            logger.logCountry();
-            prepareWebpage(countryLink);
-            Document document = Jsoup.parse(driver.getPageSource());
-            Elements gameElements = document.select("table.Hdp > tbody > tr");
-            //TODO check NPE
-            if (gameElements == null) {
-                continue;
-            }
-            for (Element gameElement : gameElements) {
-                Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
-                if (dateTimeText.text().contains("Перерыв")) {
-                    Element firstTeamElement = gameElement.selectFirst("td > a.OddsTabL > span.OddsL");
-                    Element secondTeamElement = gameElement.selectFirst("td > a.OddsTabR > span.OddsL");
-                    if (firstTeamElement == null || secondTeamElement == null) {
-                        continue;
+        try {
+            for (String countryLink : countryLinks) {
+                logger.logCountry();
+                prepareWebpage(countryLink);
+                Document document = Jsoup.parse(driver.getPageSource());
+                Elements gameElements = document.select("table.Hdp > tbody > tr");
+                //TODO check NPE
+                if (gameElements == null) {
+                    continue;
+                }
+                for (Element gameElement : gameElements) {
+                    Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
+                    if (dateTimeText.text().contains("Перерыв")) {
+                        Element firstTeamElement = gameElement.selectFirst("td > a.OddsTabL > span.OddsL");
+                        Element secondTeamElement = gameElement.selectFirst("td > a.OddsTabR > span.OddsL");
+                        if (firstTeamElement == null || secondTeamElement == null) {
+                            continue;
+                        }
+                        String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
+                        Game game = new Game(0, LocalDateTime.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
+                        if (noResultGames.contains(game) | games.contains(game)) {
+                            continue;
+                        }
+                        games.add(game);
                     }
-                    String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
-                    Game game = new Game(0, LocalDateTime.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
-                    if (noResultGames.contains(game) | games.contains(game)) {
-                        continue;
-                    }
-                    games.add(game);
                 }
             }
+        } catch (Exception e) {
+            //TODO remove when exception will be found
+            System.out.print("\nПроизошла ошибка при сканировании стран: " + e.getMessage());
+            e.printStackTrace();
         }
         return games;
     }
