@@ -39,6 +39,8 @@ public class ResultScanner {
 
     private GameDao gameDao;
 
+    private int gamesResultNumber;
+
     public ResultScanner(DriverManager driverManager, GameDao gameDao) {
         this.driverManager = driverManager;
         this.gameDao = gameDao;
@@ -57,7 +59,7 @@ public class ResultScanner {
         } catch (IOException e) {
             throw new ResultScannerException(e.getMessage(), e);
         } finally {
-            logger.endLogMessage();
+            logger.endLogMessage(gamesResultNumber);
             ConsoleLogger.endMessage(LogType.BLOCK_END);
         }
     }
@@ -147,6 +149,7 @@ public class ResultScanner {
                         int awayGoalFinal = Integer.parseInt(finalScores[1]);
                         game.setFinalGoal(new Goal(homeGoalFinal, awayGoalFinal));
                         gameDao.save(game);
+                        gamesResultNumber++;
                     }
                 }
             }
