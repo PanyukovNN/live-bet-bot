@@ -20,30 +20,36 @@ import java.util.concurrent.TimeUnit;
 public class LiveBetBotApplication {
 
     public static void main(String[] args) {
-        DriverManager driverManager = new DriverManager();
-        driverManager.initiateDriver(false);
+        DriverManager parsingDriverManager = new DriverManager();
+        DriverManager resultScannerDriverManager = new DriverManager();
         try (Connection connection = getConnection();
              BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            ScheduledTask st = new ScheduledTask(
+            ScheduledParsingTask parsingTask = new ScheduledParsingTask(
                 new GameDao(connection),
-                driverManager
+                    parsingDriverManager.initiateDriver(true)
+            );
+            ScheduledResultScanningTask resultScanningTask = new ScheduledResultScanningTask(
+                new GameDao(connection),
+                    resultScannerDriverManager.initiateDriver(false)
             );
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleAtFixedRate(st, 0, 10, TimeUnit.MINUTES);
+            scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
+            scheduler.scheduleAtFixedRate(resultScanningTask, 0, 120, TimeUnit.MINUTES);
             //noinspection StatementWithEmptyBody
             while (!reader.readLine().equals("exit")) {
             }
         } catch (SQLException | IOException e) {
             throw new LiveBetBotException(e.getMessage(), e);
         } finally {
-            driverManager.quitDriver();
+            parsingDriverManager.quitDriver();
+            resultScannerDriverManager.quitDriver();
             ConsoleLogger.endMessage(LogType.BOT_END);
             ConsoleLogger.writeToLogFile();
             System.exit(0);
         }
     }
 
-    public static Connection getConnection() {
+    static Connection getConnection() {
         try(InputStream inputStream = LiveBetBotApplication.class.getClassLoader().getResourceAsStream("LiveBetBotDb.properties")) {
             Properties property = new Properties();
             property.load(inputStream);
