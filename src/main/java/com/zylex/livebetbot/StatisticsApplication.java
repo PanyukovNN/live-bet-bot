@@ -14,7 +14,7 @@ public class StatisticsApplication {
 
     public static void main(String[] args) {
         LocalDateTime startDateTime = LocalDateTime.of(
-                LocalDate.of(2020, 1, 5),
+                LocalDate.of(2020, 1, 6),
                 LocalTime.of(0, 0));
         LocalDateTime endDateTime = LocalDateTime.now();
 

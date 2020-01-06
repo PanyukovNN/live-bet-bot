@@ -19,3 +19,12 @@ CREATE TABLE IF NOT EXISTS tml (
     coefficient FLOAT,
     FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE
 );
+
+SELECT date_time, first_team, second_team, break_score, final_score, rule_number,
+       (SELECT coefficient
+           FROM tml
+           WHERE size = 1 AND more_less = 'MORE' AND game_id = id),
+       (SELECT coefficient
+           FROM tml
+           WHERE  size = 1.5 AND more_less = 'MORE' AND game_id = id)
+FROM game
