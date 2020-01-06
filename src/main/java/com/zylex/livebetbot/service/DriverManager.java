@@ -21,15 +21,12 @@ public class DriverManager {
 
     private WebDriver driver;
 
-    public WebDriver getDriver() {
-        return driver;
-    }
-
     /**
      * Initiate web driver and return it.
      * @param headless - flag for headless driver.
+     * @return - instance of WebDriver;
      */
-    public void initiateDriver(boolean headless) {
+    public WebDriver initiateDriver(boolean headless) {
         WebDriverManager.chromedriver().setup();
         setUpLogging();
         driver = headless
@@ -37,6 +34,7 @@ public class DriverManager {
                 : new ChromeDriver();
         manageDriver();
         logger.logDriver();
+        return driver;
     }
 
     private void manageDriver() {

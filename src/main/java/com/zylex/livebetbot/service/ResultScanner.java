@@ -35,14 +35,12 @@ public class ResultScanner {
 
     private WebDriver driver;
 
-    private DriverManager driverManager;
-
     private GameDao gameDao;
 
     private int gamesResultNumber;
 
-    public ResultScanner(DriverManager driverManager, GameDao gameDao) {
-        this.driverManager = driverManager;
+    public ResultScanner(WebDriver driver, GameDao gameDao) {
+        this.driver = driver;
         this.gameDao = gameDao;
     }
 
@@ -78,7 +76,6 @@ public class ResultScanner {
     }
 
     private void initDriver() {
-        driver = driverManager.getDriver();
         wait = new WebDriverWait(driver, 5);
         driver.navigate().to("http://ballchockdee.com");
     }

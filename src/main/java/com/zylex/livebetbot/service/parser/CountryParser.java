@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @SuppressWarnings("WeakerAccess")
 public class CountryParser {
@@ -65,14 +67,14 @@ public class CountryParser {
         List<Game> games = new ArrayList<>();
         try {
             for (String countryLink : countryLinks) {
-                logger.logCountry();
-                prepareWebpage(countryLink);
-                Document document = Jsoup.parse(driver.getPageSource());
-                Elements gameElements = document.select("table.Hdp > tbody > tr");
-                //TODO check NPE
-                if (gameElements == null) {
+                if (prepareWebpage(countryLink)) {
+                    logger.logCountry(LogType.OKAY);
+                } else {
+                    logger.logCountry(LogType.ERROR);
                     continue;
                 }
+                Document document = Jsoup.parse(driver.getPageSource());
+                Elements gameElements = document.select("table.Hdp > tbody > tr");
                 for (Element gameElement : gameElements) {
                     Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
                     if (dateTimeText.text().contains("Перерыв")) {
@@ -91,19 +93,24 @@ public class CountryParser {
                 }
             }
         } catch (Exception e) {
-            //TODO remove when exception will be found
+            //TODO may be removed
             System.out.print("\nПроизошла ошибка при сканировании стран: " + e.getMessage());
             e.printStackTrace();
         }
         return games;
     }
 
-    private void prepareWebpage(String countryLink) {
-        driver.navigate().to("http://ballchockdee.com" + countryLink);
-        wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(By.id("bu:od:go:mt:2")));
-        driver.findElement(By.id("bu:od:go:mt:2")).click();
-        wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(By.className("Hdp")));
+    private boolean prepareWebpage(String countryLink) {
+        try {
+            driver.navigate().to("http://ballchockdee.com" + countryLink);
+            wait.ignoring(StaleElementReferenceException.class)
+                    .until(ExpectedConditions.presenceOfElementLocated(By.id("bu:od:go:mt:2")));
+            driver.findElement(By.id("bu:od:go:mt:2")).click();
+            wait.ignoring(StaleElementReferenceException.class)
+                    .until(ExpectedConditions.presenceOfElementLocated(By.className("Hdp")));
+            return true;
+        } catch (TimeoutException | NoSuchElementException e) {
+            return false;
+        }
     }
 }

@@ -8,5 +8,7 @@ public enum LogType {
     COUNTRIES,
     GAMES,
     BLOCK_END,
-    BOT_END
+    BOT_END,
+    ERROR,
+    OKAY
 }

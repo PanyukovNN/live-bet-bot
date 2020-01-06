@@ -20,6 +20,8 @@ public class ParserLogger extends ConsoleLogger {
 
     private AtomicInteger processedGames = new AtomicInteger();
 
+    private AtomicInteger processedErrorCountries = new AtomicInteger();
+
     public synchronized void startLogMessage(LogType type, Integer arg) {
         if (type == LogType.PARSING_START) {
             DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a dd.MM.yyyy");
@@ -43,13 +45,24 @@ public class ParserLogger extends ConsoleLogger {
         writeLineSeparator();
     }
 
-    public synchronized void logCountry() {
-        String output = String.format("Processing countries: %d/%d (%s%%)",
-                processedCountries.incrementAndGet(),
-                totalCountries,
-                new DecimalFormat("#0.0").format(((double) processedCountries.get() / (double) totalCountries) * 100).replace(",", "."));
-        writeInLine(StringUtils.repeat("\b", output.length()) + output);
+    public synchronized void logCountry(LogType type) {
+        if (type == LogType.ERROR) {
+            processedErrorCountries.incrementAndGet();
+            processedCountries.incrementAndGet();
+            return;
+        }
+        if (type == LogType.OKAY) {
+            String output = String.format("Processing countries: %d/%d (%s%%)",
+                    processedCountries.incrementAndGet(),
+                    totalCountries,
+                    new DecimalFormat("#0.0").format(((double) processedCountries.get() / (double) totalCountries) * 100).replace(",", "."));
+            writeInLine(StringUtils.repeat("\b", output.length()) + output);
+        }
         if (processedCountries.get() == totalCountries) {
+            if (processedErrorCountries.get() > 0) {
+                String output = String.format("\nError countries: %d", processedErrorCountries.get());
+                writeErrorMessage(output);
+            }
             writeLineSeparator();
         }
     }
