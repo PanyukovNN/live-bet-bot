@@ -61,7 +61,7 @@ class GameParser {
             List<Element> tmlMarketElements = marketElements.stream()
                     .filter(market -> {
                         String header = market.select("div.SubHead > span").text();
-                        return header.contains("Первая половина: тотал (больше/меньше)") || header.contains("Тотал (больше/меньше)");
+                        return header.contains("First Half Over Under") || header.contains("Over Under");
                     })
                     .collect(Collectors.toList());
             List<Tml> TmlList = new ArrayList<>();

@@ -61,7 +61,7 @@ public class CountryParser {
     }
 
     private List<String> parseCountryLinks() throws IOException {
-        Document document = Jsoup.connect("http://ballchockdee.com/ru-ru/euro/ставки-live/футбол")
+        Document document = Jsoup.connect("http://ballchockdee.com/euro/live-betting/football")
                 .userAgent("Chrome/4.0.249.0 Safari/532.5")
                 .referrer("http://www.google.com")
                 .get();
@@ -85,7 +85,7 @@ public class CountryParser {
                 Elements gameElements = document.select("table.Hdp > tbody > tr");
                 for (Element gameElement : gameElements) {
                     Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
-                    if (dateTimeText.text().contains("Перерыв")) {
+                    if (dateTimeText.text().contains("HT")) {
                         Element firstTeamElement = gameElement.selectFirst("td > a.OddsTabL > span.OddsL");
                         Element secondTeamElement = gameElement.selectFirst("td > a.OddsTabR > span.OddsL");
                         if (firstTeamElement == null || secondTeamElement == null) {

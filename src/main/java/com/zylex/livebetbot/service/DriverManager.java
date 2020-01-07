@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 /**
  * Managing chrome drivers.
  */
-@SuppressWarnings("WeakerAccess")
 public class DriverManager {
 
     private DriverConsoleLogger logger = new DriverConsoleLogger();
