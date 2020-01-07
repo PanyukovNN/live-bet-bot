@@ -18,7 +18,7 @@ public class RuleProcessor {
 
     public Map<RuleNumber, List<Game>> process() {
         List<Game> games = parseProcessor.process();
-        if (games.size() == 0) {
+        if (games.isEmpty()) {
             return new HashMap<>();
         }
         return filter(games);

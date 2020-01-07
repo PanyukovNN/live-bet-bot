@@ -24,7 +24,7 @@ public class ParseProcessor {
     public List<Game> process() {
         logger.startLogMessage(LogType.PARSING_START, 0);
         List<Game> breakGames = new CountryParser(driver, gameDao.getNoResultGames(), logger).parse();
-        if (breakGames.size() == 0) {
+        if (breakGames.isEmpty()) {
             return breakGames;
         }
         GameParser gameParser = new GameParser(driver, logger);

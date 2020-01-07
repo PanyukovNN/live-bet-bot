@@ -42,14 +42,18 @@ public class CountryParser {
     List<Game> parse() {
         try {
             List<String> countryLinks = parseCountryLinks();
-            if (countryLinks.size() == 0) {
+            if (countryLinks.isEmpty()) {
                 logger.logCountriesFound(LogType.NO_COUNTRIES);
                 return new ArrayList<>();
             }
             logger.logCountriesFound(LogType.OKAY);
             logger.startLogMessage(LogType.COUNTRIES, countryLinks.size());
             List<Game> breakGames = findBreakGames(countryLinks);
-            logger.startLogMessage(LogType.GAMES, breakGames.size());
+            if (breakGames.isEmpty()) {
+                logger.startLogMessage(LogType.NO_GAMES, 0);
+            } else {
+                logger.startLogMessage(LogType.GAMES, breakGames.size());
+            }
             return breakGames;
         } catch (IOException e) {
             throw new CountryParserException(e.getMessage(), e);
