@@ -49,16 +49,18 @@ public class ResultScanner {
             logger.startLogMessage();
             List<Game> noResultGames = gameDao.getNoResultGames();
             noResultGames = removeOldGames(noResultGames);
-            if (!noResultGames.isEmpty()) {
-                initDriver();
-                String userHash = logIn();
-                processResults(noResultGames, userHash);
+            if (noResultGames.isEmpty()) {
+                logger.endLogMessage(LogType.NO_GAMES, 0);
+                ConsoleLogger.endMessage(LogType.BLOCK_END);
+                return;
             }
+            initDriver();
+            String userHash = logIn();
+            processResults(noResultGames, userHash);
+            logger.endLogMessage(LogType.OKAY, gamesResultNumber);
+            ConsoleLogger.endMessage(LogType.BLOCK_END);
         } catch (IOException e) {
             throw new ResultScannerException(e.getMessage(), e);
-        } finally {
-            logger.endLogMessage(gamesResultNumber);
-            ConsoleLogger.endMessage(LogType.BLOCK_END);
         }
     }
 

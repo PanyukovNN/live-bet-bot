@@ -8,11 +8,16 @@ public class ResultScannerLogger extends ConsoleLogger {
         writeInLine("\nResult scanning: ...");
     }
 
-    public void endLogMessage(int gamesNumber) {
-        String output = "Result scanning: complete";
-        output += gamesNumber == 0
-                ? " (no results found)"
-                : String.format(" (found %d results)", gamesNumber);
+    public void endLogMessage(LogType type, int gamesNumber) {
+        String output = "";
+        if (type == LogType.OKAY) {
+            output = String.format("Result scanning: complete (found %d results)", gamesNumber);
+            if (gamesNumber == 0) {
+                output = "Result scanning: complete (no results found)";
+            }
+        } else if (type == LogType.NO_GAMES) {
+            output = "Result scanning: complete (no games to scan)";
+        }
         writeInLine(StringUtils.repeat("\b", output.length()) + output);
     }
 }
