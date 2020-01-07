@@ -21,12 +21,6 @@ public class SaverLogger extends ConsoleLogger {
                 writeInLine(String.format("\n%d) %s", ++i, game));
             }
         }
-        String output = "\n" + StringUtils.repeat("~", 50);
-        writeInLine(output);
-    }
-
-    public void logBlockEndSeparator() {
-        String output = "\n" + StringUtils.repeat("~", 50);
-        writeInLine(output);
+        endMessage(LogType.BLOCK_END);
     }
 }
