@@ -24,6 +24,10 @@ public class Saver {
 
     public void save() {
         Map<RuleNumber, List<Game>> ruleGames = ruleProcessor.process();
+        if (ruleGames.isEmpty()) {
+            logger.logBlockEndSeparator();
+            return;
+        }
         logger.logRuleGames(ruleGames);
         ruleGames.forEach((k, v) -> v.forEach(gameDao::save));
     }

@@ -7,6 +7,8 @@ public enum LogType {
     PARSING_START,
     COUNTRIES,
     GAMES,
+    NO_COUNTRIES,
+    NO_GAMES,
     BLOCK_END,
     BOT_END,
     ERROR,

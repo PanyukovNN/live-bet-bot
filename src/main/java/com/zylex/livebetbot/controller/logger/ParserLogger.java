@@ -39,8 +39,13 @@ public class ParserLogger extends ConsoleLogger {
         }
     }
 
-    public void logCountriesFound() {
-        String output = "Finding countries: complete";
+    public void logCountriesFound(LogType type) {
+        String output = "";
+        if (type == LogType.OKAY) {
+            output = "Finding countries: complete";
+        } else if (type == LogType.NO_COUNTRIES) {
+            output = "Finding countries: complete (no countries)";
+        }
         writeInLine(StringUtils.repeat("\b", output.length()) + output);
         writeLineSeparator();
     }

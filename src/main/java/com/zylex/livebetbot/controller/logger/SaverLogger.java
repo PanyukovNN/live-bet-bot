@@ -2,6 +2,7 @@ package com.zylex.livebetbot.controller.logger;
 
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.rule.RuleNumber;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,12 @@ public class SaverLogger extends ConsoleLogger {
                 writeInLine(String.format("\n%d) %s", ++i, game));
             }
         }
-        writeLineSeparator();
+        String output = "\n" + StringUtils.repeat("~", 50);
+        writeInLine(output);
+    }
+
+    public void logBlockEndSeparator() {
+        String output = "\n" + StringUtils.repeat("~", 50);
+        writeInLine(output);
     }
 }
