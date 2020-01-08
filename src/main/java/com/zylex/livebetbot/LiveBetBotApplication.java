@@ -41,7 +41,6 @@ public class LiveBetBotApplication {
             parsingDriverManager.quitDriver();
             resultScannerDriverManager.quitDriver();
             ConsoleLogger.endMessage(LogType.BOT_END);
-            ConsoleLogger.writeToLogFile();
             System.exit(0);
         }
     }

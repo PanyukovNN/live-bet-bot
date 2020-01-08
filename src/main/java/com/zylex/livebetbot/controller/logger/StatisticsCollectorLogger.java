@@ -36,6 +36,6 @@ public class StatisticsCollectorLogger {
     }
 
     public void fileCreatedSuccessful(int insertedGames) {
-        System.out.print(String.format("\nStatistics file created successful (inserted %d games)", insertedGames));
+        System.out.print(String.format("\n Statistics file created successfully (inserted %d games)", insertedGames));
     }
 }

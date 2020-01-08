@@ -30,7 +30,7 @@ public abstract class ConsoleLogger {
      * Write log to file.
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public synchronized static void writeToLogFile() {
+    private synchronized static void writeToLogFile() {
         try {
             File logFile = new File("log.txt");
             logFile.createNewFile();
@@ -48,9 +48,11 @@ public abstract class ConsoleLogger {
             String output = "\nBot work completed in " + computeTime(programStartTime.get())
             + "\n" + StringUtils.repeat("*", 50);
             writeInLine(output);
+            writeToLogFile();
         } else if (type == LogType.BLOCK_END) {
             String output = "\n" + StringUtils.repeat("~", 50);
             writeInLine(output);
+            writeToLogFile();
         }
     }
 
