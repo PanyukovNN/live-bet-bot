@@ -46,7 +46,7 @@ public class LiveBetBotApplication {
         }
     }
 
-    static Connection getConnection() {
+    private static Connection getConnection() {
         try(InputStream inputStream = LiveBetBotApplication.class.getClassLoader().getResourceAsStream("dataBase.properties")) {
             Properties property = new Properties();
             property.load(inputStream);

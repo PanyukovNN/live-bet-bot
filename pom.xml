@@ -17,7 +17,8 @@
         <maven-dependency-plugin.version>2.4</maven-dependency-plugin.version>
         <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
-        <main-class-path>com.zylex.livebetbot.LiveBetBotApplication</main-class-path>
+        <betbot-main-class-path>com.zylex.livebetbot.LiveBetBotApplication</betbot-main-class-path>
+        <statistics-main-class-path>com.zylex.livebetbot.StatisticsApplication</statistics-main-class-path>
         <slf4j.version>1.7.5</slf4j.version>
         <webdrivermanager.version>3.7.1</webdrivermanager.version>
         <postgresql.version>42.2.8.jre7</postgresql.version>
@@ -103,7 +104,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>${main-class-path}</mainClass>
+                            <mainClass>${betbot-main-class-path}</mainClass>
                             <packageName>com.zylex.livebetbot</packageName>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
