@@ -116,9 +116,9 @@ public class Game {
 
     @Override
     public String toString() {
-        DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a yyyy.MM.dd");
+        DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a yyyy.MM.dd");
         return String.format("%s %s - %s (%d:%d) (%d:%d) (%s)",
-                DATE_FORMATTER.format(dateTime),
+                DATE_TIME_FORMATTER.format(dateTime),
                 firstTeam,
                 secondTeam,
                 breakGoal.getHomeGoals(),

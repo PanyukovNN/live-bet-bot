@@ -4,9 +4,15 @@ import com.zylex.livebetbot.exception.GameDaoException;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.Goal;
 import com.zylex.livebetbot.service.rule.RuleNumber;
+import org.postgresql.copy.CopyManager;
+import org.postgresql.core.BaseConnection;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,13 +139,34 @@ public class GameDao {
         return new Goal(homeGoal, awayGoal);
     }
 
+    public int createStatisticsFile(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        String fileName = startDateTime.toLocalDate().equals(endDateTime.toLocalDate())
+                ? String.format("games_%s.csv", DATE_FORMATTER.format(startDateTime))
+                : String.format("games_%s-%s.csv", DATE_FORMATTER.format(startDateTime), DATE_FORMATTER.format(endDateTime));
+        String sqlRequest = String.format(SQLGame.SAVE_STATISTICS_TO_FILE.QUERY,
+                Timestamp.valueOf(startDateTime),
+                Timestamp.valueOf(endDateTime));
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            return (int) new CopyManager((BaseConnection) connection).copyOut(sqlRequest, writer);
+        } catch (SQLException | IOException e) {
+            throw new GameDaoException(e.getMessage(), e);
+        }
+    }
+
     enum SQLGame {
         GET("SELECT * FROM game WHERE rule_number = (?) AND link = (?)"),
         GET_ALL("SELECT * FROM game"),
         GET_BY_DATE("SELECT * FROM game WHERE date_time >= (?) AND date_time <= (?)"),
         GET_WITH_NO_RESULT("SELECT * FROM game WHERE final_score IS NULL OR final_score = '-1:-1'"),
         INSERT("INSERT INTO game (id, date_time, first_team, second_team, break_score, final_score, rule_number, link) VALUES (DEFAULT, (?), (?), (?), (?), (?), (?), (?))"),
-        UPDATE("UPDATE game SET date_time = (?), first_team = (?), second_team = (?), break_score = (?), final_score = (?), rule_number = (?), link = (?) WHERE id = (?)");
+        UPDATE("UPDATE game SET date_time = (?), first_team = (?), second_team = (?), break_score = (?), final_score = (?), rule_number = (?), link = (?) WHERE id = (?)"),
+        SAVE_STATISTICS_TO_FILE("COPY " +
+                "(SELECT date_time, first_team, second_team, break_score, final_score, rule_number,\n" +
+                "       ROUND((SELECT coefficient FROM over_under WHERE size = 1 AND type = 'OVER' AND game_id = game.id)::numeric, 2),\n" +
+                "       ROUND((SELECT coefficient FROM over_under WHERE  size = 1.5 AND type = 'OVER' AND game_id = game.id)::numeric, 2)\n" +
+                "FROM game WHERE date_time > '%s' AND date_time < '%s')\n" +
+                "TO STDOUT DELIMITER ',' CSV");
 
         String QUERY;
 

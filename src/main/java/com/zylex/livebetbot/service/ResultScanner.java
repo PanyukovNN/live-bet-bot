@@ -155,15 +155,13 @@ public class ResultScanner {
     }
 
     private String findSecondTeam(Elements teams) {
-        String secondTeam = "";
         teams.remove(0);
         for (Element teamElement : teams) {
             if (!teamElement.text().isEmpty()) {
-                secondTeam = teamElement.text();
-                break;
+                return teamElement.text();
             }
         }
-        return secondTeam;
+        return "";
     }
 
     private List<Game> removeGameWithResults(List<Game> noResultGames) {

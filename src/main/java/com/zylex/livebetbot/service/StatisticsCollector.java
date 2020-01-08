@@ -30,11 +30,13 @@ public class StatisticsCollector {
         List<Game> games = gameDao.getByDate(startDateTime, endDateTime);
         for (RuleNumber ruleNumber : RuleNumber.values()) {
             List<Game> ruleGames = games.stream().filter(game -> game.getRuleNumber() == ruleNumber).collect(Collectors.toList());
-            int moreGoal = (int) ruleGames.stream().filter(game -> (game.getFinalGoal().getHomeGoals() + game.getFinalGoal().getAwayGoals()) > 1).count();
-            int oneGoal = (int) ruleGames.stream().filter(game -> (game.getFinalGoal().getHomeGoals() + game.getFinalGoal().getAwayGoals()) == 1).count();
-            int noGoal = (int) ruleGames.stream().filter(game -> (game.getFinalGoal().getHomeGoals() + game.getFinalGoal().getAwayGoals()) == 0).count();
-            int noResult = (int) ruleGames.stream().filter(game -> (game.getFinalGoal().getHomeGoals() + game.getFinalGoal().getAwayGoals()) == -2).count();
-            logger.logStatistics(ruleNumber, moreGoal, oneGoal, noGoal, noResult);
+            int overGoal    = (int) ruleGames.stream().filter(game -> (game.getFinalGoal().getHomeGoals() + game.getFinalGoal().getAwayGoals()) > 1).count();
+            int refund      = (int) ruleGames.stream().filter(game -> (game.getFinalGoal().getHomeGoals() + game.getFinalGoal().getAwayGoals()) == 1).count();
+            int noGoal      = (int) ruleGames.stream().filter(game -> (game.getFinalGoal().getHomeGoals() + game.getFinalGoal().getAwayGoals()) == 0).count();
+            int noResult    = (int) ruleGames.stream().filter(game -> (game.getFinalGoal().getHomeGoals() + game.getFinalGoal().getAwayGoals()) == -2).count();
+            logger.logStatistics(ruleNumber, overGoal, refund, noGoal, noResult);
         }
+        int insertedGames = gameDao.createStatisticsFile(startDateTime, endDateTime);
+        System.out.print(String.format("\nStatistics file created successful (inserted %d games)", insertedGames));
     }
 }
