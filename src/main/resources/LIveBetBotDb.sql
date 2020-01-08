@@ -28,3 +28,4 @@ SELECT date_time, first_team, second_team, break_score, final_score, rule_number
            FROM tml
            WHERE  size = 1.5 AND more_less = 'MORE' AND game_id = game.id)
 FROM game
+WHERE date_time > '2020-01-07 00:00:00.000000';

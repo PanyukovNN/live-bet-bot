@@ -26,11 +26,11 @@ public class LiveBetBotApplication {
              BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             ScheduledParsingTask parsingTask = new ScheduledParsingTask(
                 new GameDao(connection),
-                    parsingDriverManager.initiateDriver(false)
+                parsingDriverManager.initiateDriver(true)
             );
             ScheduledResultScanningTask resultScanningTask = new ScheduledResultScanningTask(
                 new GameDao(connection),
-                    resultScannerDriverManager.initiateDriver(false)
+                resultScannerDriverManager.initiateDriver(true)
             );
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
             scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);

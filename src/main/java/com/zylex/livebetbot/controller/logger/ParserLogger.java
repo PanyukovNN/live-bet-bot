@@ -39,23 +39,21 @@ public class ParserLogger extends ConsoleLogger {
     }
 
     public void logCountriesFound(LogType type) {
-        String output = "";
         if (type == LogType.OKAY) {
-            output = "Finding countries: complete";
+            String output = "Finding countries: complete";
+            writeInLine(StringUtils.repeat("\b", output.length()) + output);
+            writeLineSeparator();
         } else if (type == LogType.NO_COUNTRIES) {
-            output = "Finding countries: complete (no countries)";
+            String output = "Finding countries: complete (no countries)";
+            writeInLine(StringUtils.repeat("\b", output.length()) + output);
         }
-        writeInLine(StringUtils.repeat("\b", output.length()) + output);
-        writeLineSeparator();
     }
 
     public synchronized void logCountry(LogType type) {
         if (type == LogType.ERROR) {
             processedErrorCountries.incrementAndGet();
-            processedCountries.incrementAndGet();
             return;
-        }
-        if (type == LogType.OKAY) {
+        } else if (type == LogType.OKAY) {
             String output = String.format("Processing countries: %d/%d (%s%%)",
                     processedCountries.incrementAndGet(),
                     totalCountries,
@@ -64,7 +62,7 @@ public class ParserLogger extends ConsoleLogger {
         }
         if (processedCountries.get() == totalCountries) {
             if (processedErrorCountries.get() > 0) {
-                String output = String.format("\nError countries: %d", processedErrorCountries.get());
+                String output = String.format("Error countries: %d", processedErrorCountries.get());
                 writeErrorMessage(output);
             }
             writeLineSeparator();
