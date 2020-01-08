@@ -37,6 +37,6 @@ public class StatisticsCollector {
             logger.logStatistics(ruleNumber, overGoal, refund, noGoal, noResult);
         }
         int insertedGames = gameDao.createStatisticsFile(startDateTime, endDateTime);
-        System.out.print(String.format("\nStatistics file created successful (inserted %d games)", insertedGames));
+        logger.fileCreatedSuccessful(insertedGames);
     }
 }

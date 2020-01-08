@@ -34,4 +34,8 @@ public class StatisticsCollectorLogger {
         System.out.print(output);
         System.out.print("\n" + StringUtils.repeat("-", output.length() + 1));
     }
+
+    public void fileCreatedSuccessful(int insertedGames) {
+        System.out.print(String.format("\nStatistics file created successful (inserted %d games)", insertedGames));
+    }
 }
