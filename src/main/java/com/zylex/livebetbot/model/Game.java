@@ -21,7 +21,7 @@ public class Game {
 
     private Goal finalGoal = new Goal(-1, -1);
 
-    private List<Tml> tmlList;
+    private List<OverUnder> overUnderList;
 
     private String link;
 
@@ -42,7 +42,7 @@ public class Game {
         this.secondTeam = oldGame.getSecondTeam();
         this.breakGoal = oldGame.getBreakGoal();
         this.finalGoal = oldGame.getFinalGoal();
-        this.tmlList = oldGame.tmlList;
+        this.overUnderList = oldGame.overUnderList;
         this.link = oldGame.link;
         this.ruleNumber = oldGame.ruleNumber;
     }
@@ -90,12 +90,12 @@ public class Game {
         this.finalGoal = finalGoal;
     }
 
-    public List<Tml> getTmlList() {
-        return tmlList;
+    public List<OverUnder> getOverUnderList() {
+        return overUnderList;
     }
 
-    public void setTmlList(List<Tml> TmlList) {
-        this.tmlList = TmlList;
+    public void setOverUnderList(List<OverUnder> overUnderList) {
+        this.overUnderList = overUnderList;
     }
 
     public RuleNumber getRuleNumber() {

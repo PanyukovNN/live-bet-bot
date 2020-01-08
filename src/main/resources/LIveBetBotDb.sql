@@ -10,11 +10,11 @@ CREATE TABLE IF NOT EXISTS game (
     link              VARCHAR(500)
 );
 
-DROP TABLE IF EXISTS tml CASCADE;
-CREATE TABLE IF NOT EXISTS tml (
+DROP TABLE IF EXISTS over_under CASCADE;
+CREATE TABLE IF NOT EXISTS over_under (
     id          SERIAL NOT NULL PRIMARY KEY,
     game_id     BIGINT NOT NULL,
-    more_less   VARCHAR(20),
+    type        VARCHAR(20),
     size        FLOAT,
     coefficient FLOAT,
     FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE
@@ -22,10 +22,10 @@ CREATE TABLE IF NOT EXISTS tml (
 
 SELECT date_time, first_team, second_team, break_score, final_score, rule_number,
        (SELECT coefficient
-           FROM tml
-           WHERE size = 1 AND more_less = 'MORE' AND game_id = game.id),
+           FROM over_under
+           WHERE size = 1 AND type = 'OVER' AND game_id = game.id),
        (SELECT coefficient
-           FROM tml
-           WHERE  size = 1.5 AND more_less = 'MORE' AND game_id = game.id)
+           FROM over_under
+           WHERE  size = 1.5 AND type = 'OVER' AND game_id = game.id)
 FROM game
 WHERE date_time > '2020-01-07 00:00:00.000000' AND date_time < '2020-01-07 23:59:99.999999';

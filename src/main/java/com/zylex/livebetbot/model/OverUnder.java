@@ -1,33 +1,33 @@
 package com.zylex.livebetbot.model;
 
 /**
- * Total-more-less model.
+ * Over under model.
  */
-public class Tml {
+public class OverUnder {
 
     private long id;
 
     private long gameId;
 
-    private MoreLess moreLess;
+    private OverUnderType overUnderType;
 
     private double size;
 
     private double coefficient;
 
-    public Tml(long id, long gameId, MoreLess moreLess, double size, double coefficient) {
+    public OverUnder(long id, long gameId, OverUnderType overUnderType, double size, double coefficient) {
         this.id = id;
         this.gameId = gameId;
-        this.moreLess = moreLess;
+        this.overUnderType = overUnderType;
         this.size = size;
         this.coefficient = coefficient;
     }
 
-    public Tml() {
+    public OverUnder() {
     }
 
-    public MoreLess getMoreLess() {
-        return moreLess;
+    public OverUnderType getOverUnderType() {
+        return overUnderType;
     }
 
     public double getSize() {
@@ -56,10 +56,10 @@ public class Tml {
 
     @Override
     public String toString() {
-        return "Tml{" +
+        return "OverUnder{" +
                 "id=" + id +
                 ", gameId=" + gameId +
-                ", moreLess=" + moreLess +
+                ", type=" + overUnderType +
                 ", size=" + size +
                 ", coefficient=" + coefficient +
                 '}';

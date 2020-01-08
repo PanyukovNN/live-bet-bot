@@ -15,11 +15,11 @@ public class GameDao {
 
     private final Connection connection;
 
-    private final TmlDao tmlDao;
+    private final OverUnderDao overUnderDao;
 
     public GameDao(final Connection connection) {
         this.connection = connection;
-        this.tmlDao = new TmlDao(connection);
+        this.overUnderDao = new OverUnderDao(connection);
     }
 
     public List<Game> getAll() {
@@ -90,7 +90,7 @@ public class GameDao {
         extractedGame.setBreakGoal(breakScore);
         extractedGame.setFinalGoal(finalScore);
         extractedGame.setRuleNumber(ruleNumber);
-        extractedGame.setTmlList(tmlDao.getByGameId(id));
+        extractedGame.setOverUnderList(overUnderDao.getByGameId(id));
         return extractedGame;
     }
 
@@ -114,10 +114,10 @@ public class GameDao {
                 ResultSet generatedKeys = statement.getGeneratedKeys();
                 if (generatedKeys.next()) {
                     game.setId(generatedKeys.getInt(1));
-                    game.getTmlList().forEach(tml -> tml.setGameId(game.getId()));
+                    game.getOverUnderList().forEach(overUnder -> overUnder.setGameId(game.getId()));
                 }
             }
-            game.getTmlList().forEach(tmlDao::save);
+            game.getOverUnderList().forEach(overUnderDao::save);
         } catch (SQLException e) {
             throw new GameDaoException(e.getMessage(), e);
         }

@@ -3,8 +3,8 @@ package com.zylex.livebetbot.service.parser;
 import com.zylex.livebetbot.controller.logger.ParserLogger;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.Goal;
-import com.zylex.livebetbot.model.MoreLess;
-import com.zylex.livebetbot.model.Tml;
+import com.zylex.livebetbot.model.OverUnder;
+import com.zylex.livebetbot.model.OverUnderType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -35,7 +35,7 @@ class GameParser {
         logger.logGame();
         driver.navigate().to("http://ballchockdee.com" + game.getLink());
         game.setBreakGoal(findGoal());
-        game.setTmlList(findTml());
+        game.setOverUnderList(findOverUnder());
     }
 
     private Goal findGoal() {
@@ -53,34 +53,34 @@ class GameParser {
         }
     }
 
-    private List<Tml> findTml() {
+    private List<OverUnder> findOverUnder() {
         try {
             waitElementWithClassName("MarketT");
             Document document = Jsoup.parse(driver.getPageSource());
             Elements marketElements = document.select("div.MarketT");
-            List<Element> tmlMarketElements = marketElements.stream()
+            List<Element> overUnderMarketElements = marketElements.stream()
                     .filter(market -> {
                         String header = market.select("div.SubHead > span").text();
                         return header.contains("First Half Over Under") || header.contains("Over Under");
                     })
                     .collect(Collectors.toList());
-            List<Tml> TmlList = new ArrayList<>();
-            for (Element marketElement : tmlMarketElements) {
-                Elements tmlElements = marketElement.select("table > tbody > tr");
-                for (Element tmlElement : tmlElements) {
-                    if (tmlElement.className().equals("OddsClosed")) {
+            List<OverUnder> overUnderList = new ArrayList<>();
+            for (Element marketElement : overUnderMarketElements) {
+                Elements overUnderElements = marketElement.select("table > tbody > tr");
+                for (Element overUnderElement : overUnderElements) {
+                    if (overUnderElement.className().equals("OddsClosed")) {
                         continue;
                     }
-                    double moreSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
-                    double moreCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
-                    TmlList.add(new Tml(0, 0, MoreLess.MORE, moreSize, moreCoefficient));
+                    double overSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
+                    double overCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
+                    overUnderList.add(new OverUnder(0, 0, OverUnderType.OVER, overSize, overCoefficient));
 
-                    double lessSize = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
-                    double lessCoefficient = Double.parseDouble(tmlElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
-                    TmlList.add(new Tml(0, 0, MoreLess.LESS, lessSize, lessCoefficient));
+                    double underSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
+                    double underCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
+                    overUnderList.add(new OverUnder(0, 0, OverUnderType.UNDER, underSize, underCoefficient));
                 }
             }
-            return TmlList;
+            return overUnderList;
         } catch (Exception e) {
             //TODO remove when exception will be found
             System.out.print("\nПроизошла ошибка при сканировании тоталов игры: " + e.getMessage());
