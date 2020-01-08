@@ -48,7 +48,7 @@ public class ResultScanner {
         try {
             logger.startLogMessage();
             List<Game> noResultGames = gameDao.getNoResultGames();
-            noResultGames = removeOldGames(noResultGames);
+            noResultGames = removeEarlyGames(removeOldGames(noResultGames));
             if (noResultGames.isEmpty()) {
                 logger.endLogMessage(LogType.NO_GAMES, 0);
                 ConsoleLogger.endMessage(LogType.BLOCK_END);
@@ -67,6 +67,12 @@ public class ResultScanner {
     private List<Game> removeOldGames(List<Game> noResultGames) {
         return noResultGames.stream()
                 .filter(game -> game.getDateTime().isAfter(LocalDateTime.of(LocalDate.now().minusDays(2), LocalTime.of(0,0))))
+                .collect(Collectors.toList());
+    }
+
+    private List<Game> removeEarlyGames(List<Game> noResultGames) {
+        return noResultGames.stream()
+                .filter(game -> game.getDateTime().isBefore(LocalDateTime.of(LocalDate.now(), LocalTime.now().minusHours(1))))
                 .collect(Collectors.toList());
     }
 
