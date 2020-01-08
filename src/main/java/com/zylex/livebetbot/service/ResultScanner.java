@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -111,56 +112,58 @@ public class ResultScanner {
         wait.ignoring(StaleElementReferenceException.class)
                 .until(ExpectedConditions.presenceOfElementLocated(By.name("Yesterday")));
         driver.findElement(By.name("Yesterday")).click();
-        //TODO find better way
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.sleep(1500);
+        } catch (InterruptedException ignore) {
         }
-        waitElementWithClassName("ContentTable");
     }
 
     private void findingResults(List<Game> noResultGames) {
-        try {
-            if (noResultGames.isEmpty()) {
-                return;
-            }
-            noResultGames = removeGameWithResults(noResultGames);
-            Document document = Jsoup.parse(driver.getPageSource());
-            Elements gameElements = document.select("tr.tr_odd, tr.tr_even");
-            for (Element gameElement : gameElements) {
-                Elements cells = gameElement.select("td");
-                Elements teams = cells.get(1).select("span");
-                String firstTeam = teams.get(0).text();
-                teams.remove(0);
-                String secondTeam = "";
-                //TODO simplify
-                for (Element teamElement : teams) {
-                    if (!teamElement.text().isEmpty()) {
-                        secondTeam = teamElement.text();
-                        break;
-                    }
-                }
-                String[] finalScores = cells.get(3).text().split(" : ");
-                if (finalScores[0].equals("-")) {
-                    continue;
-                }
-                for (Game game : noResultGames) {
-                    if (game.getFinalGoal().getHomeGoals() >= 0) {
-                        continue;
-                    }
-                    if (game.getFirstTeam().equals(firstTeam) && game.getSecondTeam().equals(secondTeam)) {
-                        int homeGoalFinal = Integer.parseInt(finalScores[0]);
-                        int awayGoalFinal = Integer.parseInt(finalScores[1]);
-                        game.setFinalGoal(new Goal(homeGoalFinal, awayGoalFinal));
-                        gameDao.save(game);
-                        gamesResultNumber++;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        noResultGames = removeGameWithResults(noResultGames);
+        if (noResultGames.isEmpty()) {
+            return;
         }
+        Document document = Jsoup.parse(driver.getPageSource());
+        Elements gameElements = document.select("tr.tr_odd, tr.tr_even");
+        for (Element gameElement : gameElements) {
+            Elements cells = gameElement.select("td");
+            Elements teams = cells.get(1).select("span");
+            String firstTeam = teams.get(0).text();
+            String secondTeam = findSecondTeam(teams);
+            Goal goal = findScores(cells);
+            if (goal == null) {
+                continue;
+            }
+            Optional<Game> gameOptional = noResultGames.stream().filter(game -> game.getFirstTeam().equals(firstTeam) && game.getSecondTeam().equals(secondTeam)).findFirst();
+            if (gameOptional.isPresent()) {
+                Game game = gameOptional.get();
+                game.setFinalGoal(goal);
+                gameDao.save(game);
+                gamesResultNumber++;
+            }
+        }
+    }
+
+    private Goal findScores(Elements cells) {
+        String[] finalScores = cells.get(3).text().split(" : ");
+        if (finalScores[0].equals("-")) {
+            return null;
+        }
+        int homeGoalFinal = Integer.parseInt(finalScores[0]);
+        int awayGoalFinal = Integer.parseInt(finalScores[1]);
+        return new Goal(homeGoalFinal, awayGoalFinal);
+    }
+
+    private String findSecondTeam(Elements teams) {
+        String secondTeam = "";
+        teams.remove(0);
+        for (Element teamElement : teams) {
+            if (!teamElement.text().isEmpty()) {
+                secondTeam = teamElement.text();
+                break;
+            }
+        }
+        return secondTeam;
     }
 
     private List<Game> removeGameWithResults(List<Game> noResultGames) {
