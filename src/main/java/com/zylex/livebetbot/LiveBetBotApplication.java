@@ -47,7 +47,7 @@ public class LiveBetBotApplication {
     }
 
     static Connection getConnection() {
-        try(InputStream inputStream = LiveBetBotApplication.class.getClassLoader().getResourceAsStream("LiveBetBotDb.properties")) {
+        try(InputStream inputStream = LiveBetBotApplication.class.getClassLoader().getResourceAsStream("dataBase.properties")) {
             Properties property = new Properties();
             property.load(inputStream);
             final String login = property.getProperty("db.login");
@@ -56,8 +56,6 @@ public class LiveBetBotApplication {
             Class.forName("org.postgresql.Driver");
             return java.sql.DriverManager.getConnection(url, login, password);
         } catch(SQLException | IOException | ClassNotFoundException e) {
-            System.out.println();
-            e.printStackTrace();
             throw new LiveBetBotException(e.getMessage(), e);
         }
     }
