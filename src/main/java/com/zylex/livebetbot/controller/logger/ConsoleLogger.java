@@ -20,7 +20,7 @@ public abstract class ConsoleLogger {
 
     static {
         DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a dd.MM.yyyy");
-        logOutput = StringUtils.repeat("*", 50) + "\n"
+        logOutput = "\n" + StringUtils.repeat("*", 50) + "\n"
                 + String.format("Bot started at: %s", LocalDateTime.now().format(DATE_TIME_FORMATTER))
                 + "\n" + StringUtils.repeat("-", 50);
         System.out.print(logOutput.substring(1));
@@ -46,7 +46,7 @@ public abstract class ConsoleLogger {
     public synchronized static void endMessage(LogType type) {
         if (type == LogType.BOT_END) {
             String output = "\nBot work completed in " + computeTime(programStartTime.get())
-            + "\n" + StringUtils.repeat("*", 50) + "\n";
+            + "\n" + StringUtils.repeat("*", 50);
             writeInLine(output);
         } else if (type == LogType.BLOCK_END) {
             String output = "\n" + StringUtils.repeat("~", 50);

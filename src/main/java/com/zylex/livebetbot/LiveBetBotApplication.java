@@ -6,10 +6,7 @@ import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.exception.LiveBetBotException;
 import com.zylex.livebetbot.service.DriverManager;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -59,6 +56,8 @@ public class LiveBetBotApplication {
             Class.forName("org.postgresql.Driver");
             return java.sql.DriverManager.getConnection(url, login, password);
         } catch(SQLException | IOException | ClassNotFoundException e) {
+            System.out.println();
+            e.printStackTrace();
             throw new LiveBetBotException(e.getMessage(), e);
         }
     }

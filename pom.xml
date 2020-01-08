@@ -20,7 +20,6 @@
         <main-class-path>com.zylex.livebetbot.LiveBetBotApplication</main-class-path>
         <slf4j.version>1.7.5</slf4j.version>
         <webdrivermanager.version>3.7.1</webdrivermanager.version>
-        <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <postgresql.version>42.2.8.jre7</postgresql.version>
         <jstl.version>1.2</jstl.version>
     </properties>
@@ -50,19 +49,6 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
-        </dependency>
-
-        <!--Web-->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${javax.servlet-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-            <version>${jstl.version}</version>
         </dependency>
 
         <!--Junit-->
