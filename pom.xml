@@ -87,6 +87,7 @@
 
     <build>
         <finalName>LiveBetBot</finalName>
+<!--        <finalName>StatisticsCollector</finalName>-->
         <defaultGoal>package</defaultGoal>
 
         <resources>
@@ -105,6 +106,7 @@
                     <archive>
                         <manifest>
                             <mainClass>${betbot-main-class-path}</mainClass>
+<!--                            <mainClass>${statistics-main-class-path}</mainClass>-->
                             <packageName>com.zylex.livebetbot</packageName>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>

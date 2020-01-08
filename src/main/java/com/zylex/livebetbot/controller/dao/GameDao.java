@@ -145,8 +145,8 @@ public class GameDao {
         String fileName = startDateTime.toLocalDate().equals(endDateTime.toLocalDate())
                 ? String.format("statistics/%s.csv", DATE_FORMATTER.format(startDateTime))
                 : String.format("statistics/%s-%s.csv", DATE_FORMATTER.format(startDateTime), DATE_FORMATTER.format(endDateTime));
+        createFile(fileName);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            createFile(fileName);
             String sqlRequest = String.format(SQLGame.SAVE_STATISTICS_TO_FILE.QUERY,
                     Timestamp.valueOf(startDateTime),
                     Timestamp.valueOf(endDateTime));
@@ -157,11 +157,15 @@ public class GameDao {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void createFile(String fileName) throws IOException {
-        new File("statistics").mkdir();
-        File file = new File(fileName);
-        if (!file.exists()) {
-            file.createNewFile();
+    private void createFile(String fileName) {
+        try {
+            new File("statistics").mkdir();
+            File file = new File(fileName);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
