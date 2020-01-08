@@ -21,8 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@SuppressWarnings("WeakerAccess")
-public class CountryParser {
+class CountryParser {
 
     private WebDriver driver;
 
@@ -73,39 +72,37 @@ public class CountryParser {
 
     private List<Game> findBreakGames(List<String> countryLinks) {
         List<Game> games = new ArrayList<>();
-        try {
-            for (String countryLink : countryLinks) {
-                if (prepareWebpage(countryLink)) {
-                    logger.logCountry(LogType.OKAY);
-                } else {
-                    logger.logCountry(LogType.ERROR);
-                    continue;
-                }
-                Document document = Jsoup.parse(driver.getPageSource());
-                Elements gameElements = document.select("table.Hdp > tbody > tr");
-                for (Element gameElement : gameElements) {
-                    Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
-                    if (dateTimeText.text().contains("HT")) {
-                        Element firstTeamElement = gameElement.selectFirst("td > a.OddsTabL > span.OddsL");
-                        Element secondTeamElement = gameElement.selectFirst("td > a.OddsTabR > span.OddsL");
-                        if (firstTeamElement == null || secondTeamElement == null) {
-                            continue;
-                        }
-                        String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
-                        Game game = new Game(0, LocalDateTime.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
-                        if (noResultGames.contains(game) | games.contains(game)) {
-                            continue;
-                        }
-                        games.add(game);
-                    }
-                }
+        for (String countryLink : countryLinks) {
+            if (prepareWebpage(countryLink)) {
+                logger.logCountry(LogType.OKAY);
+            } else {
+                logger.logCountry(LogType.ERROR);
+                continue;
             }
-        } catch (Exception e) {
-            //TODO may be removed
-            System.out.print("\nПроизошла ошибка при сканировании стран: " + e.getMessage());
-            e.printStackTrace();
+            Document document = Jsoup.parse(driver.getPageSource());
+            Elements gameElements = document.select("table.Hdp > tbody > tr");
+            extractGame(games, gameElements);
         }
         return games;
+    }
+
+    private void extractGame(List<Game> games, Elements gameElements) {
+        for (Element gameElement : gameElements) {
+            Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
+            if (dateTimeText.text().contains("HT")) {
+                Element firstTeamElement = gameElement.selectFirst("td > a.OddsTabL > span.OddsL");
+                Element secondTeamElement = gameElement.selectFirst("td > a.OddsTabR > span.OddsL");
+                if (firstTeamElement == null || secondTeamElement == null) {
+                    continue;
+                }
+                String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
+                Game game = new Game(0, LocalDateTime.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
+                if (noResultGames.contains(game) | games.contains(game)) {
+                    continue;
+                }
+                games.add(game);
+            }
+        }
     }
 
     private boolean prepareWebpage(String countryLink) {

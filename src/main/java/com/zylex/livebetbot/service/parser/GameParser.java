@@ -54,39 +54,32 @@ class GameParser {
     }
 
     private List<OverUnder> findOverUnder() {
-        try {
-            waitElementWithClassName("MarketT");
-            Document document = Jsoup.parse(driver.getPageSource());
-            Elements marketElements = document.select("div.MarketT");
-            List<Element> overUnderMarketElements = marketElements.stream()
-                    .filter(market -> {
-                        String header = market.select("div.SubHead > span").text();
-                        return header.contains("First Half Over Under") || header.contains("Over Under");
-                    })
-                    .collect(Collectors.toList());
-            List<OverUnder> overUnderList = new ArrayList<>();
-            for (Element marketElement : overUnderMarketElements) {
-                Elements overUnderElements = marketElement.select("table > tbody > tr");
-                for (Element overUnderElement : overUnderElements) {
-                    if (overUnderElement.className().equals("OddsClosed")) {
-                        continue;
-                    }
-                    double overSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
-                    double overCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
-                    overUnderList.add(new OverUnder(0, 0, OverUnderType.OVER, overSize, overCoefficient));
-
-                    double underSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
-                    double underCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
-                    overUnderList.add(new OverUnder(0, 0, OverUnderType.UNDER, underSize, underCoefficient));
+        waitElementWithClassName("MarketT");
+        Document document = Jsoup.parse(driver.getPageSource());
+        Elements marketElements = document.select("div.MarketT");
+        List<Element> overUnderMarketElements = marketElements.stream()
+                .filter(market -> market.select("div.SubHead > span").text().contains("Over Under"))
+                .collect(Collectors.toList());
+        List<OverUnder> overUnderList = new ArrayList<>();
+        for (Element marketElement : overUnderMarketElements) {
+            Elements overUnderElements = marketElement.select("table > tbody > tr");
+            for (Element overUnderElement : overUnderElements) {
+                if (overUnderElement.className().equals("OddsClosed")) {
+                    continue;
                 }
+                extractOverUnder(overUnderList, overUnderElement);
             }
-            return overUnderList;
-        } catch (Exception e) {
-            //TODO remove when exception will be found
-            System.out.print("\nПроизошла ошибка при сканировании тоталов игры: " + e.getMessage());
-            e.printStackTrace();
-            return new ArrayList<>();
         }
+        return overUnderList;
+    }
+
+    private void extractOverUnder(List<OverUnder> overUnderList, Element overUnderElement) {
+        double overSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
+        double overCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
+        overUnderList.add(new OverUnder(0, 0, OverUnderType.OVER, overSize, overCoefficient));
+        double underSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
+        double underCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
+        overUnderList.add(new OverUnder(0, 0, OverUnderType.UNDER, underSize, underCoefficient));
     }
 
     private WebElement waitElementWithClassName(String className) {
