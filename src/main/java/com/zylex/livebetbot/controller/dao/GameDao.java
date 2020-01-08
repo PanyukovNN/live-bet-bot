@@ -8,6 +8,7 @@ import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
@@ -142,15 +143,25 @@ public class GameDao {
     public int createStatisticsFile(LocalDateTime startDateTime, LocalDateTime endDateTime) {
         DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         String fileName = startDateTime.toLocalDate().equals(endDateTime.toLocalDate())
-                ? String.format("games_%s.csv", DATE_FORMATTER.format(startDateTime))
-                : String.format("games_%s-%s.csv", DATE_FORMATTER.format(startDateTime), DATE_FORMATTER.format(endDateTime));
-        String sqlRequest = String.format(SQLGame.SAVE_STATISTICS_TO_FILE.QUERY,
-                Timestamp.valueOf(startDateTime),
-                Timestamp.valueOf(endDateTime));
+                ? String.format("%s", DATE_FORMATTER.format(startDateTime))
+                : String.format("%s-%s", DATE_FORMATTER.format(startDateTime), DATE_FORMATTER.format(endDateTime));
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            createFile(fileName);
+            String sqlRequest = String.format(SQLGame.SAVE_STATISTICS_TO_FILE.QUERY,
+                    Timestamp.valueOf(startDateTime),
+                    Timestamp.valueOf(endDateTime));
             return (int) new CopyManager((BaseConnection) connection).copyOut(sqlRequest, writer);
         } catch (SQLException | IOException e) {
             throw new GameDaoException(e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void createFile(String fileName) throws IOException {
+        new File("statistics").mkdir();
+        File file = new File(String.format("statistics/%s.csv", fileName));
+        if (!file.exists()) {
+            file.createNewFile();
         }
     }
 
