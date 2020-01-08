@@ -1,6 +1,7 @@
 package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.controller.dao.GameDao;
+import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.service.parser.ParseProcessor;
 import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.rule.RuleProcessor;
@@ -30,6 +31,8 @@ public class ScheduledParsingTask implements Runnable {
             ).save();
         } catch (Throwable t) {
             t.printStackTrace();
+        } finally {
+            ConsoleLogger.writeToLogFile();
         }
     }
 }

@@ -2,7 +2,6 @@ package com.zylex.livebetbot.controller.logger;
 
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.rule.RuleNumber;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;

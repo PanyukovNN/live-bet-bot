@@ -62,7 +62,7 @@ public class ParserLogger extends ConsoleLogger {
         }
         if (processedCountries.get() == totalCountries) {
             if (processedErrorCountries.get() > 0) {
-                String output = String.format("Error countries: %d", processedErrorCountries.get());
+                String output = String.format("Countries with no handicap matches: %d", processedErrorCountries.get());
                 writeErrorMessage(output);
             }
             writeLineSeparator();

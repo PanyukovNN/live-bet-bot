@@ -30,19 +30,20 @@ public abstract class ConsoleLogger {
      * Write log to file.
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void writeToLogFile() {
+    public synchronized static void writeToLogFile() {
         try {
             File logFile = new File("log.txt");
             logFile.createNewFile();
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
                 writer.write(logOutput);
             }
+            logOutput = "";
         } catch (IOException e) {
             throw new ConsoleLoggerException(e.getMessage(), e);
         }
     }
 
-    public static void endMessage(LogType type) {
+    public synchronized static void endMessage(LogType type) {
         if (type == LogType.BOT_END) {
             String output = "\nBot work completed in " + computeTime(programStartTime.get())
             + "\n" + StringUtils.repeat("*", 50);
@@ -57,7 +58,7 @@ public abstract class ConsoleLogger {
         if (line.contains("\b")) {
             int backspaces = StringUtils.countMatches(line, "\b");
             int lastNewLineIndex = logOutput.lastIndexOf("\n");
-            logOutput = logOutput.substring(0, Math.max(logOutput.length() - lastNewLineIndex, backspaces + 1))
+            logOutput = logOutput.substring(0, Math.max(logOutput.length() - backspaces, lastNewLineIndex + 1))
                     + line.replace("\b", "");
         } else {
             logOutput += line;
@@ -72,14 +73,14 @@ public abstract class ConsoleLogger {
         logOutput += "\n" + message;
     }
 
-    void writeLineSeparator() {
+    synchronized void writeLineSeparator() {
         String line = "\n" + StringUtils.repeat("-", 50);
         writeInLine(line);
     }
 
-    public static void writeErrorMessage(String line) {
-        System.err.print("\n" + line);
-        addToLog("\n" + line);
+    static synchronized void writeErrorMessage(String line) {
+        System.err.print(line);
+        addToLog(line);
     }
 
     static synchronized void writeInLine(String line) {

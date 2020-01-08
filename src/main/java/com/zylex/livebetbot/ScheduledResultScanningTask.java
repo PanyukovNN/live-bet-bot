@@ -1,6 +1,7 @@
 package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.controller.dao.GameDao;
+import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.service.ResultScanner;
 import org.openqa.selenium.WebDriver;
 
@@ -24,6 +25,8 @@ public class ScheduledResultScanningTask implements Runnable {
             ).scan();
         } catch (Throwable t) {
             t.printStackTrace();
+        } finally {
+            ConsoleLogger.writeToLogFile();
         }
     }
 }
