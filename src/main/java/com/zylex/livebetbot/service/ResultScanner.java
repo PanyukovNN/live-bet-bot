@@ -11,10 +11,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -85,7 +82,7 @@ public class ResultScanner {
     }
 
     private void initDriver() {
-        wait = new WebDriverWait(driver, 5);
+        wait = new WebDriverWait(driver, 60);
         driver.navigate().to("http://ballchockdee.com");
     }
 
@@ -98,6 +95,12 @@ public class ResultScanner {
             waitElementWithClassName("sign-in").click();
             if (driver.getCurrentUrl().startsWith("https://www.sbobet-pay.com/")) {
                 waitElementWithClassName("DWHomeBtn").click();
+            }
+            try {
+                Alert alert = (new WebDriverWait(driver, 5))
+                        .until(ExpectedConditions.alertIsPresent());
+                alert.accept();
+            } catch (NoAlertPresentException ignore) {
             }
             return driver.getCurrentUrl().split("ballchockdee")[0];
         }
@@ -145,13 +148,14 @@ public class ResultScanner {
     }
 
     private Goal findScores(Elements cells) {
-        String[] finalScores = cells.get(3).text().split(" : ");
-        if (finalScores[0].equals("-")) {
+        try {
+            String[] finalScores = cells.get(3).text().split(" : ");
+            int homeGoalFinal = Integer.parseInt(finalScores[0]);
+            int awayGoalFinal = Integer.parseInt(finalScores[1]);
+            return new Goal(homeGoalFinal, awayGoalFinal);
+        } catch (NumberFormatException e) {
             return null;
         }
-        int homeGoalFinal = Integer.parseInt(finalScores[0]);
-        int awayGoalFinal = Integer.parseInt(finalScores[1]);
-        return new Goal(homeGoalFinal, awayGoalFinal);
     }
 
     private String findSecondTeam(Elements teams) {
