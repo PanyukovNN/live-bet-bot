@@ -17,6 +17,8 @@ public class ResultScannerLogger extends ConsoleLogger {
             }
         } else if (type == LogType.NO_GAMES) {
             output = "Result scanning: complete (no games to scan)";
+        } else if (type == LogType.ERROR) {
+            output = "Result scanning: timeout error";
         }
         writeInLine(StringUtils.repeat("\b", output.length()) + output);
     }

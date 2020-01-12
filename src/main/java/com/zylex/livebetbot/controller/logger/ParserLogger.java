@@ -34,7 +34,7 @@ public class ParserLogger extends ConsoleLogger {
             totalGames = arg;
             writeInLine(String.format("\nProcessing games: 0/%d (0.0%%)", arg));
         } else if (type == LogType.NO_GAMES) {
-            writeInLine("\nProcessing games: no games");
+            writeInLine("\nProcessing games: no HT games");
         }
     }
 

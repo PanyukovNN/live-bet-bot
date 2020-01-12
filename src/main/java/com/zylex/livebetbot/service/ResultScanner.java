@@ -54,8 +54,11 @@ public class ResultScanner {
             }
             initDriver();
             String userHash = logIn();
-            processResults(noResultGames, userHash);
-            logger.endLogMessage(LogType.OKAY, gamesResultNumber);
+            if (processResults(noResultGames, userHash)) {
+                logger.endLogMessage(LogType.OKAY, gamesResultNumber);
+            } else {
+                logger.endLogMessage(LogType.ERROR, 0);
+            }
             ConsoleLogger.endMessage(LogType.BLOCK_END);
         } catch (IOException e) {
             throw new ResultScannerException(e.getMessage(), e);
@@ -74,15 +77,18 @@ public class ResultScanner {
                 .collect(Collectors.toList());
     }
 
-    private void processResults(List<Game> noResultGames, String userHash) {
-        navigateToResultTab(userHash);
-        findingResults(noResultGames);
-        navigateToYesterdayResultTab();
-        findingResults(noResultGames);
+    private boolean processResults(List<Game> noResultGames, String userHash) {
+        if (navigateToResultTab(userHash)) {
+            findingResults(noResultGames);
+            navigateToYesterdayResultTab();
+            findingResults(noResultGames);
+            return true;
+        }
+        return false;
     }
 
     private void initDriver() {
-        wait = new WebDriverWait(driver, 60);
+        wait = new WebDriverWait(driver, 5);
         driver.navigate().to("http://ballchockdee.com");
     }
 
@@ -96,19 +102,27 @@ public class ResultScanner {
             if (driver.getCurrentUrl().startsWith("https://www.sbobet-pay.com/")) {
                 waitElementWithClassName("DWHomeBtn").click();
             }
-            try {
-                Alert alert = (new WebDriverWait(driver, 5))
-                        .until(ExpectedConditions.alertIsPresent());
-                alert.accept();
-            } catch (NoAlertPresentException ignore) {
-            }
-            return driver.getCurrentUrl().split("ballchockdee")[0];
+            Alert alert = (new WebDriverWait(driver, 5))
+                    .until(ExpectedConditions.alertIsPresent());
+            alert.accept();
+        } catch (NoAlertPresentException | TimeoutException ignore) {
         }
+        return driver.getCurrentUrl().split("ballchockdee")[0];
     }
 
-    private void navigateToResultTab(String userHash) {
+    private boolean navigateToResultTab(String userHash) {
         driver.navigate().to(userHash + "ballchockdee.com/web-root/restricted/result/results-more.aspx");
-        waitElementWithClassName("ContentTable");
+        int attempts = 2;
+        while (true) {
+            if (attempts-- == 0) {
+                return false;
+            }
+            try {
+                waitElementWithClassName("ContentTable");
+                return true;
+            } catch (NoSuchElementException | TimeoutException ignore) {
+            }
+        }
     }
 
     private void navigateToYesterdayResultTab() {

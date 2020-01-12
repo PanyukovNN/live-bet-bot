@@ -62,7 +62,11 @@ class CountryParser {
 
     private List<String> parseCountryLinks() throws IOException {
         List<String> countryLinks = new ArrayList<>();
+        int attempts = 5;
         while (true) {
+            if (attempts-- == 0) {
+                break;
+            }
             try {
                 Document document = Jsoup.connect("http://www.ballchockdee.com/euro/live-betting/football")
                         .userAgent("Chrome/4.0.249.0 Safari/532.5")
@@ -74,7 +78,6 @@ class CountryParser {
             } catch (UnknownHostException ignore) {
             }
         }
-        //TODO add 5 attempts
         return countryLinks;
     }
 
