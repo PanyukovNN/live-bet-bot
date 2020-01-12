@@ -16,6 +16,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,13 +61,20 @@ class CountryParser {
     }
 
     private List<String> parseCountryLinks() throws IOException {
-        Document document = Jsoup.connect("http://ballchockdee.com/euro/live-betting/football")
-                .userAgent("Chrome/4.0.249.0 Safari/532.5")
-                .referrer("http://www.google.com")
-                .get();
-        Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
         List<String> countryLinks = new ArrayList<>();
-        elements.forEach(element -> countryLinks.add(element.attr("href")));
+        while (true) {
+            try {
+                Document document = Jsoup.connect("http://www.ballchockdee.com/euro/live-betting/football")
+                        .userAgent("Chrome/4.0.249.0 Safari/532.5")
+                        .referrer("http://www.google.com")
+                        .get();
+                Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
+                elements.forEach(element -> countryLinks.add(element.attr("href")));
+                break;
+            } catch (UnknownHostException ignore) {
+            }
+        }
+        //TODO add 5 attempts
         return countryLinks;
     }
 
