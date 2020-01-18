@@ -6,7 +6,7 @@ import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ResultScannerLogger;
 import com.zylex.livebetbot.exception.ResultScannerException;
 import com.zylex.livebetbot.model.Game;
-import com.zylex.livebetbot.model.Goal;
+import com.zylex.livebetbot.model.Score;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -147,26 +147,26 @@ public class ResultScanner {
             Elements teams = cells.get(1).select("span");
             String firstTeam = teams.get(0).text();
             String secondTeam = findSecondTeam(teams);
-            Goal goal = findScores(cells);
-            if (goal == null) {
+            Score score = findScores(cells);
+            if (score == null) {
                 continue;
             }
             Optional<Game> gameOptional = noResultGames.stream().filter(game -> game.getFirstTeam().equals(firstTeam) && game.getSecondTeam().equals(secondTeam)).findFirst();
             if (gameOptional.isPresent()) {
                 Game game = gameOptional.get();
-                game.setFinalGoal(goal);
+                game.setFinalScore(score);
                 gameDao.save(game);
                 gamesResultNumber++;
             }
         }
     }
 
-    private Goal findScores(Elements cells) {
+    private Score findScores(Elements cells) {
         try {
             String[] finalScores = cells.get(3).text().split(" : ");
             int homeGoalFinal = Integer.parseInt(finalScores[0]);
             int awayGoalFinal = Integer.parseInt(finalScores[1]);
-            return new Goal(homeGoalFinal, awayGoalFinal);
+            return new Score(homeGoalFinal, awayGoalFinal);
         } catch (NumberFormatException e) {
             return null;
         }
@@ -183,7 +183,7 @@ public class ResultScanner {
     }
 
     private List<Game> removeGameWithResults(List<Game> noResultGames) {
-        return noResultGames.stream().filter(game -> game.getFinalGoal().getHomeGoals() == -1).collect(Collectors.toList());
+        return noResultGames.stream().filter(game -> game.getFinalScore().getHomeGoals() == -1).collect(Collectors.toList());
     }
 
     private WebElement waitElementWithId(String id) {

@@ -1,29 +1,31 @@
 package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.controller.dao.GameDao;
+import com.zylex.livebetbot.service.DriverManager;
 import com.zylex.livebetbot.service.ResultScanner;
-import org.openqa.selenium.WebDriver;
 
 public class ScheduledResultScanningTask implements Runnable {
 
     private GameDao gameDao;
 
-    private WebDriver driver;
+    private DriverManager driverManager;
 
-    ScheduledResultScanningTask(GameDao gameDao, WebDriver driver) {
+    ScheduledResultScanningTask(GameDao gameDao, DriverManager driverManager) {
         this.gameDao = gameDao;
-        this.driver = driver;
+        this.driverManager = driverManager;
     }
 
     @Override
     public void run() {
         try {
             new ResultScanner(
-                driver,
+                driverManager.initiateDriver(true),
                 gameDao
             ).scan();
         } catch (Throwable t) {
             t.printStackTrace();
+        } finally {
+            driverManager.quitDriver();
         }
     }
 }

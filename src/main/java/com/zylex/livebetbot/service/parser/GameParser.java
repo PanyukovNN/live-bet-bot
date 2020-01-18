@@ -2,7 +2,7 @@ package com.zylex.livebetbot.service.parser;
 
 import com.zylex.livebetbot.controller.logger.ParserLogger;
 import com.zylex.livebetbot.model.Game;
-import com.zylex.livebetbot.model.Goal;
+import com.zylex.livebetbot.model.Score;
 import com.zylex.livebetbot.model.OverUnder;
 import com.zylex.livebetbot.model.OverUnderType;
 import org.jsoup.Jsoup;
@@ -34,22 +34,22 @@ class GameParser {
     void parse(Game game) {
         logger.logGame();
         driver.navigate().to("http://ballchockdee.com" + game.getLink());
-        game.setBreakGoal(findGoal());
+        game.setHalfTimeScore(findGoal());
         game.setOverUnderList(findOverUnder());
     }
 
-    private Goal findGoal() {
+    private Score findGoal() {
         try {
             WebElement scoreElement = waitElementWithClassName("Score");
             String[] scores = scoreElement.getText().split(":");
             int homeGoals = Integer.parseInt(scores[0]);
             int awayGoals = Integer.parseInt(scores[1]);
-            return new Goal(homeGoals, awayGoals);
+            return new Score(homeGoals, awayGoals);
         } catch (StaleElementReferenceException | TimeoutException e) {
-            return new Goal(-1, -1);
+            return new Score(-1, -1);
         } catch (Exception e) {
             e.printStackTrace();
-            return new Goal(-1, -1);
+            return new Score(-1, -1);
         }
     }
 

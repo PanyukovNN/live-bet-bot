@@ -1,12 +1,12 @@
 package com.zylex.livebetbot.model;
 
-public class Goal {
+public class Score {
 
     private int homeGoals;
 
     private int awayGoals;
 
-    public Goal(int homeGoals, int awayGoals) {
+    public Score(int homeGoals, int awayGoals) {
         this.homeGoals = homeGoals;
         this.awayGoals = awayGoals;
     }

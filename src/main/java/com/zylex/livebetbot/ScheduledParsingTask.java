@@ -1,20 +1,20 @@
 package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.controller.dao.GameDao;
+import com.zylex.livebetbot.service.DriverManager;
 import com.zylex.livebetbot.service.parser.ParseProcessor;
 import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.rule.RuleProcessor;
-import org.openqa.selenium.WebDriver;
 
 public class ScheduledParsingTask implements Runnable {
 
     private GameDao gameDao;
 
-    private WebDriver driver;
+    private DriverManager driverManager;
 
-    ScheduledParsingTask(GameDao gameDao, WebDriver driver) {
+    ScheduledParsingTask(GameDao gameDao, DriverManager driverManager) {
         this.gameDao = gameDao;
-        this.driver = driver;
+        this.driverManager = driverManager;
     }
 
     @Override
@@ -23,13 +23,15 @@ public class ScheduledParsingTask implements Runnable {
             new Saver(
                 new RuleProcessor(
                     new ParseProcessor(
-                        driver,
+                        driverManager.initiateDriver(true),
                         gameDao
                     )),
                 gameDao
             ).save();
         } catch (Throwable t) {
             t.printStackTrace();
+        } finally {
+            driverManager.quitDriver();
         }
     }
 }

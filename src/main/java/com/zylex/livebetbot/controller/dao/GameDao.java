@@ -2,7 +2,7 @@ package com.zylex.livebetbot.controller.dao;
 
 import com.zylex.livebetbot.exception.GameDaoException;
 import com.zylex.livebetbot.model.Game;
-import com.zylex.livebetbot.model.Goal;
+import com.zylex.livebetbot.model.Score;
 import com.zylex.livebetbot.service.rule.RuleNumber;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
@@ -89,13 +89,13 @@ public class GameDao {
         LocalDateTime dateTime = resultSet.getTimestamp("date_time").toLocalDateTime();
         String firstTeam = resultSet.getString("first_team");
         String secondTeam = resultSet.getString("second_team");
-        Goal breakScore = stringToGoal(resultSet.getString("break_score"));
-        Goal finalScore = stringToGoal(resultSet.getString("final_score"));
+        Score breakScore = stringToGoal(resultSet.getString("break_score"));
+        Score finalScore = stringToGoal(resultSet.getString("final_score"));
         RuleNumber ruleNumber = RuleNumber.valueOf(resultSet.getString("rule_number"));
         String link = resultSet.getString("link");
         Game extractedGame = new Game(id, dateTime, firstTeam, secondTeam, link);
-        extractedGame.setBreakGoal(breakScore);
-        extractedGame.setFinalGoal(finalScore);
+        extractedGame.setHalfTimeScore(breakScore);
+        extractedGame.setFinalScore(finalScore);
         extractedGame.setRuleNumber(ruleNumber);
         extractedGame.setOverUnderList(overUnderDao.getByGameId(id));
         return extractedGame;
@@ -109,8 +109,8 @@ public class GameDao {
             statement.setTimestamp(1, Timestamp.valueOf(game.getDateTime()));
             statement.setString(2, game.getFirstTeam());
             statement.setString(3, game.getSecondTeam());
-            statement.setString(4, game.getBreakGoal().toString());
-            statement.setString(5, game.getFinalGoal().toString());
+            statement.setString(4, game.getHalfTimeScore().toString());
+            statement.setString(5, game.getFinalScore().toString());
             statement.setString(6, game.getRuleNumber().toString());
             statement.setString(7, game.getLink());
             if (sqlRequest == SQLGame.UPDATE) {
@@ -130,14 +130,14 @@ public class GameDao {
         }
     }
 
-    private Goal stringToGoal(String input) {
+    private Score stringToGoal(String input) {
         if (input == null) {
-            return new Goal(-1, -1);
+            return new Score(-1, -1);
         }
         String[] goals = input.split(":");
         int homeGoal = Integer.parseInt(goals[0]);
         int awayGoal = Integer.parseInt(goals[1]);
-        return new Goal(homeGoal, awayGoal);
+        return new Score(homeGoal, awayGoal);
     }
 
     public int createStatisticsFile(LocalDateTime startDateTime, LocalDateTime endDateTime) {

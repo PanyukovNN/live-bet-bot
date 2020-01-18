@@ -10,38 +10,39 @@ import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class LiveBetBotApplication {
 
     public static void main(String[] args) {
-        DriverManager parsingDriverManager = new DriverManager();
-        DriverManager resultScannerDriverManager = new DriverManager();
+//        DriverManager parsingDriverManager = new DriverManager();
+//        DriverManager resultScannerDriverManager = new DriverManager();
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            return t;
+        });
         try (Connection connection = getConnection();
-             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             ScheduledParsingTask parsingTask = new ScheduledParsingTask(
-                new GameDao(connection),
-                parsingDriverManager.initiateDriver(true)
+                    new GameDao(connection),
+                    new DriverManager()
             );
             ScheduledResultScanningTask resultScanningTask = new ScheduledResultScanningTask(
-                new GameDao(connection),
-                resultScannerDriverManager.initiateDriver(true)
+                    new GameDao(connection),
+                    new DriverManager()
             );
-            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
             scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
             scheduler.scheduleAtFixedRate(resultScanningTask, 0, 120, TimeUnit.MINUTES);
-            //noinspection StatementWithEmptyBody
-            while (!reader.readLine().equals("exit")) {
+            while (!reader.readLine().equalsIgnoreCase("exit")) {
             }
         } catch (SQLException | IOException e) {
             throw new LiveBetBotException(e.getMessage(), e);
         } finally {
-            parsingDriverManager.quitDriver();
-            resultScannerDriverManager.quitDriver();
+            scheduler.shutdown();
+//            parsingDriverManager.quitDriver();
+//            resultScannerDriverManager.quitDriver();
             ConsoleLogger.endMessage(LogType.BOT_END);
-            System.exit(0);
         }
     }
 

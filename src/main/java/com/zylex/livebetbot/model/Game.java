@@ -17,9 +17,9 @@ public class Game {
 
     private String secondTeam;
 
-    private Goal breakGoal = new Goal(-1, -1);
+    private Score halfTimeScore = new Score(-1, -1);
 
-    private Goal finalGoal = new Goal(-1, -1);
+    private Score finalScore = new Score(-1, -1);
 
     private List<OverUnder> overUnderList;
 
@@ -40,8 +40,8 @@ public class Game {
         this.dateTime = oldGame.getDateTime();
         this.firstTeam = oldGame.getFirstTeam();
         this.secondTeam = oldGame.getSecondTeam();
-        this.breakGoal = oldGame.getBreakGoal();
-        this.finalGoal = oldGame.getFinalGoal();
+        this.halfTimeScore = oldGame.getHalfTimeScore();
+        this.finalScore = oldGame.getFinalScore();
         this.overUnderList = oldGame.overUnderList;
         this.link = oldGame.link;
         this.ruleNumber = oldGame.ruleNumber;
@@ -74,20 +74,20 @@ public class Game {
         return link;
     }
 
-    public Goal getBreakGoal() {
-        return breakGoal;
+    public Score getHalfTimeScore() {
+        return halfTimeScore;
     }
 
-    public void setBreakGoal(Goal breakGoal) {
-        this.breakGoal = breakGoal;
+    public void setHalfTimeScore(Score halfTimeScore) {
+        this.halfTimeScore = halfTimeScore;
     }
 
-    public Goal getFinalGoal() {
-        return finalGoal;
+    public Score getFinalScore() {
+        return finalScore;
     }
 
-    public void setFinalGoal(Goal finalGoal) {
-        this.finalGoal = finalGoal;
+    public void setFinalScore(Score finalGoal) {
+        this.finalScore = finalGoal;
     }
 
     public List<OverUnder> getOverUnderList() {
@@ -121,10 +121,10 @@ public class Game {
                 DATE_TIME_FORMATTER.format(dateTime),
                 firstTeam,
                 secondTeam,
-                breakGoal.getHomeGoals(),
-                breakGoal.getAwayGoals(),
-                finalGoal.getHomeGoals(),
-                finalGoal.getAwayGoals(),
+                halfTimeScore.getHomeGoals(),
+                halfTimeScore.getAwayGoals(),
+                finalScore.getHomeGoals(),
+                finalScore.getAwayGoals(),
                 (ruleNumber == null
                         ? "NO_RULE"
                         :ruleNumber.toString()));
