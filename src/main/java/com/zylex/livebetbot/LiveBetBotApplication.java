@@ -15,8 +15,6 @@ import java.util.concurrent.*;
 public class LiveBetBotApplication {
 
     public static void main(String[] args) {
-//        DriverManager parsingDriverManager = new DriverManager();
-//        DriverManager resultScannerDriverManager = new DriverManager();
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, r -> {
             Thread t = new Thread(r);
             t.setDaemon(true);
@@ -28,20 +26,13 @@ public class LiveBetBotApplication {
                     new GameDao(connection),
                     new DriverManager()
             );
-            ScheduledResultScanningTask resultScanningTask = new ScheduledResultScanningTask(
-                    new GameDao(connection),
-                    new DriverManager()
-            );
             scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
-            scheduler.scheduleAtFixedRate(resultScanningTask, 0, 120, TimeUnit.MINUTES);
             while (!reader.readLine().equalsIgnoreCase("exit")) {
             }
         } catch (SQLException | IOException e) {
             throw new LiveBetBotException(e.getMessage(), e);
         } finally {
             scheduler.shutdown();
-//            parsingDriverManager.quitDriver();
-//            resultScannerDriverManager.quitDriver();
             ConsoleLogger.endMessage(LogType.BOT_END);
         }
     }

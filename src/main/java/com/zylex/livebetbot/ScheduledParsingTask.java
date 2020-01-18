@@ -2,6 +2,7 @@ package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.controller.dao.GameDao;
 import com.zylex.livebetbot.service.DriverManager;
+import com.zylex.livebetbot.service.ResultScanner;
 import com.zylex.livebetbot.service.parser.ParseProcessor;
 import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.rule.RuleProcessor;
@@ -28,6 +29,10 @@ public class ScheduledParsingTask implements Runnable {
                     )),
                 gameDao
             ).save();
+            new ResultScanner(
+                driverManager.initiateDriver(true),
+                gameDao
+            ).scan();
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {
