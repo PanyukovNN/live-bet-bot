@@ -23,7 +23,8 @@ public class ParseProcessor {
 
     public List<Game> process() {
         logger.startLogMessage(LogType.PARSING_START, 0);
-        List<Game> noResultGames = gameRepository.getNoResultGames();
+        List<Game> noResultGames = gameRepository.getWithoutResult();
+        noResultGames.forEach(game -> game.setRuleNumber(null));
         List<Game> breakGames = new CountryParser(driver, noResultGames, logger).parse();
         if (breakGames.isEmpty()) {
             return breakGames;

@@ -1,8 +1,8 @@
 package com.zylex.livebetbot.service;
 
-import com.zylex.livebetbot.controller.dao.GameDao;
 import com.zylex.livebetbot.controller.logger.StatisticsCollectorLogger;
 import com.zylex.livebetbot.model.Game;
+import com.zylex.livebetbot.service.repository.GameRepository;
 import com.zylex.livebetbot.service.rule.RuleNumber;
 
 import java.time.LocalDateTime;
@@ -13,30 +13,35 @@ public class StatisticsCollector {
 
     private StatisticsCollectorLogger logger = new StatisticsCollectorLogger();
 
-    private GameDao gameDao;
+    private GameRepository gameRepository;
 
     private LocalDateTime startDateTime;
 
     private LocalDateTime endDateTime;
 
-    public StatisticsCollector(GameDao gameDao, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        this.gameDao = gameDao;
+    public StatisticsCollector(GameRepository gameRepository, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        this.gameRepository = gameRepository;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
     }
 
     public void analyse() {
         logger.startLogMessage(startDateTime.toLocalDate(), endDateTime.toLocalDate());
-        List<Game> games = gameDao.getByDate(startDateTime, endDateTime);
+        List<Game> games = gameRepository.getByDate(startDateTime, endDateTime);
         for (RuleNumber ruleNumber : RuleNumber.values()) {
-            List<Game> ruleGames = games.stream().filter(game -> game.getRuleNumber() == ruleNumber).collect(Collectors.toList());
-            int twoMoreGoal    = (int) ruleGames.stream().filter(game -> (game.getFinalScore().getHomeGoals() + game.getFinalScore().getAwayGoals()) > 1).count();
-            int oneGoal      = (int) ruleGames.stream().filter(game -> (game.getFinalScore().getHomeGoals() + game.getFinalScore().getAwayGoals()) == 1).count();
-            int noGoal      = (int) ruleGames.stream().filter(game -> (game.getFinalScore().getHomeGoals() + game.getFinalScore().getAwayGoals()) == 0).count();
-            int noResult    = (int) ruleGames.stream().filter(game -> (game.getFinalScore().getHomeGoals() + game.getFinalScore().getAwayGoals()) == -2).count();
+            List<Game> ruleGames = games.stream().filter(game -> game.getRuleNumber().equals(ruleNumber.toString())).collect(Collectors.toList());
+            int twoMoreGoal = (int) ruleGames.stream().filter(game -> countTotalScore(game.getFinalScore()) > 1).count();
+            int oneGoal     = (int) ruleGames.stream().filter(game -> countTotalScore(game.getFinalScore()) == 1).count();
+            int noGoal      = (int) ruleGames.stream().filter(game -> countTotalScore(game.getFinalScore()) == 0).count();
+            int noResult    = (int) ruleGames.stream().filter(game -> countTotalScore(game.getFinalScore()) == -2).count();
             logger.logStatistics(ruleNumber, twoMoreGoal, oneGoal, noGoal, noResult);
         }
-        int insertedGames = gameDao.createStatisticsFile(startDateTime, endDateTime);
-        logger.fileCreatedSuccessfully(insertedGames);
+//        int insertedGames = gameDao.createStatisticsFile(startDateTime, endDateTime);
+//        logger.fileCreatedSuccessfully(insertedGames);
+    }
+
+    private int countTotalScore(String score) {
+        String[] scores = score.split(":");
+        return Integer.parseInt(scores[0]) + Integer.parseInt(scores[1]);
     }
 }

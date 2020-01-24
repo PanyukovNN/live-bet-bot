@@ -45,7 +45,7 @@ public class ResultScanner {
     public void scan() {
         try {
             logger.startLogMessage();
-            List<Game> noResultGames = gameRepository.getNoResultGames();
+            List<Game> noResultGames = gameRepository.getWithoutResult();
             noResultGames = removeEarlyGames(removeOldGames(noResultGames));
             if (noResultGames.isEmpty()) {
                 logger.endLogMessage(LogType.NO_GAMES, 0);
