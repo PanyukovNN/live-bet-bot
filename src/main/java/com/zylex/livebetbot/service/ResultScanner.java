@@ -99,12 +99,13 @@ public class ResultScanner {
             waitElementWithId("username").sendKeys(property.getProperty("LiveBetBot.login"));
             waitElementWithId("password").sendKeys(property.getProperty("LiveBetBot.password"));
             waitElementWithClassName("sign-in").click();
-            if (driver.getCurrentUrl().startsWith("https://www.sbobet-pay.com/")) {
-                waitElementWithClassName("DWHomeBtn").click();
-            }
             Alert alert = (new WebDriverWait(driver, 5))
                     .until(ExpectedConditions.alertIsPresent());
             alert.accept();
+//TODO halde org.openqa.selenium.WebDriverException: Remote browser did not respond to getCurrentUrl
+            if (driver.getCurrentUrl().startsWith("https://www.sbobet-pay.com/")) {
+                waitElementWithClassName("DWHomeBtn").click();
+            }
         } catch (NoAlertPresentException | TimeoutException ignore) {
         }
         return driver.getCurrentUrl().split("ballchockdee")[0];

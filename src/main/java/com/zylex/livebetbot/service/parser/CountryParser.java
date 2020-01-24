@@ -108,7 +108,8 @@ class CountryParser {
                 }
                 String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
                 Game game = new Game(LocalDateTime.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
-                if (noResultGames.contains(game) | games.contains(game)) {
+                boolean noResultContains = noResultGames.stream().anyMatch(g -> g.getLink().equals(game.getLink()));
+                if (noResultContains | games.contains(game)) {
                     continue;
                 }
                 games.add(game);

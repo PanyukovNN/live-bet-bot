@@ -32,7 +32,7 @@ public class Game implements Serializable {
     @Column(name = "final_score")
     private String finalScore = "-1:-1";
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<OverUnder> overUnderSet = new HashSet<>();
 
     @Column(name = "link")
