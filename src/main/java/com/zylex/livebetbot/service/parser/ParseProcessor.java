@@ -3,10 +3,9 @@ package com.zylex.livebetbot.service.parser;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ParserLogger;
 import com.zylex.livebetbot.model.Game;
-import org.hibernate.Session;
+import com.zylex.livebetbot.service.repository.GameRepository;
 import org.openqa.selenium.WebDriver;
 
-import javax.persistence.Query;
 import java.util.List;
 
 public class ParseProcessor {
@@ -15,17 +14,16 @@ public class ParseProcessor {
 
     private WebDriver driver;
 
-    private Session session;
+    private GameRepository gameRepository;
 
-    public ParseProcessor(WebDriver driver, Session session) {
+    public ParseProcessor(WebDriver driver, GameRepository gameRepository) {
         this.driver = driver;
-        this.session = session;
+        this.gameRepository = gameRepository;
     }
 
     public List<Game> process() {
         logger.startLogMessage(LogType.PARSING_START, 0);
-        Query query = session.createQuery("FROM Game WHERE finalScore IS NULL OR finalScore = '-1:-1'");
-        List<Game> noResultGames = query.getResultList();
+        List<Game> noResultGames = gameRepository.getNoResultGames();
         List<Game> breakGames = new CountryParser(driver, noResultGames, logger).parse();
         if (breakGames.isEmpty()) {
             return breakGames;

@@ -7,7 +7,8 @@ Live-bet-bot includes three modules:
 #### **Used tecnologies:**
 - Maven
 - Selenium
-- PostgreSQL, JDBC
+- PostgreSQL
+- Hibernate, JPA
 - Stream API
 - Scheduled executor service
 - Java 8 Data/Time API

@@ -4,9 +4,9 @@ import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.SaverLogger;
 import com.zylex.livebetbot.model.Game;
+import com.zylex.livebetbot.service.repository.GameRepository;
 import com.zylex.livebetbot.service.rule.RuleNumber;
 import com.zylex.livebetbot.service.rule.RuleProcessor;
-import org.hibernate.Session;
 
 import java.util.Map;
 import java.util.Set;
@@ -20,11 +20,11 @@ public class Saver {
 
     private RuleProcessor ruleProcessor;
 
-    private Session session;
+    private GameRepository gameRepository;
 
-    public Saver(RuleProcessor ruleProcessor, Session session) {
+    public Saver(RuleProcessor ruleProcessor, GameRepository gameRepository) {
         this.ruleProcessor = ruleProcessor;
-        this.session = session;
+        this.gameRepository = gameRepository;
     }
 
     public void save() {
@@ -34,8 +34,6 @@ public class Saver {
             return;
         }
         logger.logRuleGames(ruleGames);
-        session.beginTransaction();
-        ruleGames.forEach((k, v) -> v.forEach(session::save));
-        session.getTransaction().commit();
+        ruleGames.forEach((k, v) -> gameRepository.saveGames(v));
     }
 }

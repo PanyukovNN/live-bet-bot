@@ -7,6 +7,7 @@ import java.util.Objects;
 /**
  * Over under model.
  */
+@SuppressWarnings("unused")
 @Entity
 @Table(name = "over_under")
 public class OverUnder implements Serializable {
