@@ -35,15 +35,7 @@ public class Saver {
         }
         logger.logRuleGames(ruleGames);
         session.beginTransaction();
-//        ruleGames.forEach((k, v) -> v.forEach(session::save));
-        for (RuleNumber ruleNumber : ruleGames.keySet()) {
-            for (Game game : ruleGames.get(ruleNumber)) {
-                System.out.println(game);
-                game.getOverUnderSet().forEach(System.out::println);
-                session.save(game);
-                session.flush();
-            }
-        }
+        ruleGames.forEach((k, v) -> v.forEach(session::save));
         session.getTransaction().commit();
     }
 }

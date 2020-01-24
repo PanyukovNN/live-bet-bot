@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@SuppressWarnings("unused")
 @Entity
 @Table(name = "game")
 public class Game implements Serializable {
@@ -45,18 +46,6 @@ public class Game implements Serializable {
         this.firstTeam = firstTeam;
         this.secondTeam = secondTeam;
         this.link = link;
-    }
-
-    public Game(Game oldGame) {
-        this.id = oldGame.getId();
-        this.dateTime = oldGame.getDateTime();
-        this.firstTeam = oldGame.getFirstTeam();
-        this.secondTeam = oldGame.getSecondTeam();
-        this.halfTimeScore = oldGame.getHalfTimeScore();
-        this.finalScore = oldGame.getFinalScore();
-        this.overUnderSet = oldGame.overUnderSet;
-        this.link = oldGame.link;
-        this.ruleNumber = oldGame.ruleNumber;
     }
 
     public Game() {
@@ -159,6 +148,6 @@ public class Game implements Serializable {
                 finalScore,
                 (ruleNumber == null
                         ? "NO_RULE"
-                        :ruleNumber.toString()));
+                        :ruleNumber));
     }
 }
