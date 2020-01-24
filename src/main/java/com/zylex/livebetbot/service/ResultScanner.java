@@ -1,12 +1,12 @@
 package com.zylex.livebetbot.service;
 
-import com.zylex.livebetbot.controller.dao.GameDao;
 import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ResultScannerLogger;
 import com.zylex.livebetbot.exception.ResultScannerException;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.Score;
+import com.zylex.livebetbot.service.repository.GameRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -33,19 +33,19 @@ public class ResultScanner {
 
     private WebDriver driver;
 
-    private GameDao gameDao;
+    private GameRepository gameRepository;
 
     private int gamesResultNumber;
 
-    public ResultScanner(WebDriver driver, GameDao gameDao) {
+    public ResultScanner(WebDriver driver, GameRepository gameRepository) {
         this.driver = driver;
-        this.gameDao = gameDao;
+        this.gameRepository = gameRepository;
     }
 
     public void scan() {
         try {
             logger.startLogMessage();
-            List<Game> noResultGames = gameDao.getNoResultGames();
+            List<Game> noResultGames = gameRepository.getNoResultGames();
             noResultGames = removeEarlyGames(removeOldGames(noResultGames));
             if (noResultGames.isEmpty()) {
                 logger.endLogMessage(LogType.NO_GAMES, 0);
@@ -120,7 +120,8 @@ public class ResultScanner {
             try {
                 waitElementWithClassName("ContentTable");
                 return true;
-            } catch (NoSuchElementException | TimeoutException ignore) {
+            } catch (NoSuchElementException | TimeoutException | UnhandledAlertException ignore) {
+                //TODO handle alert
             }
         }
     }
@@ -154,8 +155,8 @@ public class ResultScanner {
             Optional<Game> gameOptional = noResultGames.stream().filter(game -> game.getFirstTeam().equals(firstTeam) && game.getSecondTeam().equals(secondTeam)).findFirst();
             if (gameOptional.isPresent()) {
                 Game game = gameOptional.get();
-                game.setFinalScore(score);
-                gameDao.save(game);
+                game.setFinalScore(score.toString());
+                gameRepository.save(game);
                 gamesResultNumber++;
             }
         }
@@ -183,7 +184,9 @@ public class ResultScanner {
     }
 
     private List<Game> removeGameWithResults(List<Game> noResultGames) {
-        return noResultGames.stream().filter(game -> game.getFinalScore().getHomeGoals() == -1).collect(Collectors.toList());
+        return noResultGames.stream()
+                .filter(game -> game.getFinalScore().equals("-1:-1"))
+                .collect(Collectors.toList());
     }
 
     private WebElement waitElementWithId(String id) {

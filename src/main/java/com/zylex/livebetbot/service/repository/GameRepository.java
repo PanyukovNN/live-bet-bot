@@ -21,7 +21,13 @@ public class GameRepository {
         return query.getResultList();
     }
 
-    public void saveGames(Set<Game> games) {
+    public void save(Game game) {
+        session.beginTransaction();
+        session.save(game);
+        session.getTransaction().commit();
+    }
+
+    public void save(Set<Game> games) {
         session.beginTransaction();
         games.forEach(session::save);
         session.getTransaction().commit();

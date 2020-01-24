@@ -34,6 +34,6 @@ public class Saver {
             return;
         }
         logger.logRuleGames(ruleGames);
-        ruleGames.forEach((k, v) -> gameRepository.saveGames(v));
+        ruleGames.forEach((k, v) -> gameRepository.save(v));
     }
 }
