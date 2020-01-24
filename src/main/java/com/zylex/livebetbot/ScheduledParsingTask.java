@@ -1,21 +1,23 @@
 package com.zylex.livebetbot;
 
-import com.zylex.livebetbot.controller.dao.GameDao;
 import com.zylex.livebetbot.service.DriverManager;
-import com.zylex.livebetbot.service.ResultScanner;
-import com.zylex.livebetbot.service.parser.ParseProcessor;
 import com.zylex.livebetbot.service.Saver;
+import com.zylex.livebetbot.service.parser.ParseProcessor;
 import com.zylex.livebetbot.service.rule.RuleProcessor;
+import org.hibernate.Session;
 
 public class ScheduledParsingTask implements Runnable {
 
-    private GameDao gameDao;
+//    private GameDao_remove gameDao;
 
     private DriverManager driverManager;
 
-    ScheduledParsingTask(GameDao gameDao, DriverManager driverManager) {
-        this.gameDao = gameDao;
+    private Session session;
+
+    ScheduledParsingTask(DriverManager driverManager, Session session) {
+//        this.gameDao = gameDao;
         this.driverManager = driverManager;
+        this.session = session;
     }
 
     @Override
@@ -25,14 +27,14 @@ public class ScheduledParsingTask implements Runnable {
                 new RuleProcessor(
                     new ParseProcessor(
                         driverManager.initiateDriver(true),
-                        gameDao
+                        session
                     )),
-                gameDao
+                session
             ).save();
-            new ResultScanner(
-                driverManager.initiateDriver(true),
-                gameDao
-            ).scan();
+//            new ResultScanner(
+//                driverManager.initiateDriver(true),
+//                gameDao
+//            ).scan();
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {

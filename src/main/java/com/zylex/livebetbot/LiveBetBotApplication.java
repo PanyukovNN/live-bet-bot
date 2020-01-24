@@ -1,16 +1,18 @@
 package com.zylex.livebetbot;
 
-import com.zylex.livebetbot.controller.dao.GameDao;
 import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.exception.LiveBetBotException;
 import com.zylex.livebetbot.service.DriverManager;
+import com.zylex.livebetbot.service.HibernateUtil;
+import org.hibernate.Session;
 
-import java.io.*;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.concurrent.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class LiveBetBotApplication {
 
@@ -20,16 +22,17 @@ public class LiveBetBotApplication {
             t.setDaemon(true);
             return t;
         });
-        try (Connection connection = getConnection();
+        try (Session session = HibernateUtil.getSessionFactory().openSession();
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             ScheduledParsingTask parsingTask = new ScheduledParsingTask(
-                    new GameDao(connection),
-                    new DriverManager()
+                    new DriverManager(),
+                    session
             );
             scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
+            //noinspection StatementWithEmptyBody
             while (!reader.readLine().equalsIgnoreCase("exit")) {
             }
-        } catch (SQLException | IOException e) {
+        } catch (IOException e) {
             throw new LiveBetBotException(e.getMessage(), e);
         } finally {
             scheduler.shutdown();
@@ -37,17 +40,17 @@ public class LiveBetBotApplication {
         }
     }
 
-    private static Connection getConnection() {
-        try(InputStream inputStream = LiveBetBotApplication.class.getClassLoader().getResourceAsStream("dataBase.properties")) {
-            Properties property = new Properties();
-            property.load(inputStream);
-            final String login = property.getProperty("db.login");
-            final String password = property.getProperty("db.password");
-            final String url = property.getProperty("db.url");
-            Class.forName("org.postgresql.Driver");
-            return java.sql.DriverManager.getConnection(url, login, password);
-        } catch(SQLException | IOException | ClassNotFoundException e) {
-            throw new LiveBetBotException(e.getMessage(), e);
-        }
-    }
+//    private static Connection getConnection() {
+//        try(InputStream inputStream = LiveBetBotApplication.class.getClassLoader().getResourceAsStream("dataBase.properties")) {
+//            Properties property = new Properties();
+//            property.load(inputStream);
+//            final String login = property.getProperty("db.login");
+//            final String password = property.getProperty("db.password");
+//            final String url = property.getProperty("db.url");
+//            Class.forName("org.postgresql.Driver");
+//            return java.sql.DriverManager.getConnection(url, login, password);
+//        } catch(SQLException | IOException | ClassNotFoundException e) {
+//            throw new LiveBetBotException(e.getMessage(), e);
+//        }
+//    }
 }

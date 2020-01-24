@@ -26,6 +26,9 @@ public class DriverManager {
      * @return - instance of WebDriver;
      */
     public WebDriver initiateDriver(boolean headless) {
+        if (driver != null) {
+            return driver;
+        }
         WebDriverManager.chromedriver().setup();
         setUpLogging();
         driver = headless
@@ -55,6 +58,7 @@ public class DriverManager {
     public void quitDriver() {
         if (driver != null) {
             driver.quit();
+            driver = null;
         }
     }
 }

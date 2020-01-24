@@ -3,10 +3,7 @@ package com.zylex.livebetbot.service.rule;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.parser.ParseProcessor;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RuleProcessor {
 
@@ -16,7 +13,7 @@ public class RuleProcessor {
         this.parseProcessor = parseProcessor;
     }
 
-    public Map<RuleNumber, List<Game>> process() {
+    public Map<RuleNumber, Set<Game>> process() {
         List<Game> games = parseProcessor.process();
         if (games.isEmpty()) {
             return new HashMap<>();
@@ -24,8 +21,8 @@ public class RuleProcessor {
         return filter(games);
     }
 
-    private Map<RuleNumber, List<Game>> filter(List<Game> games) {
-        Map<RuleNumber, List<Game>> ruleGames = new LinkedHashMap<>();
+    private Map<RuleNumber, Set<Game>> filter(List<Game> games) {
+        Map<RuleNumber, Set<Game>> ruleGames = new LinkedHashMap<>();
         for (RuleNumber ruleNumber : RuleNumber.values()) {
             ruleGames.putIfAbsent(ruleNumber, ruleNumber.rule.filter(games));
         }
