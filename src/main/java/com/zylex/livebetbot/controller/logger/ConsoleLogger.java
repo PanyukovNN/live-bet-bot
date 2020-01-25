@@ -1,9 +1,9 @@
 package com.zylex.livebetbot.controller.logger;
 
-import com.zylex.livebetbot.exception.ConsoleLoggerException;
+import com.zylex.livebetbot.LiveBetBotApplication;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
-import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
@@ -13,6 +13,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * Base class for loggers.
  */
 public abstract class ConsoleLogger {
+
+    private final static Logger LOG = Logger.getLogger(LiveBetBotApplication.class);
 
     private volatile static String logOutput;
 
@@ -24,48 +26,50 @@ public abstract class ConsoleLogger {
                 + String.format("Bot started at: %s", LocalDateTime.now().format(DATE_TIME_FORMATTER))
                 + "\n" + StringUtils.repeat("-", 50);
         System.out.print(logOutput.substring(1));
+        LOG.info("Bot started");
     }
 
-    /**
-     * Write log to file.
-     */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private synchronized static void writeToLogFile() {
-        try {
-            File logFile = new File("log.txt");
-            logFile.createNewFile();
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
-                writer.write(logOutput);
-            }
-            logOutput = "";
-        } catch (IOException e) {
-            throw new ConsoleLoggerException(e.getMessage(), e);
-        }
-    }
+//    /**
+//     * Write log to file.
+//     */
+//    @SuppressWarnings("ResultOfMethodCallIgnored")
+//    private synchronized static void writeToLogFile() {
+//        try {
+//            File logFile = new File("log.txt");
+//            logFile.createNewFile();
+//            try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
+//                writer.write(logOutput);
+//            }
+//            logOutput = "";
+//        } catch (IOException e) {
+//            throw new ConsoleLoggerException(e.getMessage(), e);
+//        }
+//    }
 
     public synchronized static void endMessage(LogType type) {
         if (type == LogType.BOT_END) {
             String output = "\nBot work completed in " + computeTime(programStartTime.get())
             + "\n" + StringUtils.repeat("*", 50);
             writeInLine(output);
-            writeToLogFile();
+            LOG.info("Bot work completed");
         } else if (type == LogType.BLOCK_END) {
             String output = "\n" + StringUtils.repeat("~", 50);
             writeInLine(output);
-            writeToLogFile();
+            LOG.info("Block completed");
         }
+//        writeToLogFile();
     }
 
-    private synchronized static void addToLog(String line) {
-        if (line.contains("\b")) {
-            int backspaces = StringUtils.countMatches(line, "\b");
-            int lastNewLineIndex = logOutput.lastIndexOf("\n");
-            logOutput = logOutput.substring(0, Math.max(logOutput.length() - backspaces, lastNewLineIndex + 1))
-                    + line.replace("\b", "");
-        } else {
-            logOutput += line;
-        }
-    }
+//    private synchronized static void addToLog(String line) {
+//        if (line.contains("\b")) {
+//            int backspaces = StringUtils.countMatches(line, "\b");
+//            int lastNewLineIndex = logOutput.lastIndexOf("\n");
+//            logOutput = logOutput.substring(0, Math.max(logOutput.length() - backspaces, lastNewLineIndex + 1))
+//                    + line.replace("\b", "");
+//        } else {
+//            logOutput += line;
+//        }
+//    }
 
     /**
      * Write exception in log.
@@ -82,12 +86,12 @@ public abstract class ConsoleLogger {
 
     static synchronized void writeErrorMessage(String line) {
         System.err.print(line);
-        addToLog(line);
+//        addToLog(line);
     }
 
     static synchronized void writeInLine(String line) {
         System.out.print(line);
-        addToLog(line);
+//        addToLog(line);
     }
 
     static String computeTime(long startTime) {

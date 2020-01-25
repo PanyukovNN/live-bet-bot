@@ -100,7 +100,7 @@ class CountryParser {
     private void extractGame(List<Game> games, Elements gameElements) {
         for (Element gameElement : gameElements) {
             Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
-//            if (dateTimeText.text().contains("HT")) {
+            if (dateTimeText.text().contains("HT")) {
                 Element firstTeamElement = gameElement.selectFirst("td > a.OddsTabL > span.OddsL");
                 Element secondTeamElement = gameElement.selectFirst("td > a.OddsTabR > span.OddsL");
                 if (firstTeamElement == null || secondTeamElement == null) {
@@ -113,7 +113,7 @@ class CountryParser {
                     continue;
                 }
                 games.add(game);
-//            }
+            }
         }
     }
 
