@@ -1,7 +1,6 @@
 package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.service.DriverManager;
-import com.zylex.livebetbot.service.ResultScanner;
 import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.parser.ParseProcessor;
 import com.zylex.livebetbot.service.repository.GameRepository;
@@ -31,10 +30,10 @@ public class ScheduledParsingTask implements Runnable {
                     )),
                 gameRepository
             ).save();
-            new ResultScanner(
-                driverManager.initiateDriver(true),
-                gameRepository
-            ).scan();
+//            new ResultScanner(
+//                driverManager.initiateDriver(true),
+//                gameRepository
+//            ).scan();
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {

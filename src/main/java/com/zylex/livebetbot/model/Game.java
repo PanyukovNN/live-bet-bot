@@ -1,7 +1,7 @@
 package com.zylex.livebetbot.model;
 
 import javax.persistence.*;
-import java.io.Serializable;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -11,7 +11,7 @@ import java.util.Set;
 @SuppressWarnings("unused")
 @Entity
 @Table(name = "game")
-public class Game implements Serializable {
+public class Game implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +32,7 @@ public class Game implements Serializable {
     @Column(name = "final_score")
     private String finalScore = "-1:-1";
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<OverUnder> overUnderSet = new HashSet<>();
 
     @Column(name = "link")
@@ -124,6 +124,21 @@ public class Game implements Serializable {
     }
 
     @Override
+    public Game clone() throws CloneNotSupportedException {
+        try (ByteArrayOutputStream writeBuffer = new ByteArrayOutputStream();
+             ObjectOutputStream outputStream = new ObjectOutputStream(writeBuffer)) {
+            Game game = new Game();
+            outputStream.writeObject(game);
+            byte[] buffer = writeBuffer.toByteArray();
+            try (ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(buffer))) {
+                return (Game) inputStream.readObject();
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            throw new CloneNotSupportedException(e.getMessage());
+        }
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -148,6 +163,6 @@ public class Game implements Serializable {
                 finalScore,
                 (ruleNumber == null
                         ? "NO_RULE"
-                        :ruleNumber));
+                        : ruleNumber));
     }
 }
