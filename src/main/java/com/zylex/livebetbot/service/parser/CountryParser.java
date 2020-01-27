@@ -4,6 +4,7 @@ import com.zylex.livebetbot.controller.logger.CountryParserLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.exception.CountryParserException;
 import com.zylex.livebetbot.model.Game;
+import com.zylex.livebetbot.service.DriverManager;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -25,6 +26,8 @@ import java.util.NoSuchElementException;
 
 class CountryParser {
 
+    private DriverManager driverManager;
+
     private WebDriver driver;
 
     private WebDriverWait wait;
@@ -33,14 +36,18 @@ class CountryParser {
 
     private CountryParserLogger logger = new CountryParserLogger();
 
-    CountryParser(WebDriver driver, GameRepository gameRepository) {
-        this.driver = driver;
-        wait = new WebDriverWait(driver, 60);
+    CountryParser(DriverManager driverManager, GameRepository gameRepository) {
+        this.driverManager = driverManager;
         this.gameRepository = gameRepository;
+    }
+
+    public WebDriver getDriver() {
+        return driver;
     }
 
     List<Game> parse() {
         try {
+            initDriver();
             List<String> countryLinks = parseCountryLinks();
             if (countryLinks.isEmpty()) {
                 logger.logCountriesFound(LogType.NO_COUNTRIES);
@@ -52,6 +59,11 @@ class CountryParser {
         } catch (IOException e) {
             throw new CountryParserException(e.getMessage(), e);
         }
+    }
+
+    private void initDriver() {
+        driver = driverManager.getDriver();
+        wait = new WebDriverWait(driver, 60);
     }
 
     private List<String> parseCountryLinks() throws IOException {

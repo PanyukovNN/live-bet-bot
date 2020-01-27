@@ -4,7 +4,6 @@ import com.zylex.livebetbot.controller.logger.ParseProcessorLogger;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.DriverManager;
 import com.zylex.livebetbot.service.repository.GameRepository;
-import org.openqa.selenium.WebDriver;
 
 import java.util.List;
 
@@ -23,10 +22,13 @@ public class ParseProcessor {
 
     public List<Game> process() {
         try {
-            WebDriver driver = driverManager.initiateDriver(true);
+            driverManager.initiateDriver(true);
             logger.startLogMessage();
-            List<Game> breakGames = new CountryParser(driver, gameRepository).parse();
-            new GameParser(driver).parse(breakGames);
+            List<Game> breakGames = new GameParser(
+                new CountryParser(
+                    driverManager,
+                    gameRepository)
+            ).parse();
             logger.parsingComplete();
             return breakGames;
         } finally {

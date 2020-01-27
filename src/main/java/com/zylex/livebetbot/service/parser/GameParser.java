@@ -25,20 +25,29 @@ class GameParser {
 
     private WebDriverWait wait;
 
+    private CountryParser countryParser;
+
     private GameParserLogger logger = new GameParserLogger();
 
-    GameParser(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, 60);
+    GameParser(CountryParser countryParser) {
+        this.countryParser = countryParser;
     }
 
-    void parse(List<Game> games) {
+    List<Game> parse() {
+        List<Game> games = countryParser.parse();
+        initDriver();
         if (games.isEmpty()) {
             logger.startLogMessage(LogType.NO_GAMES, 0);
-            return;
+            return games;
         }
         logger.startLogMessage(LogType.OKAY, games.size());
         games.forEach(this::parseSingleGame);
+        return games;
+    }
+
+    private void initDriver() {
+        driver = countryParser.getDriver();
+        wait = new WebDriverWait(driver, 60);
     }
 
     private void parseSingleGame(Game game) {
