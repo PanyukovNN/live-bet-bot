@@ -5,9 +5,9 @@ import com.zylex.livebetbot.model.Game;
 
 import java.io.*;
 
-public class RuleUtil {
+class RuleUtil {
 
-    public Game cloneGame(Game game) {
+    Game cloneGame(Game game) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ObjectOutputStream ous = new ObjectOutputStream(baos)) {
             ous.writeObject(game);

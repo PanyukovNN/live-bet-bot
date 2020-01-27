@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 @Entity
 @Table(name = "game")
 public class Game implements Serializable, Cloneable {
@@ -121,21 +121,6 @@ public class Game implements Serializable, Cloneable {
 
     public void setRuleNumber(String ruleNumber) {
         this.ruleNumber = ruleNumber;
-    }
-
-    @Override
-    public Game clone() throws CloneNotSupportedException {
-        try (ByteArrayOutputStream writeBuffer = new ByteArrayOutputStream();
-             ObjectOutputStream outputStream = new ObjectOutputStream(writeBuffer)) {
-            Game game = new Game();
-            outputStream.writeObject(game);
-            byte[] buffer = writeBuffer.toByteArray();
-            try (ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(buffer))) {
-                return (Game) inputStream.readObject();
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            throw new CloneNotSupportedException(e.getMessage());
-        }
     }
 
     @Override
