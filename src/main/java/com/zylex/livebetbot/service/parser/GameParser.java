@@ -12,12 +12,15 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Service
 public class GameParser {
 
     private WebDriver driver;
@@ -28,6 +31,7 @@ public class GameParser {
 
     private GameParserLogger logger = new GameParserLogger();
 
+    @Autowired
     public GameParser(CountryParser countryParser) {
         this.countryParser = countryParser;
     }

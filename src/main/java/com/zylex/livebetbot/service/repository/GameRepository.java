@@ -2,12 +2,14 @@ package com.zylex.livebetbot.service.repository;
 
 import com.zylex.livebetbot.model.Game;
 import org.hibernate.Session;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+@Repository
 public class GameRepository {
 
     private Session session = HibernateUtil.getSessionFactory().openSession();

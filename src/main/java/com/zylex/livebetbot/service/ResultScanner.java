@@ -13,6 +13,8 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +26,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+@Service
 public class ResultScanner {
 
     private ResultScannerLogger logger = new ResultScannerLogger();
@@ -38,6 +41,7 @@ public class ResultScanner {
 
     private DriverManager driverManager;
 
+    @Autowired
     public ResultScanner(DriverManager driverManager, GameRepository gameRepository) {
         this.driverManager = driverManager;
         this.gameRepository = gameRepository;

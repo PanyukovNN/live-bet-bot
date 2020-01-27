@@ -4,17 +4,21 @@ import com.zylex.livebetbot.controller.logger.StatisticsCollectorLogger;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import com.zylex.livebetbot.service.rule.RuleNumber;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class StatisticsCollector {
 
     private StatisticsCollectorLogger logger = new StatisticsCollectorLogger();
 
     private GameRepository gameRepository;
 
+    @Autowired
     public StatisticsCollector(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
     }

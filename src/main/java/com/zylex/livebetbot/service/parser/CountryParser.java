@@ -16,6 +16,8 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@Service
 public class CountryParser {
 
     private DriverManager driverManager;
@@ -36,6 +39,7 @@ public class CountryParser {
 
     private CountryParserLogger logger = new CountryParserLogger();
 
+    @Autowired
     public CountryParser(DriverManager driverManager, GameRepository gameRepository) {
         this.driverManager = driverManager;
         this.gameRepository = gameRepository;

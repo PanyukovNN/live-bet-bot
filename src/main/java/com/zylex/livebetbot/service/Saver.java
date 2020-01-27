@@ -7,10 +7,13 @@ import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import com.zylex.livebetbot.service.rule.RuleNumber;
 import com.zylex.livebetbot.service.rule.RuleProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Set;
 
+@Service
 public class Saver {
 
     private SaverLogger logger = new SaverLogger();
@@ -19,6 +22,7 @@ public class Saver {
 
     private GameRepository gameRepository;
 
+    @Autowired
     public Saver(RuleProcessor ruleProcessor, GameRepository gameRepository) {
         this.ruleProcessor = ruleProcessor;
         this.gameRepository = gameRepository;
