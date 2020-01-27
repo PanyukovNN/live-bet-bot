@@ -29,23 +29,6 @@ public abstract class ConsoleLogger {
         LOG.info("Bot started");
     }
 
-//    /**
-//     * Write log to file.
-//     */
-//    @SuppressWarnings("ResultOfMethodCallIgnored")
-//    private synchronized static void writeToLogFile() {
-//        try {
-//            File logFile = new File("log.txt");
-//            logFile.createNewFile();
-//            try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
-//                writer.write(logOutput);
-//            }
-//            logOutput = "";
-//        } catch (IOException e) {
-//            throw new ConsoleLoggerException(e.getMessage(), e);
-//        }
-//    }
-
     public synchronized static void endMessage(LogType type) {
         if (type == LogType.BOT_END) {
             String output = "\nBot work completed in " + computeTime(programStartTime.get())
@@ -57,19 +40,7 @@ public abstract class ConsoleLogger {
             writeInLine(output);
             LOG.info("Block completed");
         }
-//        writeToLogFile();
     }
-
-//    private synchronized static void addToLog(String line) {
-//        if (line.contains("\b")) {
-//            int backspaces = StringUtils.countMatches(line, "\b");
-//            int lastNewLineIndex = logOutput.lastIndexOf("\n");
-//            logOutput = logOutput.substring(0, Math.max(logOutput.length() - backspaces, lastNewLineIndex + 1))
-//                    + line.replace("\b", "");
-//        } else {
-//            logOutput += line;
-//        }
-//    }
 
     /**
      * Write exception in log.
@@ -86,12 +57,10 @@ public abstract class ConsoleLogger {
 
     static synchronized void writeErrorMessage(String line) {
         System.err.print(line);
-//        addToLog(line);
     }
 
     static synchronized void writeInLine(String line) {
         System.out.print(line);
-//        addToLog(line);
     }
 
     static String computeTime(long startTime) {

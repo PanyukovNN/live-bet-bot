@@ -21,9 +21,11 @@ public class ParseProcessorLogger extends ConsoleLogger {
         LOG.info("Finding countries");
     }
 
-    public void parsingComplete() {
+    public void parsingComplete(LogType type) {
         writeInLine(String.format("\nParsing completed in %s", computeTime(parsingStartTime.get())));
-        writeLineSeparator();
+        if (type == LogType.OKAY) {
+            writeLineSeparator();
+        }
         LOG.info("Parsing completed");
     }
 }

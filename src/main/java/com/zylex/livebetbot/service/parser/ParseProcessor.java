@@ -1,5 +1,6 @@
 package com.zylex.livebetbot.service.parser;
 
+import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ParseProcessorLogger;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.DriverManager;
@@ -24,7 +25,11 @@ public class ParseProcessor {
             driverManager.initiateDriver(true);
             logger.startLogMessage();
             List<Game> breakGames = gameParser.parse();
-            logger.parsingComplete();
+            if (breakGames.isEmpty()) {
+                logger.parsingComplete(LogType.NO_GAMES);
+            } else {
+                logger.parsingComplete(LogType.OKAY);
+            }
             return breakGames;
         } finally {
             driverManager.quitDriver();

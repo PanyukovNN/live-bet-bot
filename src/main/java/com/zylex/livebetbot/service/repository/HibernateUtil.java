@@ -1,4 +1,4 @@
-package com.zylex.livebetbot.service;
+package com.zylex.livebetbot.service.repository;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
