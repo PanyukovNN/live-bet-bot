@@ -1,11 +1,11 @@
 package com.zylex.livebetbot;
 
+import com.zylex.livebetbot.service.DriverManager;
 import com.zylex.livebetbot.service.Saver;
+import com.zylex.livebetbot.service.repository.HibernateUtil;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
 @ComponentScan
 public class ScheduledParsingTask implements Runnable {
 
@@ -18,6 +18,9 @@ public class ScheduledParsingTask implements Runnable {
             saver.save();
 //            ResultScanner resultScanner = context.getBean(ResultScanner.class);
 //            resultScanner.scan();
+            HibernateUtil.getSessionFactory().getCurrentSession().close();
+            DriverManager driverManager = context.getBean(DriverManager.class);
+            driverManager.quitDriver();
         } catch (Throwable t) {
             t.printStackTrace();
         }

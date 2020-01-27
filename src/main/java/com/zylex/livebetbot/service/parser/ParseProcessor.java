@@ -25,18 +25,14 @@ public class ParseProcessor {
     }
 
     public List<Game> process() {
-        try {
-            driverManager.initiateDriver(true);
-            logger.startLogMessage();
-            List<Game> breakGames = gameParser.parse();
-            if (breakGames.isEmpty()) {
-                logger.parsingComplete(LogType.NO_GAMES);
-            } else {
-                logger.parsingComplete(LogType.OKAY);
-            }
-            return breakGames;
-        } finally {
-            driverManager.quitDriver();
+        driverManager.initiateDriver(true);
+        logger.startLogMessage();
+        List<Game> breakGames = gameParser.parse();
+        if (breakGames.isEmpty()) {
+            logger.parsingComplete(LogType.NO_GAMES);
+        } else {
+            logger.parsingComplete(LogType.OKAY);
         }
+        return breakGames;
     }
 }

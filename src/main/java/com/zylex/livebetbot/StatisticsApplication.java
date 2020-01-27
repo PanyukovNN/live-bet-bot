@@ -3,14 +3,12 @@ package com.zylex.livebetbot;
 import com.zylex.livebetbot.service.StatisticsCollector;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-@Configuration
 @ComponentScan
 public class StatisticsApplication {
 
