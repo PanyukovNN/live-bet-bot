@@ -5,7 +5,6 @@ import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ResultScannerLogger;
 import com.zylex.livebetbot.exception.ResultScannerException;
 import com.zylex.livebetbot.model.Game;
-import com.zylex.livebetbot.model.Score;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -153,28 +152,15 @@ public class ResultScanner {
             Elements teams = cells.get(1).select("span");
             String firstTeam = teams.get(0).text();
             String secondTeam = findSecondTeam(teams);
-            Score score = findScores(cells);
-            if (score == null) {
-                continue;
-            }
+            //TODO check number format
+            String score = cells.get(3).text();
             Optional<Game> gameOptional = noResultGames.stream().filter(game -> game.getFirstTeam().equals(firstTeam) && game.getSecondTeam().equals(secondTeam)).findFirst();
             if (gameOptional.isPresent()) {
                 Game game = gameOptional.get();
-                game.setFinalScore(score.toString());
+                game.setFinalScore(score);
                 gameRepository.save(game);
                 gamesResultNumber++;
             }
-        }
-    }
-
-    private Score findScores(Elements cells) {
-        try {
-            String[] finalScores = cells.get(3).text().split(" : ");
-            int homeGoalFinal = Integer.parseInt(finalScores[0]);
-            int awayGoalFinal = Integer.parseInt(finalScores[1]);
-            return new Score(homeGoalFinal, awayGoalFinal);
-        } catch (NumberFormatException e) {
-            return null;
         }
     }
 
