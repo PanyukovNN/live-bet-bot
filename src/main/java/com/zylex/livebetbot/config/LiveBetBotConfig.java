@@ -1,9 +1,6 @@
 package com.zylex.livebetbot.config;
 
-import com.zylex.livebetbot.service.DriverManager;
-import com.zylex.livebetbot.service.HibernateUtil;
-import com.zylex.livebetbot.service.ResultScanner;
-import com.zylex.livebetbot.service.Saver;
+import com.zylex.livebetbot.service.*;
 import com.zylex.livebetbot.service.parser.CountryParser;
 import com.zylex.livebetbot.service.parser.GameParser;
 import com.zylex.livebetbot.service.parser.ParseProcessor;
@@ -55,5 +52,10 @@ public class LiveBetBotConfig {
     @Bean
     public ResultScanner resultScanner(DriverManager driverManager, GameRepository gameRepository) {
         return new ResultScanner(driverManager, gameRepository);
+    }
+
+    @Bean
+    public StatisticsCollector statisticsCollector(GameRepository gameRepository) {
+        return new StatisticsCollector(gameRepository);
     }
 }

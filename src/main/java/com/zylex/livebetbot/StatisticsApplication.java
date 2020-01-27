@@ -1,15 +1,17 @@
 package com.zylex.livebetbot;
 
-import com.zylex.livebetbot.service.HibernateUtil;
 import com.zylex.livebetbot.service.StatisticsCollector;
-import com.zylex.livebetbot.service.repository.GameRepository;
-import org.hibernate.Session;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+@Configuration
+@ComponentScan
 public class StatisticsApplication {
 
     public static void main(String[] args) {
@@ -20,12 +22,10 @@ public class StatisticsApplication {
         LocalDateTime endDateTime = args.length > 1
                 ? LocalDateTime.of(LocalDate.parse(args[1], DATE_FORMATTER), LocalTime.MAX)
                 : LocalDateTime.of(startDateTime.toLocalDate(), LocalTime.MAX);
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            new StatisticsCollector(
-                new GameRepository(session),
-                startDateTime,
-                endDateTime
-            ).analyse();
-        }
+
+        AnnotationConfigApplicationContext context =
+                new AnnotationConfigApplicationContext(StatisticsApplication.class);
+        StatisticsCollector statisticsCollector = context.getBean(StatisticsCollector.class);
+        statisticsCollector.analyse(startDateTime, endDateTime);
     }
 }

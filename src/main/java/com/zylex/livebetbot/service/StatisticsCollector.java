@@ -15,17 +15,11 @@ public class StatisticsCollector {
 
     private GameRepository gameRepository;
 
-    private LocalDateTime startDateTime;
-
-    private LocalDateTime endDateTime;
-
-    public StatisticsCollector(GameRepository gameRepository, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public StatisticsCollector(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
     }
 
-    public void analyse() {
+    public void analyse(LocalDateTime startDateTime, LocalDateTime endDateTime) {
         logger.startLogMessage(startDateTime.toLocalDate(), endDateTime.toLocalDate());
         List<Game> games = gameRepository.getByDate(startDateTime, endDateTime);
         for (RuleNumber ruleNumber : RuleNumber.values()) {
