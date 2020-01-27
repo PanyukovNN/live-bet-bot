@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class GameParser {
+public class GameParser {
 
     private WebDriver driver;
 
@@ -29,7 +29,7 @@ class GameParser {
 
     private GameParserLogger logger = new GameParserLogger();
 
-    GameParser(CountryParser countryParser) {
+    public GameParser(CountryParser countryParser) {
         this.countryParser = countryParser;
     }
 

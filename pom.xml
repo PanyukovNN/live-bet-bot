@@ -17,13 +17,14 @@
         <maven-dependency-plugin.version>2.4</maven-dependency-plugin.version>
         <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
-        <betbot-main-class-path>com.zylex.livebetbot.LiveBetBotApplication</betbot-main-class-path>
+        <livebetbot-main-class-path>com.zylex.livebetbot.LiveBetBotApplication</livebetbot-main-class-path>
         <statistics-main-class-path>com.zylex.livebetbot.StatisticsApplication</statistics-main-class-path>
         <slf4j.version>1.7.5</slf4j.version>
         <webdrivermanager.version>3.7.1</webdrivermanager.version>
         <postgresql.version>42.2.8.jre7</postgresql.version>
         <jstl.version>1.2</jstl.version>
         <hibernate.version>5.4.10.Final</hibernate.version>
+        <spring.version>5.2.3.RELEASE</spring.version>
     </properties>
 
     <dependencies>
@@ -94,11 +95,25 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${hibernate.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-dbcp</artifactId>
+            <version>9.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
         <finalName>LiveBetBot</finalName>
-<!--        <finalName>StatisticsCollector</finalName>-->
         <defaultGoal>package</defaultGoal>
 
         <resources>
@@ -116,8 +131,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>${betbot-main-class-path}</mainClass>
-<!--                            <mainClass>${statistics-main-class-path}</mainClass>-->
+                            <mainClass>${livebetbot-main-class-path}</mainClass>
                             <packageName>com.zylex.livebetbot</packageName>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>

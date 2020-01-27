@@ -11,9 +11,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("StatementWithEmptyBody")
 public class LiveBetBotApplication {
 
-    @SuppressWarnings("StatementWithEmptyBody")
     public static void main(String[] args) {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
@@ -27,4 +27,5 @@ public class LiveBetBotApplication {
             ConsoleLogger.endMessage(LogType.BOT_END);
         }
     }
+
 }

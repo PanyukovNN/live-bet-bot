@@ -1,31 +1,23 @@
 package com.zylex.livebetbot;
 
-import com.zylex.livebetbot.service.DriverManager;
-import com.zylex.livebetbot.service.HibernateUtil;
 import com.zylex.livebetbot.service.Saver;
-import com.zylex.livebetbot.service.parser.ParseProcessor;
-import com.zylex.livebetbot.service.repository.GameRepository;
-import com.zylex.livebetbot.service.rule.RuleProcessor;
-import org.hibernate.Session;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
+@ComponentScan
 public class ScheduledParsingTask implements Runnable {
 
     @Override
     public void run() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            GameRepository gameRepository = new GameRepository(session);
-            new Saver(
-                new RuleProcessor(
-                    new ParseProcessor(
-                        new DriverManager(),
-                        gameRepository
-                    )),
-                gameRepository
-            ).save();
-//            new ResultScanner(
-//                driverManager.initiateDriver(true),
-//                gameRepository
-//            ).scan();
+        try {
+            AnnotationConfigApplicationContext context =
+                    new AnnotationConfigApplicationContext(ScheduledParsingTask.class);
+            Saver saver = context.getBean(Saver.class);
+            saver.save();
+//            ResultScanner resultScanner = context.getBean(ResultScanner.class);
+//            resultScanner.scan();
         } catch (Throwable t) {
             t.printStackTrace();
         }

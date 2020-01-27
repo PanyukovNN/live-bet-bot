@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-class CountryParser {
+public class CountryParser {
 
     private DriverManager driverManager;
 
@@ -36,12 +36,12 @@ class CountryParser {
 
     private CountryParserLogger logger = new CountryParserLogger();
 
-    CountryParser(DriverManager driverManager, GameRepository gameRepository) {
+    public CountryParser(DriverManager driverManager, GameRepository gameRepository) {
         this.driverManager = driverManager;
         this.gameRepository = gameRepository;
     }
 
-    public WebDriver getDriver() {
+    WebDriver getDriver() {
         return driver;
     }
 

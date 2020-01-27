@@ -10,11 +10,8 @@ import com.zylex.livebetbot.service.rule.RuleProcessor;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 public class Saver {
-
-    private static final Logger LOG = Logger.getLogger(Saver.class.getName());
 
     private SaverLogger logger = new SaverLogger();
 

@@ -27,7 +27,6 @@ public class DriverManager {
     /**
      * Initiate web driver and return it.
      * @param headless - flag for headless driver.
-     * @return - instance of WebDriver;
      */
     public void initiateDriver(boolean headless) {
         if (driver != null) {

@@ -5,10 +5,11 @@ Live-bet-bot includes three modules:
 1. Export statistics to file and also displays it to console. 
 
 #### **Used tecnologies:**
+- Spring framework
+- Hibernate, JPA
+- PostgreSQL
 - Maven
 - Selenium
-- PostgreSQL
-- Hibernate, JPA
 - Logging (log4j)
 - Stream API
 - Scheduled executor service
