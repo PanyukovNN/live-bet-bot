@@ -1,6 +1,7 @@
 package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.service.DriverManager;
+import com.zylex.livebetbot.service.HibernateUtil;
 import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.parser.ParseProcessor;
 import com.zylex.livebetbot.service.repository.GameRepository;
@@ -9,23 +10,14 @@ import org.hibernate.Session;
 
 public class ScheduledParsingTask implements Runnable {
 
-    private DriverManager driverManager;
-
-    private Session session;
-
-    ScheduledParsingTask(DriverManager driverManager, Session session) {
-        this.driverManager = driverManager;
-        this.session = session;
-    }
-
     @Override
     public void run() {
-        GameRepository gameRepository = new GameRepository(session);
-        try {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            GameRepository gameRepository = new GameRepository(session);
             new Saver(
                 new RuleProcessor(
                     new ParseProcessor(
-                        driverManager.initiateDriver(true),
+                        new DriverManager(),
                         gameRepository
                     )),
                 gameRepository
@@ -36,8 +28,6 @@ public class ScheduledParsingTask implements Runnable {
 //            ).scan();
         } catch (Throwable t) {
             t.printStackTrace();
-        } finally {
-            driverManager.quitDriver();
         }
     }
 }

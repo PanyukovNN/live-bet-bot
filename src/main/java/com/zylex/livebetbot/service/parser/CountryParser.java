@@ -1,9 +1,10 @@
 package com.zylex.livebetbot.service.parser;
 
+import com.zylex.livebetbot.controller.logger.CountryParserLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
-import com.zylex.livebetbot.controller.logger.ParserLogger;
 import com.zylex.livebetbot.exception.CountryParserException;
 import com.zylex.livebetbot.model.Game;
+import com.zylex.livebetbot.service.repository.GameRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -28,15 +29,14 @@ class CountryParser {
 
     private WebDriverWait wait;
 
-    private List<Game> noResultGames;
+    private GameRepository gameRepository;
 
-    private ParserLogger logger;
+    private CountryParserLogger logger = new CountryParserLogger();
 
-    CountryParser(WebDriver driver, List<Game> noResultGames, ParserLogger logger) {
+    CountryParser(WebDriver driver, GameRepository gameRepository) {
         this.driver = driver;
         wait = new WebDriverWait(driver, 60);
-        this.noResultGames = noResultGames;
-        this.logger = logger;
+        this.gameRepository = gameRepository;
     }
 
     List<Game> parse() {
@@ -47,14 +47,8 @@ class CountryParser {
                 return new ArrayList<>();
             }
             logger.logCountriesFound(LogType.OKAY);
-            logger.startLogMessage(LogType.COUNTRIES, countryLinks.size());
-            List<Game> breakGames = findBreakGames(countryLinks);
-            if (breakGames.isEmpty()) {
-                logger.startLogMessage(LogType.NO_GAMES, 0);
-            } else {
-                logger.startLogMessage(LogType.GAMES, breakGames.size());
-            }
-            return breakGames;
+            logger.startLogMessage(countryLinks.size());
+            return findBreakGames(countryLinks);
         } catch (IOException e) {
             throw new CountryParserException(e.getMessage(), e);
         }
@@ -83,6 +77,7 @@ class CountryParser {
 
     private List<Game> findBreakGames(List<String> countryLinks) {
         List<Game> games = new ArrayList<>();
+        List<Game> noResultGames = gameRepository.getWithoutResult();
         for (String countryLink : countryLinks) {
             if (prepareWebpage(countryLink)) {
                 logger.logCountry(LogType.OKAY);
@@ -92,12 +87,12 @@ class CountryParser {
             }
             Document document = Jsoup.parse(driver.getPageSource());
             Elements gameElements = document.select("table.Hdp > tbody > tr");
-            extractGame(games, gameElements);
+            extractGame(games, gameElements, noResultGames);
         }
         return games;
     }
 
-    private void extractGame(List<Game> games, Elements gameElements) {
+    private void extractGame(List<Game> games, Elements gameElements, List<Game> noResultGames) {
         for (Element gameElement : gameElements) {
             Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
             if (dateTimeText.text().contains("HT")) {

@@ -1,8 +1,8 @@
 package com.zylex.livebetbot.service.parser;
 
-import com.zylex.livebetbot.controller.logger.LogType;
-import com.zylex.livebetbot.controller.logger.ParserLogger;
+import com.zylex.livebetbot.controller.logger.ParseProcessorLogger;
 import com.zylex.livebetbot.model.Game;
+import com.zylex.livebetbot.service.DriverManager;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import org.openqa.selenium.WebDriver;
 
@@ -10,26 +10,27 @@ import java.util.List;
 
 public class ParseProcessor {
 
-    private ParserLogger logger = new ParserLogger();
+    private ParseProcessorLogger logger = new ParseProcessorLogger();
 
-    private WebDriver driver;
+    private DriverManager driverManager;
 
-    private GameRepository gameRepository;
+    private final GameRepository gameRepository;
 
-    public ParseProcessor(WebDriver driver, GameRepository gameRepository) {
-        this.driver = driver;
+    public ParseProcessor(DriverManager driverManager, GameRepository gameRepository) {
+        this.driverManager = driverManager;
         this.gameRepository = gameRepository;
     }
 
     public List<Game> process() {
-        logger.startLogMessage(LogType.PARSING_START, 0);
-        List<Game> noResultGames = gameRepository.getWithoutResult();
-        List<Game> breakGames = new CountryParser(driver, noResultGames, logger).parse();
-        if (breakGames.isEmpty()) {
+        try {
+            WebDriver driver = driverManager.initiateDriver(true);
+            logger.startLogMessage();
+            List<Game> breakGames = new CountryParser(driver, gameRepository).parse();
+            new GameParser(driver).parse(breakGames);
+            logger.parsingComplete();
             return breakGames;
+        } finally {
+            driverManager.quitDriver();
         }
-        GameParser gameParser = new GameParser(driver, logger);
-        breakGames.forEach(gameParser::parse);
-        return breakGames;
     }
 }

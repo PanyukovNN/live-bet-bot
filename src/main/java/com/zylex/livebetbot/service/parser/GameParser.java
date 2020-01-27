@@ -1,6 +1,7 @@
 package com.zylex.livebetbot.service.parser;
 
-import com.zylex.livebetbot.controller.logger.ParserLogger;
+import com.zylex.livebetbot.controller.logger.GameParserLogger;
+import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
 import com.zylex.livebetbot.model.OverUnderType;
@@ -24,15 +25,23 @@ class GameParser {
 
     private WebDriverWait wait;
 
-    private ParserLogger logger;
+    private GameParserLogger logger = new GameParserLogger();
 
-    GameParser(WebDriver driver, ParserLogger logger) {
+    GameParser(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, 60);
-        this.logger = logger;
     }
 
-    void parse(Game game) {
+    void parse(List<Game> games) {
+        if (games.isEmpty()) {
+            logger.startLogMessage(LogType.NO_GAMES, 0);
+            return;
+        }
+        logger.startLogMessage(LogType.OKAY, games.size());
+        games.forEach(this::parseSingleGame);
+    }
+
+    private void parseSingleGame(Game game) {
         logger.logGame();
         driver.navigate().to("http://ballchockdee.com" + game.getLink());
         game.setHalfTimeScore(findGoal());
