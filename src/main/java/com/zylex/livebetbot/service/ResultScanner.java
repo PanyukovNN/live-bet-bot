@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -67,11 +68,7 @@ public class ResultScanner {
         List<Game> yesterdayGames = gameRepository.getByDate(LocalDate.now().minusDays(1));
         List<Game> noResultGames = removeGamesWithResult(yesterdayGames);
         if (noResultGames.isEmpty()) {
-            if (gameRepository.createStatisticsFile(LocalDate.now().minusDays(1))) {
-                logger.fileCreatedSuccessfully(LogType.OKAY);
-            } else {
-                logger.fileCreatedSuccessfully(LogType.ERROR);
-            }
+            createStatisticsFile();
             logger.endLogMessage(LogType.NO_GAMES, 0);
             ConsoleLogger.endMessage(LogType.BLOCK_END);
             return;
@@ -86,6 +83,16 @@ public class ResultScanner {
         }
         logOut();
         ConsoleLogger.endMessage(LogType.BLOCK_END);
+    }
+
+    private void createStatisticsFile() {
+        if (LocalTime.now().isAfter(LocalTime.of(3, 0))) {
+            if (gameRepository.createStatisticsFile(LocalDate.now().minusDays(1))) {
+                logger.fileCreatedSuccessfully(LogType.OKAY);
+            } else {
+                logger.fileCreatedSuccessfully(LogType.ERROR);
+            }
+        }
     }
 
     private List<Game> removeGamesWithResult(List<Game> noResultGames) {
