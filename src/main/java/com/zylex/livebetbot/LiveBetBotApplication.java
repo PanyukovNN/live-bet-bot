@@ -25,8 +25,10 @@ public class LiveBetBotApplication {
         DriverManager driverManager = context.getBean(DriverManager.class);
         driverManager.initiateDriver(true);
         Runnable parsingTask = context.getBean(ScheduledParsingTask.class);
+        Runnable resultScanningTask = context.getBean(ScheduledResultScanningTask.class);
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(resultScanningTask, 0, 6, TimeUnit.HOURS);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             while (!reader.readLine().equalsIgnoreCase("exit")) {
             }
