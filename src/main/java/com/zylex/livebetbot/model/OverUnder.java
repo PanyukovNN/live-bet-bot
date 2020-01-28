@@ -21,7 +21,7 @@ public class OverUnder implements Serializable {
     private Game game;
 
     @Column(name = "type")
-    private String overUnderType;
+    private String type;
 
     @Column(name = "size")
     private double size;
@@ -29,8 +29,8 @@ public class OverUnder implements Serializable {
     @Column(name = "coefficient")
     private double coefficient;
 
-    public OverUnder(String overUnderType, double size, double coefficient) {
-        this.overUnderType = overUnderType;
+    public OverUnder(String type, double size, double coefficient) {
+        this.type = type;
         this.size = size;
         this.coefficient = coefficient;
     }
@@ -54,12 +54,12 @@ public class OverUnder implements Serializable {
         this.game = game;
     }
 
-    public String getOverUnderType() {
-        return overUnderType;
+    public String getType() {
+        return type;
     }
 
-    public void setOverUnderType(String overUnderType) {
-        this.overUnderType = overUnderType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public double getSize() {
@@ -83,14 +83,12 @@ public class OverUnder implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OverUnder overUnder = (OverUnder) o;
-        return Double.compare(overUnder.size, size) == 0 &&
-                Double.compare(overUnder.coefficient, coefficient) == 0 &&
-                Objects.equals(overUnderType, overUnder.overUnderType);
+        return id == overUnder.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(overUnderType, size, coefficient);
+        return Objects.hash(id);
     }
 
     @Override
@@ -98,9 +96,14 @@ public class OverUnder implements Serializable {
         return "OverUnder{" +
                 "id=" + id +
                 ", gameId=" + game.getId() +
-                ", type=" + overUnderType +
+                ", type=" + type +
                 ", size=" + size +
                 ", coefficient=" + coefficient +
                 '}';
+    }
+
+    public enum Type {
+        OVER,
+        UNDER
     }
 }

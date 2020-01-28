@@ -4,7 +4,6 @@ import com.zylex.livebetbot.controller.logger.GameParserLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
-import com.zylex.livebetbot.model.OverUnderType;
 import com.zylex.livebetbot.service.DriverManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -99,10 +98,10 @@ public class GameParser {
     private void extractOverUnder(Set<OverUnder> overUnderSet, Element overUnderElement) {
         double overSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
         double overCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
-        overUnderSet.add(new OverUnder(OverUnderType.OVER.toString(), overSize, overCoefficient));
+        overUnderSet.add(new OverUnder(OverUnder.Type.OVER.toString(), overSize, overCoefficient));
         double underSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
         double underCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
-        overUnderSet.add(new OverUnder(OverUnderType.UNDER.toString(), underSize, underCoefficient));
+        overUnderSet.add(new OverUnder(OverUnder.Type.UNDER.toString(), underSize, underCoefficient));
     }
 
     private WebElement waitElementWithClassName(String className) {
