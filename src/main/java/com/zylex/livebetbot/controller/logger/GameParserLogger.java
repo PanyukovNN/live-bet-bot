@@ -12,9 +12,11 @@ public class GameParserLogger extends ConsoleLogger {
 
     private int totalGames;
 
-    private AtomicInteger processedGames = new AtomicInteger();
+    private AtomicInteger processedGames;
 
     public void startLogMessage(LogType type, int arg) {
+        totalGames = 0;
+        processedGames = new AtomicInteger();
         if (type == LogType.OKAY) {
             totalGames = arg;
             writeInLine(String.format("\nProcessing games: 0/%d (0.0%%)", arg));

@@ -12,12 +12,14 @@ public class CountryParserLogger extends ConsoleLogger {
 
     private int totalCountries;
 
-    private AtomicInteger processedCountries = new AtomicInteger();
+    private AtomicInteger processedCountries;
 
-    private AtomicInteger processedErrorCountries = new AtomicInteger();
+    private AtomicInteger processedErrorCountries;
 
-    public synchronized void startLogMessage(int countriesCount) {
+    public void startLogMessage(int countriesCount) {
         totalCountries = countriesCount;
+        processedCountries = new AtomicInteger();
+        processedErrorCountries = new AtomicInteger();
         writeInLine(String.format("\nProcessing countries: 0/%d (0.0%%)", countriesCount));
         LOG.info("Processing countries");
     }
@@ -46,7 +48,7 @@ public class CountryParserLogger extends ConsoleLogger {
                     new DecimalFormat("#0.0").format(((double) processedCountries.get() / (double) totalCountries) * 100).replace(",", "."));
             writeInLine(StringUtils.repeat("\b", output.length()) + output);
         }
-        if (processedCountries.get() == totalCountries) {
+        if (processedCountries.get() + processedErrorCountries.get() == totalCountries) {
             if (processedErrorCountries.get() > 0) {
                 String output = String.format("Countries with no handicap matches: %d", processedErrorCountries.get());
                 writeErrorMessage(output);

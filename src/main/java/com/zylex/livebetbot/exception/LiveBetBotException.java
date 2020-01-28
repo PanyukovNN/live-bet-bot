@@ -1,12 +1,14 @@
 package com.zylex.livebetbot.exception;
 
-import com.zylex.livebetbot.controller.logger.ConsoleLogger;
+import org.apache.log4j.Logger;
 
 public class LiveBetBotException extends RuntimeException {
 
+    private static Logger LOG = Logger.getLogger(LiveBetBotException.class);
+
     public LiveBetBotException(String message, Throwable cause) {
         super(message, cause);
-        ConsoleLogger.writeExceptionToLog(message);
+        LOG.error(message, cause);
         System.out.println();
         cause.printStackTrace();
     }

@@ -16,16 +16,14 @@ public abstract class ConsoleLogger {
 
     private final static Logger LOG = Logger.getLogger(LiveBetBotApplication.class);
 
-    private volatile static String logOutput;
-
     private static AtomicLong programStartTime = new AtomicLong(System.currentTimeMillis());
 
     static {
         DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a dd.MM.yyyy");
-        logOutput = "\n" + StringUtils.repeat("*", 50) + "\n"
-                + String.format("Bot started at: %s", LocalDateTime.now().format(DATE_TIME_FORMATTER))
-                + "\n" + StringUtils.repeat("-", 50);
-        System.out.print(logOutput.substring(1));
+        String output = StringUtils.repeat("*", 50) + "\n"
+                + String.format("Bot started at: %s", LocalDateTime.now().format(DATE_TIME_FORMATTER));
+        writeLineSeparator();
+        System.out.print(output);
         LOG.info("Bot started");
     }
 
@@ -42,15 +40,7 @@ public abstract class ConsoleLogger {
         }
     }
 
-    /**
-     * Write exception in log.
-     * @param message - stack of exception.
-     */
-    public synchronized static void writeExceptionToLog(String message) {
-        logOutput += "\n" + message;
-    }
-
-    synchronized void writeLineSeparator() {
+    static synchronized void writeLineSeparator() {
         String line = "\n" + StringUtils.repeat("-", 50);
         writeInLine(line);
     }

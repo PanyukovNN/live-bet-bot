@@ -3,7 +3,6 @@ package com.zylex.livebetbot.service.parser;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ParseProcessorLogger;
 import com.zylex.livebetbot.model.Game;
-import com.zylex.livebetbot.service.DriverManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +13,10 @@ public class ParseProcessor {
 
     private ParseProcessorLogger logger = new ParseProcessorLogger();
 
-    private DriverManager driverManager;
-
     private GameParser gameParser;
 
     @Autowired
-    public ParseProcessor(DriverManager driverManager, GameParser gameParser) {
-        this.driverManager = driverManager;
+    public ParseProcessor(GameParser gameParser) {
         this.gameParser = gameParser;
     }
 
