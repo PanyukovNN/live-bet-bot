@@ -7,7 +7,7 @@ import com.zylex.livebetbot.service.rule.RuleNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,9 +23,9 @@ public class StatisticsCollector {
         this.gameRepository = gameRepository;
     }
 
-    public void analyse(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        logger.startLogMessage(startDateTime.toLocalDate(), endDateTime.toLocalDate());
-        List<Game> games = gameRepository.getByDate(startDateTime, endDateTime);
+    public void analyse() {
+        logger.startLogMessage();
+        List<Game> games = gameRepository.getByDate(LocalDate.now().minusDays(1));
         for (RuleNumber ruleNumber : RuleNumber.values()) {
             List<Game> ruleGames = games.stream().filter(game -> game.getRuleNumber().equals(ruleNumber.toString())).collect(Collectors.toList());
             int twoMoreGoal = (int) ruleGames.stream().filter(game -> countTotalScore(game.getFinalScore()) > 1).count();
@@ -34,8 +34,6 @@ public class StatisticsCollector {
             int noResult    = (int) ruleGames.stream().filter(game -> countTotalScore(game.getFinalScore()) == -2).count();
             logger.logStatistics(ruleNumber, twoMoreGoal, oneGoal, noGoal, noResult);
         }
-//        int insertedGames = gameDao.createStatisticsFile(startDateTime, endDateTime);
-//        logger.fileCreatedSuccessfully(insertedGames);
     }
 
     private int countTotalScore(String score) {

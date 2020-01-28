@@ -45,7 +45,7 @@ public abstract class ConsoleLogger {
         writeInLine(line);
     }
 
-    static synchronized void writeErrorMessage(String line) {
+    public static synchronized void writeErrorMessage(String line) {
         System.err.print(line);
     }
 

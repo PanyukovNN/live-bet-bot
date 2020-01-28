@@ -3,7 +3,6 @@ package com.zylex.livebetbot.service;
 import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ResultScannerLogger;
-import com.zylex.livebetbot.exception.ResultScannerException;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import org.jsoup.Jsoup;
@@ -19,11 +18,10 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,54 +29,69 @@ public class ResultScanner {
 
     private ResultScannerLogger logger = new ResultScannerLogger();
 
-    private WebDriverWait wait;
-
     private WebDriver driver;
+
+    private WebDriverWait wait;
 
     private GameRepository gameRepository;
 
     private int gamesResultNumber;
 
-    private DriverManager driverManager;
+    //TODO think how to fix it
+    private DriverManager driverManager = new DriverManager();
 
     @Autowired
-    public ResultScanner(DriverManager driverManager, GameRepository gameRepository) {
-        this.driverManager = driverManager;
+    public ResultScanner(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
     }
 
     public void scan() {
         try {
-            logger.startLogMessage();
-            List<Game> noResultGames = gameRepository.getWithoutResult();
-            noResultGames = removeEarlyGames(removeOldGames(noResultGames));
-            if (noResultGames.isEmpty()) {
-                logger.endLogMessage(LogType.NO_GAMES, 0);
-                ConsoleLogger.endMessage(LogType.BLOCK_END);
-                return;
+            int attempts = 3;
+            while (attempts > 0) {
+                attempts--;
+                try {
+                    processScanning();
+                    break;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    ConsoleLogger.writeErrorMessage(e.getMessage());
+                }
             }
-            initDriver();
-            String userHash = logIn();
-            if (processResults(noResultGames, userHash)) {
-                logger.endLogMessage(LogType.OKAY, gamesResultNumber);
-            } else {
-                logger.endLogMessage(LogType.ERROR, 0);
-            }
-            ConsoleLogger.endMessage(LogType.BLOCK_END);
-        } catch (IOException e) {
-            throw new ResultScannerException(e.getMessage(), e);
+        } finally {
+            driverManager.quitDriver();
         }
     }
 
-    private List<Game> removeOldGames(List<Game> noResultGames) {
-        return noResultGames.stream()
-                .filter(game -> game.getDateTime().isAfter(LocalDateTime.of(LocalDate.now().minusDays(2), LocalTime.of(0,0))))
-                .collect(Collectors.toList());
+    private void processScanning() throws IOException {
+        List<Game> yesterdayGames = gameRepository.getByDate(LocalDate.now().minusDays(1));
+        List<Game> noResultGames = removeGamesWithResult(yesterdayGames);
+        if (noResultGames.isEmpty()) {
+            if (gameRepository.createStatisticsFile(LocalDate.now().minusDays(1))) {
+                logger.fileCreatedSuccessfully(LogType.OKAY);
+            } else {
+                logger.fileCreatedSuccessfully(LogType.ERROR);
+            }
+            logger.endLogMessage(LogType.NO_GAMES, 0);
+            ConsoleLogger.endMessage(LogType.BLOCK_END);
+            return;
+        }
+        initDriver();
+        logger.startLogMessage();
+        String userHash = logIn();
+        if (processResults(noResultGames, userHash)) {
+            logger.endLogMessage(LogType.OKAY, gamesResultNumber);
+        } else {
+            logger.endLogMessage(LogType.ERROR, 0);
+        }
+        ConsoleLogger.endMessage(LogType.BLOCK_END);
     }
 
-    private List<Game> removeEarlyGames(List<Game> noResultGames) {
+    private List<Game> removeGamesWithResult(List<Game> noResultGames) {
         return noResultGames.stream()
-                .filter(game -> game.getDateTime().isBefore(LocalDateTime.of(LocalDate.now(), LocalTime.now().minusHours(1))))
+                .filter(game -> game.getFinalScore() == null ||
+                        game.getFinalScore().isEmpty() ||
+                        game.getFinalScore().equals("-1:-1"))
                 .collect(Collectors.toList());
     }
 
@@ -93,8 +106,7 @@ public class ResultScanner {
     }
 
     private void initDriver() {
-        //TODO do not need initiate initiate
-//        driverManager.initiateDriver(true);
+        driverManager.initiateDriver(true);
         driver = driverManager.getDriver();
         wait = new WebDriverWait(driver, 5);
         driver.navigate().to("http://ballchockdee.com");
@@ -107,21 +119,20 @@ public class ResultScanner {
             waitElementWithId("username").sendKeys(property.getProperty("LiveBetBot.login"));
             waitElementWithId("password").sendKeys(property.getProperty("LiveBetBot.password"));
             waitElementWithClassName("sign-in").click();
-            Alert alert = (new WebDriverWait(driver, 5))
-                    .until(ExpectedConditions.alertIsPresent());
-            alert.accept();
-//TODO halde org.openqa.selenium.WebDriverException: Remote browser did not respond to getCurrentUrl
             if (driver.getCurrentUrl().startsWith("https://www.sbobet-pay.com/")) {
                 waitElementWithClassName("DWHomeBtn").click();
             }
-        } catch (NoAlertPresentException | TimeoutException ignore) {
+            Alert alert = (new WebDriverWait(driver, 5))
+                    .until(ExpectedConditions.alertIsPresent());
+            alert.accept();
+        } catch (WebDriverException ignore) {
         }
         return driver.getCurrentUrl().split("ballchockdee")[0];
     }
 
     private boolean navigateToResultTab(String userHash) {
         driver.navigate().to(userHash + "ballchockdee.com/web-root/restricted/result/results-more.aspx");
-        int attempts = 2;
+        int attempts = 3;
         while (true) {
             if (attempts-- == 0) {
                 return false;
@@ -130,7 +141,6 @@ public class ResultScanner {
                 waitElementWithClassName("ContentTable");
                 return true;
             } catch (NoSuchElementException | TimeoutException | UnhandledAlertException ignore) {
-                //TODO handle alert
             }
         }
     }
@@ -140,13 +150,13 @@ public class ResultScanner {
                 .until(ExpectedConditions.presenceOfElementLocated(By.name("Yesterday")));
         driver.findElement(By.name("Yesterday")).click();
         try {
-            Thread.sleep(1500);
+            Thread.sleep(2000);
         } catch (InterruptedException ignore) {
         }
     }
 
     private void findingResults(List<Game> noResultGames) {
-        noResultGames = removeGameWithResults(noResultGames);
+        noResultGames = removeGamesWithResult(noResultGames);
         if (noResultGames.isEmpty()) {
             return;
         }
@@ -157,8 +167,10 @@ public class ResultScanner {
             Elements teams = cells.get(1).select("span");
             String firstTeam = teams.get(0).text();
             String secondTeam = findSecondTeam(teams);
-            //TODO check number format
-            String score = cells.get(3).text();
+            String score = cells.get(3).text().replace(" ", "");
+            if (!checkScoreCorrect(score)) {
+                continue;
+            }
             Optional<Game> gameOptional = noResultGames.stream().filter(game -> game.getFirstTeam().equals(firstTeam) && game.getSecondTeam().equals(secondTeam)).findFirst();
             if (gameOptional.isPresent()) {
                 Game game = gameOptional.get();
@@ -169,6 +181,14 @@ public class ResultScanner {
         }
     }
 
+    private boolean checkScoreCorrect(String score) {
+        if (score == null) {
+            return false;
+        }
+        Pattern pattern = Pattern.compile("\\d+[:]\\d+");
+        return pattern.matcher(score).matches();
+    }
+
     private String findSecondTeam(Elements teams) {
         teams.remove(0);
         for (Element teamElement : teams) {
@@ -177,12 +197,6 @@ public class ResultScanner {
             }
         }
         return "";
-    }
-
-    private List<Game> removeGameWithResults(List<Game> noResultGames) {
-        return noResultGames.stream()
-                .filter(game -> game.getFinalScore().equals("-1:-1"))
-                .collect(Collectors.toList());
     }
 
     private WebElement waitElementWithId(String id) {

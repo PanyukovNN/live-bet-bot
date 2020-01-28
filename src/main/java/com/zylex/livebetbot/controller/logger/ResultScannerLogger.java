@@ -28,4 +28,15 @@ public class ResultScannerLogger extends ConsoleLogger {
         writeInLine(StringUtils.repeat("\b", output.length()) + output);
         LOG.info(output);
     }
+
+    public void fileCreatedSuccessfully(LogType type) {
+        String output = "";
+        if (type == LogType.OKAY) {
+            output = "Statistics file created successfully";
+        } else if (type == LogType.ERROR) {
+            output = "Statistics file already exist (or no games to save)";
+        }
+        writeInLine("\n " + output);
+        LOG.info(output);
+    }
 }
