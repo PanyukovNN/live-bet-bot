@@ -11,9 +11,10 @@ public class ParseProcessorLogger extends ConsoleLogger {
 
     private final static Logger LOG = Logger.getLogger(ParseProcessor.class);
 
-    private AtomicLong parsingStartTime = new AtomicLong(System.currentTimeMillis());
+    private AtomicLong parsingStartTime;
 
     public void startLogMessage() {
+        parsingStartTime = new AtomicLong(System.currentTimeMillis());
         DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a dd.MM.yyyy");
         writeInLine("\nParsing started at " + LocalDateTime.now().format(DATE_TIME_FORMATTER));
         writeInLine("\nFinding countries: ...");
