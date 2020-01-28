@@ -25,7 +25,6 @@ public class ParseProcessor {
     }
 
     public List<Game> process() {
-        driverManager.initiateDriver(true);
         logger.startLogMessage();
         List<Game> breakGames = gameParser.parse();
         if (breakGames.isEmpty()) {
