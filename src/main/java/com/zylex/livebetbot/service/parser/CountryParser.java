@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@SuppressWarnings("WeakerAccess")
 @Service
 public class CountryParser {
 
@@ -45,11 +46,7 @@ public class CountryParser {
         this.gameRepository = gameRepository;
     }
 
-    WebDriver getDriver() {
-        return driver;
-    }
-
-    List<Game> parse() {
+    public List<Game> parse() {
         try {
             initDriver();
             List<String> countryLinks = parseCountryLinks();

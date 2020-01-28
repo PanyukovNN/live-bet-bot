@@ -21,9 +21,9 @@ public class GameParserLogger extends ConsoleLogger {
             LOG.info("Processing games");
         } else if (type == LogType.NO_GAMES) {
             writeInLine("\nProcessing games: no HT games");
+            writeLineSeparator();
             LOG.info("No HT games");
         }
-        writeLineSeparator();
     }
 
     public synchronized void logGame() {

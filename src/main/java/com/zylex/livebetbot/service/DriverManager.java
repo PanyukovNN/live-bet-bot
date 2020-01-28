@@ -31,9 +31,6 @@ public class DriverManager {
      * @param headless - flag for headless driver.
      */
     public void initiateDriver(boolean headless) {
-        if (driver != null) {
-            return;
-        }
         WebDriverManager.chromedriver().setup();
         setUpLogging();
         driver = headless
@@ -52,6 +49,8 @@ public class DriverManager {
 
     private void setUpLogging() {
         System.setProperty("webdriver.chrome.silentOutput", "true");
+//        System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true");
+//        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
         Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
         logger.startLogMessage();
     }

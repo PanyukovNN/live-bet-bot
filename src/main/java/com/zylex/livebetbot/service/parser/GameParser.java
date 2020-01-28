@@ -5,6 +5,7 @@ import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
 import com.zylex.livebetbot.model.OverUnderType;
+import com.zylex.livebetbot.service.DriverManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,10 +21,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("WeakerAccess")
 @Service
 public class GameParser {
 
     private WebDriver driver;
+
+    private DriverManager driverManager;
 
     private WebDriverWait wait;
 
@@ -32,11 +36,12 @@ public class GameParser {
     private GameParserLogger logger = new GameParserLogger();
 
     @Autowired
-    public GameParser(CountryParser countryParser) {
+    public GameParser(DriverManager driverManager, CountryParser countryParser) {
+        this.driverManager = driverManager;
         this.countryParser = countryParser;
     }
 
-    List<Game> parse() {
+    public List<Game> parse() {
         List<Game> games = countryParser.parse();
         initDriver();
         if (games.isEmpty()) {
@@ -49,7 +54,7 @@ public class GameParser {
     }
 
     private void initDriver() {
-        driver = countryParser.getDriver();
+        driver = driverManager.getDriver();
         wait = new WebDriverWait(driver, 60);
     }
 

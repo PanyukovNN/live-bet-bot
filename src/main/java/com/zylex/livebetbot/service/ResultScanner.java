@@ -93,7 +93,8 @@ public class ResultScanner {
     }
 
     private void initDriver() {
-        driverManager.initiateDriver(true);
+        //TODO do not need initiate initiate
+//        driverManager.initiateDriver(true);
         driver = driverManager.getDriver();
         wait = new WebDriverWait(driver, 5);
         driver.navigate().to("http://ballchockdee.com");
