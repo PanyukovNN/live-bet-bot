@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Managing chrome drivers.
+ * Managing web drivers.
  */
 @Service
 public class DriverManager {
@@ -63,5 +63,10 @@ public class DriverManager {
             driver.quit();
             driver = null;
         }
+    }
+
+    public void refreshDriver() {
+        quitDriver();
+        initiateDriver(true);
     }
 }

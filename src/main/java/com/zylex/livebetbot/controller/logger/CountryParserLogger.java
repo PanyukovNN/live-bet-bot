@@ -40,7 +40,6 @@ public class CountryParserLogger extends ConsoleLogger {
     public synchronized void logCountry(LogType type) {
         if (type == LogType.ERROR) {
             processedErrorCountries.incrementAndGet();
-            return;
         } else if (type == LogType.OKAY) {
             String output = String.format("Processing countries: %d/%d (%s%%)",
                     processedCountries.incrementAndGet(),

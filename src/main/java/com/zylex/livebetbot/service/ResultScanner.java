@@ -37,11 +37,11 @@ public class ResultScanner {
 
     private int gamesResultNumber;
 
-    //TODO think how to fix it
-    private DriverManager driverManager = new DriverManager();
+    private DriverManager driverManager;
 
     @Autowired
-    public ResultScanner(GameRepository gameRepository) {
+    public ResultScanner(DriverManager driverManager, GameRepository gameRepository) {
+        this.driverManager = driverManager;
         this.gameRepository = gameRepository;
     }
 
@@ -84,6 +84,7 @@ public class ResultScanner {
         } else {
             logger.endLogMessage(LogType.ERROR, 0);
         }
+        logOut();
         ConsoleLogger.endMessage(LogType.BLOCK_END);
     }
 
@@ -106,7 +107,6 @@ public class ResultScanner {
     }
 
     private void initDriver() {
-        driverManager.initiateDriver(true);
         driver = driverManager.getDriver();
         wait = new WebDriverWait(driver, 5);
         driver.navigate().to("http://ballchockdee.com");
@@ -168,7 +168,7 @@ public class ResultScanner {
             String firstTeam = teams.get(0).text();
             String secondTeam = findSecondTeam(teams);
             String score = cells.get(3).text().replace(" ", "");
-            if (!checkScoreCorrect(score)) {
+            if (!checkScoreCorrectness(score)) {
                 continue;
             }
             Optional<Game> gameOptional = noResultGames.stream().filter(game -> game.getFirstTeam().equals(firstTeam) && game.getSecondTeam().equals(secondTeam)).findFirst();
@@ -181,7 +181,7 @@ public class ResultScanner {
         }
     }
 
-    private boolean checkScoreCorrect(String score) {
+    private boolean checkScoreCorrectness(String score) {
         if (score == null) {
             return false;
         }
@@ -198,6 +198,12 @@ public class ResultScanner {
         }
         return "";
     }
+
+    private void logOut() {
+        driver.navigate().to("http://ballchockdee.com");
+        waitElementWithClassName("sign-out").click();
+    }
+
 
     private WebElement waitElementWithId(String id) {
         wait.ignoring(StaleElementReferenceException.class)

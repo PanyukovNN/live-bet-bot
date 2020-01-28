@@ -22,8 +22,6 @@ public class LiveBetBotApplication {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context =
                 new AnnotationConfigApplicationContext(LiveBetBotApplication.class);
-        DriverManager driverManager = context.getBean(DriverManager.class);
-        driverManager.initiateDriver(true);
         Runnable parsingTask = context.getBean(ScheduledParsingTask.class);
         Runnable resultScanningTask = context.getBean(ScheduledResultScanningTask.class);
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -35,6 +33,7 @@ public class LiveBetBotApplication {
         } catch (IOException e) {
             throw new LiveBetBotException(e.getMessage(), e);
         } finally {
+            DriverManager driverManager = context.getBean(DriverManager.class);
             driverManager.quitDriver();
             HibernateUtil.getSessionFactory().getCurrentSession().close();
             scheduler.shutdownNow();

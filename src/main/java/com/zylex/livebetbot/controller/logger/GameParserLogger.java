@@ -14,9 +14,12 @@ public class GameParserLogger extends ConsoleLogger {
 
     private AtomicInteger processedGames;
 
+    private AtomicInteger processedErrorGames;
+
     public void startLogMessage(LogType type, int arg) {
         totalGames = 0;
         processedGames = new AtomicInteger();
+        processedErrorGames = new AtomicInteger();
         if (type == LogType.OKAY) {
             totalGames = arg;
             writeInLine(String.format("\nProcessing games: 0/%d (0.0%%)", arg));
@@ -28,13 +31,22 @@ public class GameParserLogger extends ConsoleLogger {
         }
     }
 
-    public synchronized void logGame() {
-        String output = String.format("Processing games: %d/%d (%s%%)",
-                processedGames.incrementAndGet(),
-                totalGames,
-                new DecimalFormat("#0.0").format(((double) processedGames.get() / (double) totalGames) * 100).replace(",", "."));
-        writeInLine(StringUtils.repeat("\b", output.length()) + output);
-        if (processedGames.get() == totalGames) {
+    public synchronized void logGame(LogType type) {
+        if (type == LogType.OKAY) {
+            String output = String.format("Processing games: %d/%d (%s%%)",
+                    processedGames.incrementAndGet(),
+                    totalGames,
+                    new DecimalFormat("#0.0").format(((double) processedGames.get() / (double) totalGames) * 100).replace(",", "."));
+            writeInLine(StringUtils.repeat("\b", output.length()) + output);
+        } else if (type == LogType.ERROR) {
+            processedErrorGames.incrementAndGet();
+        }
+        if (processedGames.get() + processedErrorGames.get() == totalGames) {
+            if (processedErrorGames.get() > 0) {
+                String output = String.format("Not processed games: %d", processedErrorGames.get());
+                writeErrorMessage(output);
+                LOG.warn(output);
+            }
             LOG.info(String.format("%d games processed", processedGames.get()));
             writeLineSeparator();
         }

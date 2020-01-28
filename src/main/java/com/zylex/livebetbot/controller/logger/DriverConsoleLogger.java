@@ -15,15 +15,15 @@ public class DriverConsoleLogger extends ConsoleLogger {
      * Log start message.
      */
     public void startLogMessage() {
-        writeInLine("\nStarting chrome driver: ...");
-        LOG.info("Starting chrome driver");
+        writeInLine("\nStarting web driver: ...");
+        LOG.info("Starting web driver");
     }
 
     /**
      * Log driver start.
      */
     public void logDriver() {
-        String output = "Starting chrome driver: complete";
+        String output = "Starting web driver: complete";
         LOG.info("Driver started");
         writeInLine(StringUtils.repeat("\b", output.length()) + output);
         writeLineSeparator();

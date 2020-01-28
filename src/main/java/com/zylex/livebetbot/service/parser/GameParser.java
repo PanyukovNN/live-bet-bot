@@ -58,12 +58,16 @@ public class GameParser {
     }
 
     private void parseSingleGame(Game game) {
-        logger.logGame();
-        driver.navigate().to("http://ballchockdee.com" + game.getLink());
-        game.setHalfTimeScore(findScore());
-        Set<OverUnder> overUnderList = findOverUnder();
-        game.setOverUnderSet(overUnderList);
-        overUnderList.forEach(o -> o.setGame(game));
+        try {
+            driver.navigate().to("http://ballchockdee.com" + game.getLink());
+            game.setHalfTimeScore(findScore());
+            Set<OverUnder> overUnderList = findOverUnder();
+            game.setOverUnderSet(overUnderList);
+            overUnderList.forEach(o -> o.setGame(game));
+            logger.logGame(LogType.OKAY);
+        } catch (TimeoutException e) {
+            logger.logGame(LogType.ERROR);
+        }
     }
 
     private String findScore() {
