@@ -65,7 +65,7 @@ public class CountryParser {
 
     private void initDriver() {
         driver = driverManager.getDriver();
-        wait = new WebDriverWait(driver, 15);
+        wait = new WebDriverWait(driver, 10);
     }
 
     private List<String> parseCountryLinks() throws IOException {

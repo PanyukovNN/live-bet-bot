@@ -24,7 +24,7 @@ public class ScheduledResultScanningTask implements Runnable {
             resultScanner.scan();
         } catch (Throwable t) {
             t.printStackTrace();
-            driverManager.refreshDriver();
+            driverManager.initiateDriver(true);
         }
     }
 }

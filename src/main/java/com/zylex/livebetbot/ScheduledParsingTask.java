@@ -21,11 +21,11 @@ public class ScheduledParsingTask implements Runnable {
     @Override
     public void run() {
         try {
-            driverManager.refreshDriver();
+            driverManager.initiateDriver(true);
             saver.save();
         } catch (Throwable t) {
             t.printStackTrace();
-            driverManager.refreshDriver();
+            driverManager.initiateDriver(true);
         }
     }
 }

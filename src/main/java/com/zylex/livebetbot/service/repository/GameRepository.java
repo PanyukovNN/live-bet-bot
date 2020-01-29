@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 @Repository
 public class GameRepository {
 
@@ -77,14 +78,15 @@ public class GameRepository {
         return true;
     }
 
-    private String findOverUnder(List<OverUnder> overUnderSet, OverUnder.Type type, double size) {
-        //TODO transit to stream
-        for (OverUnder overUnder : overUnderSet) {
-            if (overUnder.getType().equals(type.toString()) && Math.abs(overUnder.getSize() - size) < 0.00001) {
-                return new DecimalFormat("#0.00").format(overUnder.getCoefficient()).replace(",", ".");
-            }
-        }
-        return "";
+    private String findOverUnder(List<OverUnder> overUnderList, OverUnder.Type type, double size) {
+        return overUnderList.stream()
+                .filter(overUnder ->
+                        overUnder.getType().equals(type.toString()) && Math.abs(overUnder.getSize() - size) < 0.00001)
+                .findFirst()
+                .map(overUnder -> new DecimalFormat("#0.00")
+                        .format(overUnder.getCoefficient())
+                        .replace(",", "."))
+                .orElse("");
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

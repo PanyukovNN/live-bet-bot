@@ -53,7 +53,7 @@ public class GameParser {
 
     private void initDriver() {
         driver = driverManager.getDriver();
-        wait = new WebDriverWait(driver, 60);
+        wait = new WebDriverWait(driver, 15);
     }
 
     private void parseSingleGame(Game game) {

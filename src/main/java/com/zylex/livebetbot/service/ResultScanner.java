@@ -139,16 +139,14 @@ public class ResultScanner {
     private boolean navigateToResultTab(String userHash) {
         driver.navigate().to(userHash + "ballchockdee.com/web-root/restricted/result/results-more.aspx");
         int attempts = 3;
-        while (true) {
-            if (attempts-- == 0) {
-                return false;
-            }
+        while (attempts-- > 0) {
             try {
                 waitElementWithClassName("ContentTable");
                 return true;
             } catch (NoSuchElementException | TimeoutException | UnhandledAlertException ignore) {
             }
         }
+        return false;
     }
 
     private void navigateToYesterdayResultTab() {
