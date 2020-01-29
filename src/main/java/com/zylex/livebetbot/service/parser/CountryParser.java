@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class CountryParser {
 
     private void initDriver() {
         driver = driverManager.getDriver();
-        wait = new WebDriverWait(driver, 60);
+        wait = new WebDriverWait(driver, 30);
     }
 
     private List<String> parseCountryLinks() throws IOException {
@@ -82,7 +83,8 @@ public class CountryParser {
                 Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
                 elements.forEach(element -> countryLinks.add(element.attr("href")));
                 break;
-            } catch (UnknownHostException ignore) {
+            } catch (UnknownHostException | ConnectException ignore) {
+                //TODO add logging
             }
         }
         return countryLinks;
@@ -92,10 +94,7 @@ public class CountryParser {
         List<Game> games = new ArrayList<>();
         List<Game> noResultGames = gameRepository.getWithoutResult();
         for (String countryLink : countryLinks) {
-            if (prepareWebpage(countryLink)) {
-                logger.logCountry(LogType.OKAY);
-            } else {
-                logger.logCountry(LogType.ERROR);
+            if (!prepareWebpage(countryLink)) {
                 continue;
             }
             Document document = Jsoup.parse(driver.getPageSource());
@@ -126,16 +125,29 @@ public class CountryParser {
     }
 
     private boolean prepareWebpage(String countryLink) {
-        try {
-            driver.navigate().to("http://ballchockdee.com" + countryLink);
-            wait.ignoring(StaleElementReferenceException.class)
-                    .until(ExpectedConditions.presenceOfElementLocated(By.id("bu:od:go:mt:2")));
-            driver.findElement(By.id("bu:od:go:mt:2")).click();
-            wait.ignoring(StaleElementReferenceException.class)
-                    .until(ExpectedConditions.presenceOfElementLocated(By.className("Hdp")));
-            return true;
-        } catch (TimeoutException | NoSuchElementException e) {
-            return false;
+        int attempts = 3;
+        while (attempts > 0) {
+            try {
+                openHandicapTab(countryLink);
+                return true;
+            } catch (NoSuchElementException e) {
+                logger.logCountry(LogType.TIMEOUT);
+                return false;
+            } catch (TimeoutException e) {
+                attempts--;
+            }
         }
+        logger.logCountry(LogType.ERROR);
+        return false;
+    }
+
+    private void openHandicapTab(String countryLink) {
+        driver.navigate().to("http://ballchockdee.com" + countryLink);
+        wait.ignoring(StaleElementReferenceException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(By.id("bu:od:go:mt:2")));
+        driver.findElement(By.id("bu:od:go:mt:2")).click();
+        wait.ignoring(StaleElementReferenceException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(By.className("Hdp")));
+        logger.logCountry(LogType.OKAY);
     }
 }
