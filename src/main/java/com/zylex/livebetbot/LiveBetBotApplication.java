@@ -11,6 +11,10 @@ import org.springframework.context.annotation.ComponentScan;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +30,8 @@ public class LiveBetBotApplication {
         Runnable resultScanningTask = context.getBean(ScheduledResultScanningTask.class);
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(resultScanningTask, 0, 6, TimeUnit.HOURS);
+        scheduler.scheduleAtFixedRate(resultScanningTask, countDelay(LocalTime.of(3, 0)), 1, TimeUnit.DAYS);
+        scheduler.scheduleAtFixedRate(resultScanningTask, countDelay(LocalTime.of(6, 0)), 1, TimeUnit.DAYS);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             while (!reader.readLine().equalsIgnoreCase("exit")) {
             }
@@ -41,4 +46,12 @@ public class LiveBetBotApplication {
         }
     }
 
+    private static long countDelay(LocalTime time) {
+        final long initialDelay = LocalDateTime.now().until(LocalDateTime.of(LocalDate.now().plusDays(1), time), ChronoUnit.MINUTES);
+        if (initialDelay > TimeUnit.DAYS.toMinutes(1)) {
+            return LocalDateTime.now().until(LocalDateTime.of(LocalDate.now(), time), ChronoUnit.MINUTES);
+        } else {
+            return initialDelay;
+        }
+    }
 }

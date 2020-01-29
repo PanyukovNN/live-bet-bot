@@ -1,12 +1,13 @@
 package com.zylex.livebetbot.model;
 
 import javax.persistence.*;
-import java.io.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 @Entity
@@ -33,7 +34,9 @@ public class Game implements Serializable, Cloneable {
     private String finalScore = "-1:-1";
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<OverUnder> overUnderSet = new HashSet<>();
+    private Set<OverUnder> overUnderSet = new TreeSet<>(Comparator.comparing(OverUnder::getType)
+            .thenComparing(OverUnder::getSize)
+            .thenComparing(OverUnder::getCoefficient));
 
     @Column(name = "link")
     private String link;

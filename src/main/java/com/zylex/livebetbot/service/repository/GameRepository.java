@@ -49,43 +49,42 @@ public class GameRepository {
     }
 
     public boolean createStatisticsFile(LocalDate date) {
+        List<Game> games = getByDate(date);
+        if (games.isEmpty()) {
+            return false;
+        }
         DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         String fileName = String.format("statistics/%s.csv", DATE_FORMATTER.format(date));
         if (!createFile(fileName)) {
             return false;
         }
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName, false), StandardCharsets.UTF_8))) {
-            List<Game> games = getByDate(date);
-            if (games.isEmpty()) {
-                return false;
-            }
-            String GAME_BODY_FORMAT = "%s;%s;%s;%s;%s;%s;%s;%s;\n";
-            String overUnder1 = "";
-            String overUnder15 = "";
+            String GAME_BODY_FORMAT = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n";
             for (Game game : games) {
-                for (OverUnder overUnder : game.getOverUnderSet()) {
-                    if (overUnder.getType().equals(OverUnder.Type.OVER.toString()) && Math.abs(overUnder.getSize() - 1d) < 0.00001) {
-                        overUnder1 = new DecimalFormat("#0.00").format(overUnder.getCoefficient()).replace(",", ".");
-                    }
-                    if (overUnder.getType().equals(OverUnder.Type.OVER.toString()) && Math.abs(overUnder.getSize() - 1.5d) < 0.00001) {
-                        overUnder15 = new DecimalFormat("#0.00").format(overUnder.getCoefficient()).replace(",", ".");
-                    }
-                }
+                String over10 = findOverUnder(game.getOverUnderSet(), OverUnder.Type.OVER, 1);
+                String over15 = findOverUnder(game.getOverUnderSet(), OverUnder.Type.OVER, 1.5);
+                String under10 = findOverUnder(game.getOverUnderSet(), OverUnder.Type.UNDER, 1);
+                String under15 = findOverUnder(game.getOverUnderSet(), OverUnder.Type.UNDER, 1.5);
                 String output = String.format(GAME_BODY_FORMAT,
-                        game.getDateTime(),
-                        game.getFirstTeam(),
-                        game.getSecondTeam(),
-                        game.getHalfTimeScore(),
-                        game.getFinalScore(),
-                        game.getRuleNumber(),
-                        overUnder1,
-                        overUnder15);
+                        DATE_FORMATTER.format(game.getDateTime()),
+                        game.getFirstTeam(), game.getSecondTeam(),
+                        game.getHalfTimeScore(), game.getFinalScore(),
+                        game.getRuleNumber(), over10, over15, under10, under15);
                 writer.write(output);
             }
         } catch (IOException e) {
             throw new GameRepositoryException(e.getMessage(), e);
         }
         return true;
+    }
+
+    private String findOverUnder(Set<OverUnder> overUnderSet, OverUnder.Type type, double size) {
+        for (OverUnder overUnder : overUnderSet) {
+            if (overUnder.getType().equals(type.toString()) && Math.abs(overUnder.getSize() - size) < 0.00001) {
+                return new DecimalFormat("#0.00").format(overUnder.getCoefficient()).replace(",", ".");
+            }
+        }
+        return "";
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

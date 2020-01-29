@@ -50,7 +50,7 @@ public class CountryParserLogger extends ConsoleLogger {
         if (processedCountries.get() + processedErrorCountries.get() == totalCountries) {
             if (processedErrorCountries.get() > 0) {
                 String output = String.format("Countries with no handicap matches: %d", processedErrorCountries.get());
-                writeErrorMessage(output);
+                writeErrorMessage("\n" + output);
                 LOG.warn(output);
             }
             writeLineSeparator();

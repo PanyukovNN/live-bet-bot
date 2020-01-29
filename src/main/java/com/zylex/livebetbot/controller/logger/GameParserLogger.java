@@ -44,7 +44,7 @@ public class GameParserLogger extends ConsoleLogger {
         if (processedGames.get() + processedErrorGames.get() == totalGames) {
             if (processedErrorGames.get() > 0) {
                 String output = String.format("Not processed games: %d", processedErrorGames.get());
-                writeErrorMessage(output);
+                writeErrorMessage("\n" + output);
                 LOG.warn(output);
             }
             LOG.info(String.format("%d games processed", processedGames.get()));

@@ -86,7 +86,7 @@ public class ResultScanner {
     }
 
     private void createStatisticsFile() {
-        if (LocalTime.now().isAfter(LocalTime.of(3, 0))) {
+        if (LocalTime.now().isAfter(LocalTime.of(2, 59))) {
             if (gameRepository.createStatisticsFile(LocalDate.now().minusDays(1))) {
                 logger.fileCreatedSuccessfully(LogType.OKAY);
             } else {
