@@ -83,12 +83,15 @@ public class OverUnder implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OverUnder overUnder = (OverUnder) o;
-        return id == overUnder.id;
+        return id == overUnder.id &&
+                Double.compare(overUnder.size, size) == 0 &&
+                Double.compare(overUnder.coefficient, coefficient) == 0 &&
+                Objects.equals(type, overUnder.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, type, size, coefficient);
     }
 
     @Override

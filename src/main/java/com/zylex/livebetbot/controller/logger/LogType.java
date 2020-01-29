@@ -8,7 +8,6 @@ public enum LogType {
     NO_GAMES,
     BLOCK_END,
     BOT_END,
-    TIMEOUT,
     ERROR,
     OKAY
 }

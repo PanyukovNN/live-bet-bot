@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Set;
 
 @Repository
 public class GameRepository {
@@ -42,7 +41,7 @@ public class GameRepository {
         session.getTransaction().commit();
     }
 
-    public void save(Set<Game> games) {
+    public void save(List<Game> games) {
         session.beginTransaction();
         games.forEach(session::save);
         session.getTransaction().commit();
@@ -61,10 +60,10 @@ public class GameRepository {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName, false), StandardCharsets.UTF_8))) {
             String GAME_BODY_FORMAT = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n";
             for (Game game : games) {
-                String over10 = findOverUnder(game.getOverUnderSet(), OverUnder.Type.OVER, 1);
-                String over15 = findOverUnder(game.getOverUnderSet(), OverUnder.Type.OVER, 1.5);
-                String under10 = findOverUnder(game.getOverUnderSet(), OverUnder.Type.UNDER, 1);
-                String under15 = findOverUnder(game.getOverUnderSet(), OverUnder.Type.UNDER, 1.5);
+                String over10 = findOverUnder(game.getOverUnderList(), OverUnder.Type.OVER, 1);
+                String over15 = findOverUnder(game.getOverUnderList(), OverUnder.Type.OVER, 1.5);
+                String under10 = findOverUnder(game.getOverUnderList(), OverUnder.Type.UNDER, 1);
+                String under15 = findOverUnder(game.getOverUnderList(), OverUnder.Type.UNDER, 1.5);
                 String output = String.format(GAME_BODY_FORMAT,
                         DATE_FORMATTER.format(game.getDateTime()),
                         game.getFirstTeam(), game.getSecondTeam(),
@@ -78,7 +77,8 @@ public class GameRepository {
         return true;
     }
 
-    private String findOverUnder(Set<OverUnder> overUnderSet, OverUnder.Type type, double size) {
+    private String findOverUnder(List<OverUnder> overUnderSet, OverUnder.Type type, double size) {
+        //TODO transit to stream
         for (OverUnder overUnder : overUnderSet) {
             if (overUnder.getType().equals(type.toString()) && Math.abs(overUnder.getSize() - size) < 0.00001) {
                 return new DecimalFormat("#0.00").format(overUnder.getCoefficient()).replace(",", ".");

@@ -15,9 +15,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
@@ -61,8 +60,8 @@ public class GameParser {
         try {
             driver.navigate().to("http://ballchockdee.com" + game.getLink());
             game.setHalfTimeScore(findScore());
-            Set<OverUnder> overUnderList = findOverUnder();
-            game.setOverUnderSet(overUnderList);
+            List<OverUnder> overUnderList = findOverUnder();
+            game.setOverUnderList(overUnderList);
             overUnderList.forEach(o -> o.setGame(game));
             logger.logGame(LogType.OKAY);
         } catch (TimeoutException e) {
@@ -79,33 +78,33 @@ public class GameParser {
         }
     }
 
-    private Set<OverUnder> findOverUnder() {
+    private List<OverUnder> findOverUnder() {
         waitElementWithClassName("MarketT");
         Document document = Jsoup.parse(driver.getPageSource());
         Elements marketElements = document.select("div.MarketT");
         List<Element> overUnderMarketElements = marketElements.stream()
                 .filter(market -> market.select("div.SubHead > span").text().contains("Over Under"))
                 .collect(Collectors.toList());
-        Set<OverUnder> overUnderSet = new HashSet<>();
+        List<OverUnder> overUnderList = new ArrayList<>();
         for (Element marketElement : overUnderMarketElements) {
             Elements overUnderElements = marketElement.select("table > tbody > tr");
             for (Element overUnderElement : overUnderElements) {
                 if (overUnderElement.className().equals("OddsClosed")) {
                     continue;
                 }
-                extractOverUnder(overUnderSet, overUnderElement);
+                extractOverUnder(overUnderList, overUnderElement);
             }
         }
-        return overUnderSet;
+        return overUnderList;
     }
 
-    private void extractOverUnder(Set<OverUnder> overUnderSet, Element overUnderElement) {
+    private void extractOverUnder(List<OverUnder> overUnderList, Element overUnderElement) {
         double overSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
         double overCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
-        overUnderSet.add(new OverUnder(OverUnder.Type.OVER.toString(), overSize, overCoefficient));
+        overUnderList.add(new OverUnder(OverUnder.Type.OVER.toString(), overSize, overCoefficient));
         double underSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
         double underCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
-        overUnderSet.add(new OverUnder(OverUnder.Type.UNDER.toString(), underSize, underCoefficient));
+        overUnderList.add(new OverUnder(OverUnder.Type.UNDER.toString(), underSize, underCoefficient));
     }
 
     private WebElement waitElementWithClassName(String className) {

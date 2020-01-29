@@ -49,8 +49,7 @@ public class ResultScanner {
     public void scan() {
         try {
             int attempts = 3;
-            while (attempts > 0) {
-                attempts--;
+            while (attempts-- > 0) {
                 try {
                     processScanning();
                     break;

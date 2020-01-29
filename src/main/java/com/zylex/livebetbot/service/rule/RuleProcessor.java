@@ -17,7 +17,7 @@ public class RuleProcessor {
         this.parseProcessor = parseProcessor;
     }
 
-    public Map<RuleNumber, Set<Game>> process() {
+    public Map<RuleNumber, List<Game>> process() {
         List<Game> games = parseProcessor.process();
         if (games.isEmpty()) {
             return new HashMap<>();
@@ -25,8 +25,8 @@ public class RuleProcessor {
         return filter(games);
     }
 
-    private Map<RuleNumber, Set<Game>> filter(List<Game> games) {
-        Map<RuleNumber, Set<Game>> ruleGames = new LinkedHashMap<>();
+    private Map<RuleNumber, List<Game>> filter(List<Game> games) {
+        Map<RuleNumber, List<Game>> ruleGames = new LinkedHashMap<>();
         for (RuleNumber ruleNumber : RuleNumber.values()) {
             ruleGames.putIfAbsent(ruleNumber, ruleNumber.rule.filter(games));
         }

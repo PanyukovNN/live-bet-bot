@@ -10,8 +10,8 @@ import com.zylex.livebetbot.service.rule.RuleProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 public class Saver {
@@ -29,7 +29,7 @@ public class Saver {
     }
 
     public void save() {
-        Map<RuleNumber, Set<Game>> ruleGames = ruleProcessor.process();
+        Map<RuleNumber, List<Game>> ruleGames = ruleProcessor.process();
         if (ruleGames.isEmpty()) {
             ConsoleLogger.endMessage(LogType.BLOCK_END);
             return;

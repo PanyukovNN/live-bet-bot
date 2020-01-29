@@ -65,16 +65,13 @@ public class CountryParser {
 
     private void initDriver() {
         driver = driverManager.getDriver();
-        wait = new WebDriverWait(driver, 30);
+        wait = new WebDriverWait(driver, 15);
     }
 
     private List<String> parseCountryLinks() throws IOException {
         List<String> countryLinks = new ArrayList<>();
-        int attempts = 5;
-        while (true) {
-            if (attempts-- == 0) {
-                break;
-            }
+        int attempts = 2;
+        while (attempts-- > 0) {
             try {
                 Document document = Jsoup.connect("http://www.ballchockdee.com/euro/live-betting/football")
                         .userAgent("Chrome/4.0.249.0 Safari/532.5")
@@ -84,7 +81,6 @@ public class CountryParser {
                 elements.forEach(element -> countryLinks.add(element.attr("href")));
                 break;
             } catch (UnknownHostException | ConnectException ignore) {
-                //TODO add logging
             }
         }
         return countryLinks;
@@ -125,16 +121,13 @@ public class CountryParser {
     }
 
     private boolean prepareWebpage(String countryLink) {
-        int attempts = 3;
-        while (attempts > 0) {
+        int attempts = 2;
+        while (attempts-- > 0) {
             try {
                 openHandicapTab(countryLink);
+                logger.logCountry(LogType.OKAY);
                 return true;
-            } catch (NoSuchElementException e) {
-                logger.logCountry(LogType.TIMEOUT);
-                return false;
-            } catch (TimeoutException e) {
-                attempts--;
+            } catch (NoSuchElementException | TimeoutException ignore) {
             }
         }
         logger.logCountry(LogType.ERROR);
@@ -148,6 +141,5 @@ public class CountryParser {
         driver.findElement(By.id("bu:od:go:mt:2")).click();
         wait.ignoring(StaleElementReferenceException.class)
                 .until(ExpectedConditions.presenceOfElementLocated(By.className("Hdp")));
-        logger.logCountry(LogType.OKAY);
     }
 }
