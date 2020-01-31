@@ -4,8 +4,14 @@ import com.zylex.livebetbot.exception.GameRepositoryException;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.persistence.Query;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +26,27 @@ import java.util.List;
 @Repository
 public class GameRepository {
 
-    private Session session = HibernateUtil.getSessionFactory().openSession();
+    private Session session;
+
+    @PostConstruct
+    private void postConstruct() {
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+                .configure()
+                .build();
+        try {
+            SessionFactory sessionFactory = new MetadataSources(registry)
+                    .buildMetadata()
+                    .buildSessionFactory();
+            session = sessionFactory.openSession();
+        } catch (Exception e) {
+            StandardServiceRegistryBuilder.destroy(registry);
+        }
+    }
+
+    @PreDestroy
+    private void preDestroy() {
+        session.close();
+    }
 
     public List<Game> getWithoutResult() {
         Query query = session.createQuery("FROM Game WHERE finalScore IS NULL OR finalScore = '-1:-1'");

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ScheduledResultScanningTask implements Runnable {
+public class ScheduledResultScanningTask extends Thread {
 
     private DriverManager driverManager;
 

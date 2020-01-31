@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ScheduledParsingTask implements Runnable {
+public class ScheduledParsingTask extends Thread {
 
     private Saver saver;
 
@@ -21,11 +21,10 @@ public class ScheduledParsingTask implements Runnable {
     @Override
     public void run() {
         try {
-            driverManager.initiateDriver(true);
             saver.save();
         } catch (Throwable t) {
             t.printStackTrace();
-            driverManager.initiateDriver(true);
+            driverManager.initiateDriver(false);
         }
     }
 }

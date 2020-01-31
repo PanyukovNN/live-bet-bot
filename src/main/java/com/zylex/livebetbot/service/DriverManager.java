@@ -4,10 +4,12 @@ import com.zylex.livebetbot.controller.logger.DriverConsoleLogger;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +28,16 @@ public class DriverManager {
         return driver;
     }
 
+    @PostConstruct
+    private void postConstruct() {
+        initiateDriver(true);
+    }
+
+    @PreDestroy
+    private void preDestroy() {
+        quitDriver();
+    }
+
     /**
      * Initiate web driver and return it.
      * @param headless - flag for headless driver.
@@ -35,11 +47,11 @@ public class DriverManager {
         int attempts = 3;
         while (attempts-- > 0) {
             try {
-                WebDriverManager.firefoxdriver().setup();
+                WebDriverManager.chromedriver().setup();
                 setUpLogging();
                 driver = headless
-                        ? new FirefoxDriver(new FirefoxOptions().addArguments("--headless"))
-                        : new FirefoxDriver();
+                        ? new ChromeDriver(new ChromeOptions().addArguments("--headless"))
+                        : new ChromeDriver();
                 manageDriver();
                 logger.logDriver();
                 break;
@@ -56,9 +68,9 @@ public class DriverManager {
     }
 
     private void setUpLogging() {
-//        System.setProperty("webdriver.chrome.silentOutput", "true");
-        System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true");
-        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
+        System.setProperty("webdriver.chrome.silentOutput", "true");
+//        System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true");
+//        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
         Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
         logger.startLogMessage();
     }

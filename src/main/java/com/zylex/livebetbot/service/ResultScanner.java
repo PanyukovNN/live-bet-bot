@@ -80,7 +80,7 @@ public class ResultScanner {
         } else {
             logger.endLogMessage(LogType.ERROR, 0);
         }
-        logOut();
+//        logOut(userHash);
         ConsoleLogger.endMessage(LogType.BLOCK_END);
     }
 
@@ -203,8 +203,8 @@ public class ResultScanner {
         return "";
     }
 
-    private void logOut() {
-        driver.navigate().to("http://ballchockdee.com");
+    private void logOut(String userHash) {
+        driver.navigate().to(userHash + "ballchockdee.com/");
         waitElementWithClassName("sign-out").click();
     }
 
