@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS game (
     id                BIGSERIAL NOT NULL PRIMARY KEY,
     date_time         TIMESTAMP NOT NULL,
     country           VARCHAR(100) NOT NULL,
-    league            VARCHAR(300) NOT NULL,
+    league            VARCHAR(300),
     first_team        VARCHAR(50) NOT NULL,
     second_team       VARCHAR(50) NOT NULL,
     half_time_score   VARCHAR(20) NOT NULL,

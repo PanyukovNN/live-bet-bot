@@ -18,6 +18,12 @@ public class Game implements Serializable, Cloneable {
     @Column(name = "date_time")
     private LocalDateTime dateTime;
 
+    @Column(name = "country")
+    private String country;
+
+    @Column(name = "league")
+    private String league;
+
     @Column(name = "first_team")
     private String firstTeam;
 
@@ -39,8 +45,10 @@ public class Game implements Serializable, Cloneable {
     @Column(name = "rule_number")
     private String ruleNumber;
 
-    public Game(LocalDateTime dateTime, String firstTeam, String secondTeam, String link) {
+    public Game(LocalDateTime dateTime, String country, String league, String firstTeam, String secondTeam, String link) {
         this.dateTime = dateTime;
+        this.country = country;
+        this.league = league;
         this.firstTeam = firstTeam;
         this.secondTeam = secondTeam;
         this.link = link;
@@ -63,6 +71,22 @@ public class Game implements Serializable, Cloneable {
 
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getLeague() {
+        return league;
+    }
+
+    public void setLeague(String league) {
+        this.league = league;
     }
 
     public String getFirstTeam() {

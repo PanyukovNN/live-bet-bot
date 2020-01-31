@@ -50,14 +50,14 @@ public class CountryParser {
     public List<Game> parse() {
         try {
             initDriver();
-            List<String> countryLinks = parseCountryLinks();
-            if (countryLinks.isEmpty()) {
+            List<Country> countries = parseCountryLinks();
+            if (countries.isEmpty()) {
                 logger.logCountriesFound(LogType.NO_COUNTRIES);
                 return new ArrayList<>();
             }
             logger.logCountriesFound(LogType.OKAY);
-            logger.startLogMessage(countryLinks.size());
-            return findBreakGames(countryLinks);
+            logger.startLogMessage(countries.size());
+            return findBreakGames(countries);
         } catch (IOException e) {
             throw new CountryParserException(e.getMessage(), e);
         }
@@ -68,8 +68,8 @@ public class CountryParser {
         wait = new WebDriverWait(driver, 10);
     }
 
-    private List<String> parseCountryLinks() throws IOException {
-        List<String> countryLinks = new ArrayList<>();
+    private List<Country> parseCountryLinks() throws IOException {
+        List<Country> countries = new ArrayList<>();
         int attempts = 5;
         while (attempts-- > 0) {
             try {
@@ -78,54 +78,63 @@ public class CountryParser {
                         .referrer("http://www.google.com")
                         .get();
                 Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
-                elements.forEach(element -> countryLinks.add(element.attr("href")));
+                for (Element element : elements) {
+                    String countryName = element.select("div").first().text().replaceFirst("\\d+", "");
+                    String countryLink = element.attr("href");
+                    Country country = new Country(countryName, countryLink);
+                    countries.add(country);
+                }
                 break;
             } catch (UnknownHostException | ConnectException ignore) {
             }
         }
         //TODO log
-        return countryLinks;
+        return countries;
     }
 
-    private List<Game> findBreakGames(List<String> countryLinks) {
+    private List<Game> findBreakGames(List<Country> countries) {
         List<Game> games = new ArrayList<>();
         List<Game> noResultGames = gameRepository.getWithoutResult();
-        for (String countryLink : countryLinks) {
-            if (!prepareWebpage(countryLink)) {
+        for (Country country : countries) {
+            if (!prepareWebpage(country)) {
                 continue;
             }
             Document document = Jsoup.parse(driver.getPageSource());
-            Elements gameElements = document.select("table.Hdp > tbody > tr");
-            extractGame(games, gameElements, noResultGames);
+            Elements leagueElements = document.select("div.MarketBd");
+            for (Element leagueElement : leagueElements) {
+                String league = leagueElement.select("div.MarketLea > div.SubHeadT").first().text();
+                Elements gameElements = leagueElement.select("table.Hdp > tbody > tr");
+                extractGame(games, country.getName(), league, gameElements, noResultGames);
+            }
         }
         return games;
     }
 
-    private void extractGame(List<Game> games, Elements gameElements, List<Game> noResultGames) {
+    private void extractGame(List<Game> games, String countryName, String league, Elements gameElements, List<Game> noResultGames) {
         for (Element gameElement : gameElements) {
             Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
-            if (dateTimeText.text().contains("HT")) {
+//            if (dateTimeText.text().contains("HT")) {
                 Element firstTeamElement = gameElement.selectFirst("td > a.OddsTabL > span.OddsL");
                 Element secondTeamElement = gameElement.selectFirst("td > a.OddsTabR > span.OddsL");
                 if (firstTeamElement == null || secondTeamElement == null) {
                     continue;
                 }
                 String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
-                Game game = new Game(LocalDateTime.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
+                Game game = new Game(LocalDateTime.now(), countryName, league, firstTeamElement.text(), secondTeamElement.text(), gameLink);
                 boolean noResultContains = noResultGames.stream().anyMatch(g -> g.getLink().equals(game.getLink()));
-                if (noResultContains | games.contains(game)) {
+                if (noResultContains || games.contains(game)) {
                     continue;
                 }
                 games.add(game);
-            }
+//            }
         }
     }
 
-    private boolean prepareWebpage(String countryLink) {
+    private boolean prepareWebpage(Country country) {
         int attempts = 2;
         while (attempts-- > 0) {
             try {
-                openHandicapTab(countryLink);
+                openHandicapTab(country.getLink());
                 logger.logCountry(LogType.OKAY);
                 return true;
             } catch (NoSuchElementException | TimeoutException ignore) {
@@ -142,5 +151,25 @@ public class CountryParser {
         driver.findElement(By.id("bu:od:go:mt:2")).click();
         wait.ignoring(StaleElementReferenceException.class)
                 .until(ExpectedConditions.presenceOfElementLocated(By.className("Hdp")));
+    }
+
+    private static class Country {
+
+        private String name;
+
+        private String link;
+
+        public Country(String name, String link) {
+            this.name = name;
+            this.link = link;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getLink() {
+            return link;
+        }
     }
 }
