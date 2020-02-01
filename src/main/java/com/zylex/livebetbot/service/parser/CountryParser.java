@@ -3,9 +3,13 @@ package com.zylex.livebetbot.service.parser;
 import com.zylex.livebetbot.controller.logger.CountryParserLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.exception.CountryParserException;
+import com.zylex.livebetbot.model.Country;
 import com.zylex.livebetbot.model.Game;
+import com.zylex.livebetbot.model.League;
 import com.zylex.livebetbot.service.DriverManager;
+import com.zylex.livebetbot.service.repository.CountryRepository;
 import com.zylex.livebetbot.service.repository.GameRepository;
+import com.zylex.livebetbot.service.repository.LeagueRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,12 +43,18 @@ public class CountryParser {
 
     private GameRepository gameRepository;
 
+    private CountryRepository countryRepository;
+
+    private LeagueRepository leagueRepository;
+
     private CountryParserLogger logger = new CountryParserLogger();
 
     @Autowired
-    public CountryParser(DriverManager driverManager, GameRepository gameRepository) {
+    public CountryParser(DriverManager driverManager, GameRepository gameRepository, CountryRepository countryRepository, LeagueRepository leagueRepository) {
         this.driverManager = driverManager;
         this.gameRepository = gameRepository;
+        this.countryRepository = countryRepository;
+        this.leagueRepository = leagueRepository;
     }
 
     public List<Game> parse() {
@@ -73,23 +83,28 @@ public class CountryParser {
         int attempts = 5;
         while (attempts-- > 0) {
             try {
-                Document document = Jsoup.connect("http://www.ballchockdee.com/euro/live-betting/football")
-                        .userAgent("Chrome/4.0.249.0 Safari/532.5")
-                        .referrer("http://www.google.com")
-                        .get();
-                Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
-                for (Element element : elements) {
-                    String countryName = element.select("div").first().text().replaceFirst("\\d+", "");
-                    String countryLink = element.attr("href");
-                    Country country = new Country(countryName, countryLink);
-                    countries.add(country);
-                }
+                extractCountryLinks(countries);
                 break;
             } catch (UnknownHostException | ConnectException ignore) {
             }
         }
-        //TODO log
+        countryRepository.save(countries);
+        //TODO log attempts
         return countries;
+    }
+
+    private void extractCountryLinks(List<Country> countries) throws IOException {
+        Document document = Jsoup.connect("http://www.ballchockdee.com/euro/live-betting/football")
+                .userAgent("Chrome/4.0.249.0 Safari/532.5")
+                .referrer("http://www.google.com")
+                .get();
+        Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
+        for (Element element : elements) {
+            String countryName = element.select("div").first().text().replaceFirst("\\d+", "");
+            String countryLink = element.attr("href");
+            Country country = new Country(countryName, countryLink);
+            countries.add(country);
+        }
     }
 
     private List<Game> findBreakGames(List<Country> countries) {
@@ -102,15 +117,28 @@ public class CountryParser {
             Document document = Jsoup.parse(driver.getPageSource());
             Elements leagueElements = document.select("div.MarketBd");
             for (Element leagueElement : leagueElements) {
-                String league = leagueElement.select("div.MarketLea > div.SubHeadT").first().text();
+                String leagueName = leagueElement.select("div.MarketLea > div.SubHeadT").first().text();
+                League league = new League(leagueName);
                 Elements gameElements = leagueElement.select("table.Hdp > tbody > tr");
-                extractGame(games, country.getName(), league, gameElements, noResultGames);
+                List<Game> extractedGames = extractGames(games, gameElements, noResultGames);
+                establishDependencies(country, league, extractedGames);
+                games.addAll(extractedGames);
             }
         }
         return games;
     }
 
-    private void extractGame(List<Game> games, String countryName, String league, Elements gameElements, List<Game> noResultGames) {
+    private void establishDependencies(Country country, League league, List<Game> extractedGames) {
+        extractedGames.forEach(game -> {
+            game.setCountry(country);
+            game.setLeague(league);
+        });
+        country.getGames().addAll(extractedGames);
+        league.getGames().addAll(extractedGames);
+    }
+
+    private List<Game> extractGames(List<Game> games, Elements gameElements, List<Game> noResultGames) {
+        List<Game> extractedGames = new ArrayList<>();
         for (Element gameElement : gameElements) {
             Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
 //            if (dateTimeText.text().contains("HT")) {
@@ -120,14 +148,15 @@ public class CountryParser {
                     continue;
                 }
                 String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
-                Game game = new Game(LocalDateTime.now(), countryName, league, firstTeamElement.text(), secondTeamElement.text(), gameLink);
+                Game game = new Game(LocalDateTime.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
                 boolean noResultContains = noResultGames.stream().anyMatch(g -> g.getLink().equals(game.getLink()));
                 if (noResultContains || games.contains(game)) {
                     continue;
                 }
-                games.add(game);
+                extractedGames.add(game);
 //            }
         }
+        return extractedGames;
     }
 
     private boolean prepareWebpage(Country country) {
@@ -151,25 +180,5 @@ public class CountryParser {
         driver.findElement(By.id("bu:od:go:mt:2")).click();
         wait.ignoring(StaleElementReferenceException.class)
                 .until(ExpectedConditions.presenceOfElementLocated(By.className("Hdp")));
-    }
-
-    private static class Country {
-
-        private String name;
-
-        private String link;
-
-        public Country(String name, String link) {
-            this.name = name;
-            this.link = link;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getLink() {
-            return link;
-        }
     }
 }
