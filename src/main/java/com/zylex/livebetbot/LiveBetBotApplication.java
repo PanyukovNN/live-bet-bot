@@ -1,7 +1,5 @@
 package com.zylex.livebetbot;
 
-import com.zylex.livebetbot.controller.logger.ConsoleLogger;
-import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.exception.LiveBetBotException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -37,7 +35,6 @@ public class LiveBetBotApplication {
             throw new LiveBetBotException(e.getMessage(), e);
         } finally {
             scheduler.shutdownNow();
-            ConsoleLogger.endMessage(LogType.BOT_END);
         }
     }
 

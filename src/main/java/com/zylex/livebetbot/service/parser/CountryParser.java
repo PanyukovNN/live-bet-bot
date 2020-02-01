@@ -27,9 +27,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @SuppressWarnings("WeakerAccess")
 @Service
@@ -60,7 +58,7 @@ public class CountryParser {
     public List<Game> parse() {
         try {
             initDriver();
-            List<Country> countries = parseCountryLinks();
+            Set<Country> countries = parseCountryLinks();
             if (countries.isEmpty()) {
                 logger.logCountriesFound(LogType.NO_COUNTRIES);
                 return new ArrayList<>();
@@ -78,8 +76,8 @@ public class CountryParser {
         wait = new WebDriverWait(driver, 10);
     }
 
-    private List<Country> parseCountryLinks() throws IOException {
-        List<Country> countries = new ArrayList<>();
+    private Set<Country> parseCountryLinks() throws IOException {
+        Set<Country> countries = new LinkedHashSet<>();
         int attempts = 5;
         while (attempts-- > 0) {
             try {
@@ -93,7 +91,7 @@ public class CountryParser {
         return countries;
     }
 
-    private void extractCountryLinks(List<Country> countries) throws IOException {
+    private void extractCountryLinks(Set<Country> countries) throws IOException {
         Document document = Jsoup.connect("http://www.ballchockdee.com/euro/live-betting/football")
                 .userAgent("Chrome/4.0.249.0 Safari/532.5")
                 .referrer("http://www.google.com")
@@ -107,7 +105,7 @@ public class CountryParser {
         }
     }
 
-    private List<Game> findBreakGames(List<Country> countries) {
+    private List<Game> findBreakGames(Set<Country> countries) {
         List<Game> games = new ArrayList<>();
         List<Game> noResultGames = gameRepository.getWithoutResult();
         for (Country country : countries) {
@@ -115,14 +113,18 @@ public class CountryParser {
                 continue;
             }
             Document document = Jsoup.parse(driver.getPageSource());
-            Elements leagueElements = document.select("div.MarketBd");
-            for (Element leagueElement : leagueElements) {
-                String leagueName = leagueElement.select("div.MarketLea > div.SubHeadT").first().text();
+            Elements leagueTitleElements = document.select("div.MarketLea");
+            Elements leagueGamesElements = document.select("table.Hdp");
+            for (Element leagueGameElement : leagueGamesElements) {
+                //TODO hard to read
+                String leagueName = leagueTitleElements.get(leagueGamesElements.indexOf(leagueGameElement))
+                        .select("div.MarketLea > div.SubHeadT").first().text();
                 League league = new League(leagueName);
-                Elements gameElements = leagueElement.select("table.Hdp > tbody > tr");
+                Elements gameElements = leagueGameElement.select("tbody > tr");
                 List<Game> extractedGames = extractGames(games, gameElements, noResultGames);
                 establishDependencies(country, league, extractedGames);
                 games.addAll(extractedGames);
+                leagueRepository.save(league);
             }
         }
         return games;
@@ -133,15 +135,15 @@ public class CountryParser {
             game.setCountry(country);
             game.setLeague(league);
         });
-        country.getGames().addAll(extractedGames);
-        league.getGames().addAll(extractedGames);
+        country.getLeagues().add(league);
+        league.setCountry(country);
     }
 
     private List<Game> extractGames(List<Game> games, Elements gameElements, List<Game> noResultGames) {
         List<Game> extractedGames = new ArrayList<>();
         for (Element gameElement : gameElements) {
             Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
-//            if (dateTimeText.text().contains("HT")) {
+            if (dateTimeText.text().contains("HT")) {
                 Element firstTeamElement = gameElement.selectFirst("td > a.OddsTabL > span.OddsL");
                 Element secondTeamElement = gameElement.selectFirst("td > a.OddsTabR > span.OddsL");
                 if (firstTeamElement == null || secondTeamElement == null) {
@@ -154,7 +156,7 @@ public class CountryParser {
                     continue;
                 }
                 extractedGames.add(game);
-//            }
+            }
         }
         return extractedGames;
     }

@@ -34,7 +34,8 @@ DROP TABLE IF EXISTS country CASCADE;
 CREATE TABLE IF NOT EXISTS country (
     id      BIGSERIAL PRIMARY KEY,
     name    VARCHAR(100) NOT NULL,
-    link    VARCHAR(300) NOT NULL
+    link    VARCHAR(300) NOT NULL,
+    CONSTRAINT UC_country UNIQUE (name)
 );
 
 DROP TABLE IF EXISTS league CASCADE;
@@ -42,5 +43,6 @@ CREATE TABLE IF NOT EXISTS league (
     id          BIGSERIAL PRIMARY KEY,
     country_id  BIGSERIAL,
     name        VARCHAR(300) NOT NULL,
-    FOREIGN KEY (country_id) REFERENCES country(id) ON DELETE SET NULL
+    FOREIGN KEY (country_id) REFERENCES country(id) ON DELETE SET NULL,
+    CONSTRAINT UC_league UNIQUE (name)
 );

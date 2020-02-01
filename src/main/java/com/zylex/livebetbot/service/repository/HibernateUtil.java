@@ -1,5 +1,6 @@
 package com.zylex.livebetbot.service.repository;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -8,6 +9,8 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 public class HibernateUtil {
 
     private static SessionFactory sessionFactory;
+
+    private static Session session;
 
     static {
         final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
@@ -20,9 +23,10 @@ public class HibernateUtil {
         } catch (Exception e) {
             StandardServiceRegistryBuilder.destroy(registry);
         }
+        session = sessionFactory.openSession();
     }
 
-    public static SessionFactory getSessionFactory() {
-        return sessionFactory;
+    public static synchronized Session getSession() {
+        return session;
     }
 }
