@@ -26,10 +26,7 @@ public class GameRepository {
 
     @PostConstruct
     private void postConstruct() {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        if (session == null) {
-            session = HibernateUtil.getSessionFactory().openSession();
-        }
+        session = HibernateUtil.getSession();
     }
 
     @PreDestroy

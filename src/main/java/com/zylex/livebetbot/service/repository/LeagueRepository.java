@@ -6,7 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.List;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.transaction.Transactional;
+import java.util.Set;
 
 @Repository
 public class LeagueRepository {
@@ -15,10 +18,7 @@ public class LeagueRepository {
 
     @PostConstruct
     private void postConstruct() {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        if (session == null) {
-            session = HibernateUtil.getSessionFactory().openSession();
-        }
+        session = HibernateUtil.getSession();
     }
 
     @PreDestroy
@@ -28,15 +28,30 @@ public class LeagueRepository {
         }
     }
 
+    @Transactional
     public void save(League league) {
-        session.beginTransaction();
-        session.save(league);
-        session.getTransaction().commit();
+        League retreatedLeague = get(league);
+        league.setId(retreatedLeague.getId());
+        if (retreatedLeague.getName() == null) {
+            session.beginTransaction();
+            session.save(league);
+            session.getTransaction().commit();
+        }
     }
 
-    public void save(List<League> leagues) {
-        session.beginTransaction();
-        leagues.forEach(session::save);
-        session.getTransaction().commit();
+    @Transactional
+    public void save(Set<League> leagues) {
+        leagues.forEach(this::save);
+    }
+
+    @Transactional
+    public League get(League league) {
+        Query query = session.createQuery("FROM League WHERE name = :leagueName");
+        query.setParameter("leagueName", league.getName());
+        try {
+            return (League) query.getSingleResult();
+        } catch (NoResultException e) {
+            return new League();
+        }
     }
 }

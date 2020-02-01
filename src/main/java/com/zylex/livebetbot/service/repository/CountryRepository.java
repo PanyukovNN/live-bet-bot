@@ -6,7 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.List;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.transaction.Transactional;
+import java.util.Set;
 
 @Repository
 public class CountryRepository {
@@ -15,10 +18,7 @@ public class CountryRepository {
 
     @PostConstruct
     private void postConstruct() {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        if (session == null) {
-            session = HibernateUtil.getSessionFactory().openSession();
-        }
+        session = HibernateUtil.getSession();
     }
 
     @PreDestroy
@@ -28,15 +28,30 @@ public class CountryRepository {
         }
     }
 
+    @Transactional
     public void save(Country country) {
-        session.beginTransaction();
-        session.save(country);
-        session.getTransaction().commit();
+        Country retreatedCountry = get(country);
+        country.setId(retreatedCountry.getId());
+        if (retreatedCountry.getName() == null) {
+            session.beginTransaction();
+            session.save(country);
+            session.getTransaction().commit();
+        }
     }
 
-    public void save(List<Country> countries) {
-        session.beginTransaction();
-        countries.forEach(session::save);
-        session.getTransaction().commit();
+    @Transactional
+    public void save(Set<Country> countries) {
+        countries.forEach(this::save);
+    }
+
+    @Transactional
+    public Country get(Country country) {
+        Query query = session.createQuery("FROM Country WHERE name = :countryName");
+        query.setParameter("countryName", country.getName());
+        try {
+            return (Country) query.getSingleResult();
+        } catch (NoResultException e) {
+            return new Country();
+        }
     }
 }
