@@ -1,25 +1,23 @@
 package com.zylex.livebetbot.model;
 
 import javax.persistence.*;
-import java.util.List;
+import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name = "league")
-public class League {
+public class League implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
     private Country country;
 
     @Column(name = "name")
     private String name;
-
-    @OneToMany(mappedBy = "country", fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Game> games;
 
     public League(String name) {
         this.name = name;
@@ -52,11 +50,24 @@ public class League {
         this.name = name;
     }
 
-    public List<Game> getGames() {
-        return games;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        League league = (League) o;
+        return Objects.equals(country, league.country) &&
+                Objects.equals(name, league.name);
     }
 
-    public void setGames(List<Game> games) {
-        this.games = games;
+    @Override
+    public int hashCode() {
+        return Objects.hash(country, name);
+    }
+
+    @Override
+    public String toString() {
+        return "League{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

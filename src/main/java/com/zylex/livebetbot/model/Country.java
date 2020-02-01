@@ -1,27 +1,27 @@
 package com.zylex.livebetbot.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "country")
-public class Country {
+public class Country implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
 
     @Column(name = "link")
     private String link;
 
-    @OneToMany(mappedBy = "country", fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Game> games;
-
-    @OneToMany(mappedBy = "country", fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<League> leagues;
+    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<League> leagues = new ArrayList<>();
 
     public Country(String name, String link) {
         this.name = name;
@@ -55,19 +55,31 @@ public class Country {
         this.link = link;
     }
 
-    public List<Game> getGames() {
-        return games;
-    }
-
-    public void setGames(List<Game> games) {
-        this.games = games;
-    }
-
     public List<League> getLeagues() {
         return leagues;
     }
 
     public void setLeagues(List<League> leagues) {
         this.leagues = leagues;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Country country = (Country) o;
+        return Objects.equals(name, country.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
+    public String toString() {
+        return "Country{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

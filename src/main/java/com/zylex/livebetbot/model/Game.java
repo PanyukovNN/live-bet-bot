@@ -9,7 +9,7 @@ import java.util.*;
 @SuppressWarnings({"unused", "WeakerAccess"})
 @Entity
 @Table(name = "game")
-public class Game implements Serializable, Cloneable {
+public class Game implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,7 @@ public class Game implements Serializable, Cloneable {
     @Column(name = "final_score")
     private String finalScore = "-1:-1";
 
-    @OneToMany(mappedBy = "game", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<OverUnder> overUnderList = new ArrayList<>();
 
     @Column(name = "link")
