@@ -18,11 +18,13 @@ public class Game implements Serializable, Cloneable {
     @Column(name = "date_time")
     private LocalDateTime dateTime;
 
-    @Column(name = "country")
-    private String country;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
 
-    @Column(name = "league")
-    private String league;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "league_id")
+    private League league;
 
     @Column(name = "first_team")
     private String firstTeam;
@@ -36,7 +38,7 @@ public class Game implements Serializable, Cloneable {
     @Column(name = "final_score")
     private String finalScore = "-1:-1";
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "game", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<OverUnder> overUnderList = new ArrayList<>();
 
     @Column(name = "link")
@@ -45,10 +47,8 @@ public class Game implements Serializable, Cloneable {
     @Column(name = "rule_number")
     private String ruleNumber;
 
-    public Game(LocalDateTime dateTime, String country, String league, String firstTeam, String secondTeam, String link) {
+    public Game(LocalDateTime dateTime, String firstTeam, String secondTeam, String link) {
         this.dateTime = dateTime;
-        this.country = country;
-        this.league = league;
         this.firstTeam = firstTeam;
         this.secondTeam = secondTeam;
         this.link = link;
@@ -73,19 +73,19 @@ public class Game implements Serializable, Cloneable {
         this.dateTime = dateTime;
     }
 
-    public String getCountry() {
+    public Country getCountry() {
         return country;
     }
 
-    public void setCountry(String country) {
+    public void setCountry(Country country) {
         this.country = country;
     }
 
-    public String getLeague() {
+    public League getLeague() {
         return league;
     }
 
-    public void setLeague(String league) {
+    public void setLeague(League league) {
         this.league = league;
     }
 
@@ -162,8 +162,10 @@ public class Game implements Serializable, Cloneable {
     @Override
     public String toString() {
         DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a yyyy.MM.dd");
-        return String.format("%s %s - %s (%s) (%s) (%s)",
+        return String.format("%s %s %s \"%s\" - \"%s\" (%s) (%s) (%s)",
                 DATE_TIME_FORMATTER.format(dateTime),
+                country,
+                league,
                 firstTeam,
                 secondTeam,
                 halfTimeScore,
