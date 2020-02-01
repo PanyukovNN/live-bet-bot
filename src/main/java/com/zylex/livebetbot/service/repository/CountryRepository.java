@@ -31,11 +31,13 @@ public class CountryRepository {
     @Transactional
     public void save(Country country) {
         Country retreatedCountry = get(country);
-        country.setId(retreatedCountry.getId());
         if (retreatedCountry.getName() == null) {
             session.beginTransaction();
-            session.save(country);
+            Long id = (Long) session.save(country);
+            country.setId(id);
             session.getTransaction().commit();
+        } else {
+            country.setId(retreatedCountry.getId());
         }
     }
 

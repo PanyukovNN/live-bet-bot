@@ -31,11 +31,13 @@ public class LeagueRepository {
     @Transactional
     public void save(League league) {
         League retreatedLeague = get(league);
-        league.setId(retreatedLeague.getId());
         if (retreatedLeague.getName() == null) {
             session.beginTransaction();
-            session.save(league);
+            Long id = (Long) session.save(league);
+            league.setId(id);
             session.getTransaction().commit();
+        } else {
+            league.setId(retreatedLeague.getId());
         }
     }
 
