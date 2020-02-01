@@ -13,6 +13,8 @@
         <property name="hibernate.current_session_context_class">thread</property>
         <mapping class="com.zylex.livebetbot.model.Game"/>
         <mapping class="com.zylex.livebetbot.model.OverUnder"/>
+        <mapping class="com.zylex.livebetbot.model.Country"/>
+        <mapping class="com.zylex.livebetbot.model.League"/>
 
         <!-- DB schema will be updated if needed -->
         <!-- <property name="hibernate.hbm2ddl.auto">update</property> -->

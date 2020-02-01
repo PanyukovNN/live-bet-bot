@@ -24,7 +24,7 @@ public class ScheduledParsingTask extends Thread {
             saver.save();
         } catch (Throwable t) {
             t.printStackTrace();
-            driverManager.initiateDriver(false);
+            driverManager.initiateDriver(true);
         }
     }
 }

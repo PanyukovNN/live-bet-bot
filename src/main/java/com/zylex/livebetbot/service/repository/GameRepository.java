@@ -4,10 +4,6 @@ import com.zylex.livebetbot.exception.GameRepositoryException;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
@@ -30,22 +26,17 @@ public class GameRepository {
 
     @PostConstruct
     private void postConstruct() {
-        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-                .configure()
-                .build();
-        try {
-            SessionFactory sessionFactory = new MetadataSources(registry)
-                    .buildMetadata()
-                    .buildSessionFactory();
-            session = sessionFactory.openSession();
-        } catch (Exception e) {
-            StandardServiceRegistryBuilder.destroy(registry);
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        if (session == null) {
+            session = HibernateUtil.getSessionFactory().openSession();
         }
     }
 
     @PreDestroy
     private void preDestroy() {
-        session.close();
+        if (session.isOpen()) {
+            session.close();
+        }
     }
 
     public List<Game> getWithoutResult() {
