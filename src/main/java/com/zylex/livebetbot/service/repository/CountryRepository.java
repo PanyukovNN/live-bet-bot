@@ -9,6 +9,7 @@ import javax.annotation.PreDestroy;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Repository
@@ -29,21 +30,24 @@ public class CountryRepository {
     }
 
     @Transactional
-    public void save(Country country) {
+    public Country save(Country country) {
         Country retreatedCountry = get(country);
         if (retreatedCountry.getName() == null) {
             session.beginTransaction();
             Long id = (Long) session.save(country);
             country.setId(id);
             session.getTransaction().commit();
+            return country;
         } else {
-            country.setId(retreatedCountry.getId());
+            return retreatedCountry;
         }
     }
 
     @Transactional
-    public void save(Set<Country> countries) {
-        countries.forEach(this::save);
+    public Set<Country> save(Set<Country> countries) {
+        Set<Country> savedCountries = new LinkedHashSet<>();
+        countries.forEach(country -> savedCountries.add(save(country)));
+        return savedCountries;
     }
 
     @Transactional

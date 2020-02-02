@@ -20,7 +20,7 @@ public class Country implements Serializable {
     @Column(name = "link")
     private String link;
 
-    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "country", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<League> leagues = new ArrayList<>();
 
     public Country(String name, String link) {

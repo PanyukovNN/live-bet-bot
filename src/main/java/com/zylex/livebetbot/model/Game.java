@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings("unused")
 @Entity
 @Table(name = "game")
 public class Game implements Serializable {
@@ -162,10 +162,9 @@ public class Game implements Serializable {
     @Override
     public String toString() {
         DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a yyyy.MM.dd");
-        return String.format("%s %s %s \"%s\" - \"%s\" (%s) (%s) (%s)",
+        return String.format("%s %s \"%s\" - \"%s\" (%s) (%s) (%s)",
                 DATE_TIME_FORMATTER.format(dateTime),
-                country,
-                league,
+                league.getName(),
                 firstTeam,
                 secondTeam,
                 halfTimeScore,

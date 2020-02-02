@@ -2,14 +2,13 @@ package com.zylex.livebetbot.service.repository;
 
 import com.zylex.livebetbot.model.League;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.util.Set;
 
 @Repository
 public class LeagueRepository {
@@ -29,21 +28,17 @@ public class LeagueRepository {
     }
 
     @Transactional
-    public void save(League league) {
+    public League save(League league) {
         League retreatedLeague = get(league);
         if (retreatedLeague.getName() == null) {
             session.beginTransaction();
             Long id = (Long) session.save(league);
             league.setId(id);
             session.getTransaction().commit();
+            return league;
         } else {
-            league.setId(retreatedLeague.getId());
+            return retreatedLeague;
         }
-    }
-
-    @Transactional
-    public void save(Set<League> leagues) {
-        leagues.forEach(this::save);
     }
 
     @Transactional

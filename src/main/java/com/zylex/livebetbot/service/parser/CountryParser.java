@@ -86,7 +86,7 @@ public class CountryParser {
             } catch (UnknownHostException | ConnectException ignore) {
             }
         }
-        countryRepository.save(countries);
+        countries = countryRepository.save(countries);
         //TODO log attempts
         return countries;
     }
@@ -115,19 +115,22 @@ public class CountryParser {
             Document document = Jsoup.parse(driver.getPageSource());
             Elements leagueTitleElements = document.select("div.MarketLea");
             Elements leagueGamesElements = document.select("table.Hdp");
-            for (Element leagueGameElement : leagueGamesElements) {
-                //TODO hard to read
-                String leagueName = leagueTitleElements.get(leagueGamesElements.indexOf(leagueGameElement))
-                        .select("div.MarketLea > div.SubHeadT").first().text();
-                League league = new League(leagueName);
-                Elements gameElements = leagueGameElement.select("tbody > tr");
+            for (int i = 0; i < leagueGamesElements.size(); i++) {
+                League league = extractLeague(country, leagueTitleElements.get(i));
+                Elements gameElements = leagueGamesElements.get(i).select("tbody > tr");
                 List<Game> extractedGames = extractGames(games, gameElements, noResultGames);
                 establishDependencies(country, league, extractedGames);
                 games.addAll(extractedGames);
-                leagueRepository.save(league);
             }
         }
         return games;
+    }
+
+    private League extractLeague(Country country, Element leagueTitleElement) {
+        String leagueName = leagueTitleElement.select("div.MarketLea > div.SubHeadT").first().text();
+        League league = new League(leagueName);
+        league.setCountry(country);
+        return leagueRepository.save(league);
     }
 
     private void establishDependencies(Country country, League league, List<Game> extractedGames) {
@@ -136,7 +139,6 @@ public class CountryParser {
             game.setLeague(league);
         });
         country.getLeagues().add(league);
-        league.setCountry(country);
     }
 
     private List<Game> extractGames(List<Game> games, Elements gameElements, List<Game> noResultGames) {
