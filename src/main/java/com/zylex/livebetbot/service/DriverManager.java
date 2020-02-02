@@ -42,7 +42,7 @@ public class DriverManager {
      * Initiate web driver and return it.
      * @param headless - flag for headless driver.
      */
-    public void initiateDriver(boolean headless) {
+    private void initiateDriver(boolean headless) {
         quitDriver();
         int attempts = 3;
         while (attempts-- > 0) {
@@ -78,7 +78,7 @@ public class DriverManager {
     /**
      * Quit driver if it was initiated.
      */
-    public void quitDriver() {
+    private void quitDriver() {
         if (driver != null) {
             driver.quit();
             driver = null;

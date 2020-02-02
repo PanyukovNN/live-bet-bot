@@ -6,6 +6,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
+@SuppressWarnings("WeakerAccess")
 public class HibernateUtil {
 
     private static SessionFactory sessionFactory;

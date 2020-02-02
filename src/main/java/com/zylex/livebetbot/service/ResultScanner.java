@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -30,9 +31,9 @@ public class ResultScanner {
 
     private ResultScannerLogger logger = new ResultScannerLogger();
 
-    private WebDriver driver;
+    private WebDriverUtil webDriverUtil;
 
-    private WebDriverWait wait;
+    private WebDriver driver;
 
     private GameRepository gameRepository;
 
@@ -41,47 +42,48 @@ public class ResultScanner {
     private DriverManager driverManager;
 
     @Autowired
-    public ResultScanner(DriverManager driverManager, GameRepository gameRepository) {
+    public ResultScanner(DriverManager driverManager, GameRepository gameRepository, WebDriverUtil webDriverUtil) {
         this.driverManager = driverManager;
         this.gameRepository = gameRepository;
+        this.webDriverUtil = webDriverUtil;
     }
 
     public void scan() {
-        try {
-            int attempts = 3;
-            while (attempts-- > 0) {
-                try {
-                    processScanning();
-                    break;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    ConsoleLogger.writeErrorMessage(e.getMessage());
-                }
+        int attempts = 3;
+        while (attempts-- > 0) {
+            try {
+                processScanning();
+                break;
+            } catch (Exception e) {
+                e.printStackTrace();
+                ConsoleLogger.writeErrorMessage(e.getMessage());
             }
-        } finally {
-            driverManager.quitDriver();
         }
     }
 
     private void processScanning() throws IOException {
+        driver = driverManager.getDriver();
+        logger.startLogMessage();
+        List<Game> noResultGames = findNoResultGames();
+        if (noResultGames.isEmpty()) {
+            return;
+        }
+        String userHash = logIn();
+        processResults(noResultGames, userHash);
+        logOut(userHash);
+        ConsoleLogger.endMessage(LogType.BLOCK_END);
+    }
+
+    private List<Game> findNoResultGames() {
         List<Game> yesterdayGames = gameRepository.getByDate(LocalDate.now().minusDays(1));
         List<Game> noResultGames = removeGamesWithResult(yesterdayGames);
         if (noResultGames.isEmpty()) {
             createStatisticsFile();
             logger.endLogMessage(LogType.NO_GAMES, 0);
             ConsoleLogger.endMessage(LogType.BLOCK_END);
-            return;
+            return Collections.emptyList();
         }
-        initDriver();
-        logger.startLogMessage();
-        String userHash = logIn();
-        if (processResults(noResultGames, userHash)) {
-            logger.endLogMessage(LogType.OKAY, gamesResultNumber);
-        } else {
-            logger.endLogMessage(LogType.ERROR, 0);
-        }
-//        logOut(userHash);
-        ConsoleLogger.endMessage(LogType.BLOCK_END);
+        return noResultGames;
     }
 
     private void createStatisticsFile() {
@@ -102,31 +104,27 @@ public class ResultScanner {
                 .collect(Collectors.toList());
     }
 
-    private boolean processResults(List<Game> noResultGames, String userHash) {
+    private void processResults(List<Game> noResultGames, String userHash) {
         if (navigateToResultTab(userHash)) {
             findingResults(noResultGames);
             navigateToYesterdayResultTab();
             findingResults(noResultGames);
-            return true;
+            logger.endLogMessage(LogType.OKAY, gamesResultNumber);
+        } else {
+            logger.endLogMessage(LogType.ERROR, 0);
         }
-        return false;
-    }
-
-    private void initDriver() {
-        driver = driverManager.getDriver();
-        wait = new WebDriverWait(driver, 5);
-        driver.navigate().to("http://ballchockdee.com");
     }
 
     private String logIn() throws IOException {
+        driver.navigate().to("http://ballchockdee.com");
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("LiveBetBotAuth.properties")) {
             Properties property = new Properties();
             property.load(inputStream);
-            waitElementWithId("username").sendKeys(property.getProperty("LiveBetBot.login"));
-            waitElementWithId("password").sendKeys(property.getProperty("LiveBetBot.password"));
-            waitElementWithClassName("sign-in").click();
+            webDriverUtil.waitElement(By::id, "username").sendKeys(property.getProperty("LiveBetBot.login"));
+            webDriverUtil.waitElement(By::id, "password").sendKeys(property.getProperty("LiveBetBot.password"));
+            webDriverUtil.waitElement(By::className, "sign-in").click();
             if (driver.getCurrentUrl().startsWith("https://www.sbobet-pay.com/")) {
-                waitElementWithClassName("DWHomeBtn").click();
+                webDriverUtil.waitElement(By::className, "DWHomeBtn").click();
             }
             Alert alert = (new WebDriverWait(driver, 5))
                     .until(ExpectedConditions.alertIsPresent());
@@ -137,25 +135,32 @@ public class ResultScanner {
     }
 
     private boolean navigateToResultTab(String userHash) {
-        driver.navigate().to(userHash + "ballchockdee.com/web-root/restricted/result/results-more.aspx");
         int attempts = 3;
         while (attempts-- > 0) {
             try {
-                waitElementWithClassName("ContentTable");
+                driver.navigate().to(userHash + "ballchockdee.com/web-root/restricted/result/results-more.aspx");
+                webDriverUtil.waitElement(By::className, "ContentTable");
                 return true;
             } catch (NoSuchElementException | TimeoutException | UnhandledAlertException ignore) {
             }
         }
         return false;
     }
+//    <input id="fromdate" name="fromdate" size="11" type="text" readonly="readonly" value="02/02/2020" class="DisplayOptions hasDatepicker">
 
     private void navigateToYesterdayResultTab() {
-        wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(By.name("Yesterday")));
-        driver.findElement(By.name("Yesterday")).click();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException ignore) {
+        webDriverUtil.waitElement(By::name, "Yesterday").click();
+        while (true) {
+            try {
+                String day = driver.findElement(By.id("fromdate")).getText().split("/")[1];
+                if (Integer.parseInt(day) == LocalDate.now().minusDays(1).getDayOfMonth()) {
+                    break;
+                } else {
+                    Thread.sleep(500);
+                }
+            } catch (InterruptedException ignore) {
+            }
+
         }
     }
 
@@ -205,19 +210,7 @@ public class ResultScanner {
 
     private void logOut(String userHash) {
         driver.navigate().to(userHash + "ballchockdee.com/");
-        waitElementWithClassName("sign-out").click();
-    }
-
-
-    private WebElement waitElementWithId(String id) {
-        wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(By.id(id)));
-        return driver.findElement(By.id(id));
-    }
-
-    private WebElement waitElementWithClassName(String className) {
-        wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(By.className(className)));
-        return driver.findElement(By.className(className));
+        webDriverUtil.waitElement(By::className, "sign-out")
+                .findElement(By.tagName("a")).click();
     }
 }

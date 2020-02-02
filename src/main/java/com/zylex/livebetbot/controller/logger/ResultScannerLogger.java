@@ -9,8 +9,8 @@ public class ResultScannerLogger extends ConsoleLogger {
     private final static Logger LOG = Logger.getLogger(ResultScanner.class);
 
     public synchronized void startLogMessage() {
-        writeInLine("\nResult scanning: ...");
-        LOG.info("Result scanning");
+        writeInLine("\nResult scanning started");
+        LOG.info("Result scanning started");
     }
 
     public void endLogMessage(LogType type, int gamesNumber) {

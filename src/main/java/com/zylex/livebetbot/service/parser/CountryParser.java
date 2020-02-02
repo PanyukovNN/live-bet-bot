@@ -7,6 +7,7 @@ import com.zylex.livebetbot.model.Country;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.League;
 import com.zylex.livebetbot.service.DriverManager;
+import com.zylex.livebetbot.service.WebDriverUtil;
 import com.zylex.livebetbot.service.repository.CountryRepository;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import com.zylex.livebetbot.service.repository.LeagueRepository;
@@ -15,11 +16,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +27,7 @@ import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@SuppressWarnings("WeakerAccess")
 @Service
 public class CountryParser {
 
@@ -36,28 +35,30 @@ public class CountryParser {
 
     private WebDriver driver;
 
-    private WebDriverWait wait;
-
     private GameRepository gameRepository;
 
     private CountryRepository countryRepository;
 
     private LeagueRepository leagueRepository;
 
+    private WebDriverUtil webDriverUtil;
+
     private CountryParserLogger logger = new CountryParserLogger();
 
     @Autowired
     public CountryParser(DriverManager driverManager, GameRepository gameRepository,
-                         CountryRepository countryRepository, LeagueRepository leagueRepository) {
+                         CountryRepository countryRepository, LeagueRepository leagueRepository,
+                         WebDriverUtil webDriverUtil) {
         this.driverManager = driverManager;
         this.gameRepository = gameRepository;
         this.countryRepository = countryRepository;
         this.leagueRepository = leagueRepository;
+        this.webDriverUtil = webDriverUtil;
     }
 
     public List<Game> parse() {
         try {
-            initDriver();
+            driver = driverManager.getDriver();
             Set<Country> countries = parseCountryLinks();
             if (countries.isEmpty()) {
                 logger.logCountriesFound(LogType.NO_COUNTRIES);
@@ -69,11 +70,6 @@ public class CountryParser {
         } catch (IOException e) {
             throw new CountryParserException(e.getMessage(), e);
         }
-    }
-
-    private void initDriver() {
-        driver = driverManager.getDriver();
-        wait = new WebDriverWait(driver, 10);
     }
 
     private Set<Country> parseCountryLinks() throws IOException {
@@ -186,10 +182,7 @@ public class CountryParser {
 
     private void openHandicapTab(String countryLink) {
         driver.navigate().to("http://ballchockdee.com" + countryLink);
-        wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(By.id("bu:od:go:mt:2")));
-        driver.findElement(By.id("bu:od:go:mt:2")).click();
-        wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(By.className("Hdp")));
+        webDriverUtil.waitElement(By::id, "bu:od:go:mt:2").click();
+        webDriverUtil.waitElement(By::className, "Hdp");
     }
 }
