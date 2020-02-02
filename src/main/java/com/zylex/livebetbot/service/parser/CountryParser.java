@@ -120,7 +120,13 @@ public class CountryParser {
                 Elements gameElements = leagueGamesElements.get(i).select("tbody > tr");
                 List<Game> extractedGames = extractGames(games, gameElements, noResultGames);
                 establishDependencies(country, league, extractedGames);
-                games.addAll(extractedGames);
+                //TODO check correctness
+                for (Game game : extractedGames) {
+                    if (!games.contains(game)) {
+                        games.add(game);
+                    }
+                }
+
             }
         }
         return games;
@@ -152,11 +158,12 @@ public class CountryParser {
                     continue;
                 }
                 String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
-                Game game = new Game(LocalDateTime.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
-                boolean noResultContains = noResultGames.stream().anyMatch(g -> g.getLink().equals(game.getLink()));
-                if (noResultContains || games.contains(game)) {
+                boolean noResultContains = noResultGames.stream().anyMatch(g -> g.getLink().equals(gameLink));
+                boolean gamesContains = games.stream().anyMatch(g -> g.getLink().equals(gameLink));
+                if (noResultContains || gamesContains) {
                     continue;
                 }
+                Game game = new Game(LocalDateTime.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
                 extractedGames.add(game);
             }
         }

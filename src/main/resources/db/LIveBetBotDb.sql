@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS game (
     rule_number       VARCHAR(100),
     link              VARCHAR(500),
     FOREIGN KEY (country_id) REFERENCES country(id) ON DELETE SET NULL,
-    FOREIGN KEY (league_id) REFERENCES league(id) ON DELETE SET NULL
+    FOREIGN KEY (league_id) REFERENCES league(id) ON DELETE SET NULL,
+    CONSTRAINT UC_game UNIQUE (rule_number, link)
 );
 
 DROP TABLE IF EXISTS over_under CASCADE;
@@ -44,5 +45,5 @@ CREATE TABLE IF NOT EXISTS league (
     country_id  BIGSERIAL,
     name        VARCHAR(300) NOT NULL,
     FOREIGN KEY (country_id) REFERENCES country(id) ON DELETE SET NULL,
-    CONSTRAINT UC_league UNIQUE (name)
+    CONSTRAINT UC_league UNIQUE (country_id, name)
 );

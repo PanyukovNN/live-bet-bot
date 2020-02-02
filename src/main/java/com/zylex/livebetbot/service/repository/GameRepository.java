@@ -97,7 +97,7 @@ public class GameRepository {
             return false;
         }
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName, false), StandardCharsets.UTF_8))) {
-            String GAME_BODY_FORMAT = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n";
+            String GAME_BODY_FORMAT = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n";
             for (Game game : games) {
                 String over10 = findOverUnder(game.getOverUnderList(), OverUnder.Type.OVER, 1);
                 String over15 = findOverUnder(game.getOverUnderList(), OverUnder.Type.OVER, 1.5);
@@ -105,6 +105,8 @@ public class GameRepository {
                 String under15 = findOverUnder(game.getOverUnderList(), OverUnder.Type.UNDER, 1.5);
                 String output = String.format(GAME_BODY_FORMAT,
                         DATE_FORMATTER.format(game.getDateTime()),
+                        game.getCountry().getName(),
+                        game.getLeague().getName(),
                         game.getFirstTeam(), game.getSecondTeam(),
                         game.getHalfTimeScore(), game.getFinalScore(),
                         game.getRuleNumber(), over10, over15, under10, under15);
