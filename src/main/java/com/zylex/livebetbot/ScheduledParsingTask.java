@@ -1,30 +1,42 @@
 package com.zylex.livebetbot;
 
-import com.zylex.livebetbot.service.DriverManager;
+import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.Saver;
+import com.zylex.livebetbot.service.parser.ParseProcessor;
+import com.zylex.livebetbot.service.rule.RuleNumber;
+import com.zylex.livebetbot.service.rule.RuleProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ScheduledParsingTask extends Thread {
 
+    private ParseProcessor parseProcessor;
+
+    private RuleProcessor ruleProcessor;
+
     private Saver saver;
 
-    private DriverManager driverManager;
-
     @Autowired
-    public ScheduledParsingTask(DriverManager driverManager, Saver saver) {
-        this.driverManager = driverManager;
+    public ScheduledParsingTask(ParseProcessor parseProcessor,
+                                RuleProcessor ruleProcessor,
+                                Saver saver) {
+        this.parseProcessor = parseProcessor;
+        this.ruleProcessor = ruleProcessor;
         this.saver = saver;
     }
 
     @Override
     public void run() {
         try {
-            saver.save();
+            List<Game> appropriateGames = parseProcessor.process();
+            Map<RuleNumber, List<Game>> ruleGames = ruleProcessor.process(appropriateGames);
+            saver.save(ruleGames);
         } catch (Throwable t) {
             t.printStackTrace();
-            driverManager.initiateDriver(true);
         }
     }
 }

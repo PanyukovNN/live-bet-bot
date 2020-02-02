@@ -29,7 +29,6 @@ import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@SuppressWarnings("WeakerAccess")
 @Service
 public class CountryParser {
 
@@ -48,7 +47,8 @@ public class CountryParser {
     private CountryParserLogger logger = new CountryParserLogger();
 
     @Autowired
-    public CountryParser(DriverManager driverManager, GameRepository gameRepository, CountryRepository countryRepository, LeagueRepository leagueRepository) {
+    public CountryParser(DriverManager driverManager, GameRepository gameRepository,
+                         CountryRepository countryRepository, LeagueRepository leagueRepository) {
         this.driverManager = driverManager;
         this.gameRepository = gameRepository;
         this.countryRepository = countryRepository;

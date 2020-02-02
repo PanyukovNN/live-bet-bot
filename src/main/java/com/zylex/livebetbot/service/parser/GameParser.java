@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("WeakerAccess")
 @Service
 public class GameParser {
 
@@ -29,18 +28,14 @@ public class GameParser {
 
     private WebDriverWait wait;
 
-    private CountryParser countryParser;
-
     private GameParserLogger logger = new GameParserLogger();
 
     @Autowired
-    public GameParser(DriverManager driverManager, CountryParser countryParser) {
+    public GameParser(DriverManager driverManager) {
         this.driverManager = driverManager;
-        this.countryParser = countryParser;
     }
 
-    public List<Game> parse() {
-        List<Game> games = countryParser.parse();
+    public List<Game> parse(List<Game> games) {
         initDriver();
         if (games.isEmpty()) {
             logger.startLogMessage(LogType.NO_GAMES, 0);

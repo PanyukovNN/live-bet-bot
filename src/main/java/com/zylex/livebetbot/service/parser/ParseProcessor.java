@@ -13,16 +13,20 @@ public class ParseProcessor {
 
     private ParseProcessorLogger logger = new ParseProcessorLogger();
 
+    private CountryParser countryParser;
+
     private GameParser gameParser;
 
     @Autowired
-    public ParseProcessor(GameParser gameParser) {
+    public ParseProcessor(CountryParser countryParser, GameParser gameParser) {
+        this.countryParser = countryParser;
         this.gameParser = gameParser;
     }
 
     public List<Game> process() {
         logger.startLogMessage();
-        List<Game> breakGames = gameParser.parse();
+        List<Game> games = countryParser.parse();
+        List<Game> breakGames = gameParser.parse(games);
         if (breakGames.isEmpty()) {
             logger.parsingComplete(LogType.NO_GAMES);
         } else {

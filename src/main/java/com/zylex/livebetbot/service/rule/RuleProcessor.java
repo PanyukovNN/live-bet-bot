@@ -1,24 +1,17 @@
 package com.zylex.livebetbot.service.rule;
 
 import com.zylex.livebetbot.model.Game;
-import com.zylex.livebetbot.service.parser.ParseProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class RuleProcessor {
 
-    private ParseProcessor parseProcessor;
-
-    @Autowired
-    public RuleProcessor(ParseProcessor parseProcessor) {
-        this.parseProcessor = parseProcessor;
-    }
-
-    public Map<RuleNumber, List<Game>> process() {
-        List<Game> games = parseProcessor.process();
+    public Map<RuleNumber, List<Game>> process(List<Game> games) {
         if (games.isEmpty()) {
             return new HashMap<>();
         }
