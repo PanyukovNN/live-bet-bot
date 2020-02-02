@@ -37,14 +37,9 @@ public class WebDriverUtil {
         return driver.findElement(byFunction.get(elementName));
     }
 
-    public WebElement waitElementWithClassName(ByFunction byFunction, String elementName) {
-        wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(byFunction.get(elementName)));
-        return driver.findElement(byFunction.get(elementName));
-    }
-
     @FunctionalInterface
     public interface ByFunction {
+
         By get(String input);
     }
 }

@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -69,6 +68,8 @@ public class ResultScanner {
             return;
         }
         String userHash = logIn();
+        //TODO add to userHash
+//        http://t0x313uroa0e.asia.ballchockdee.com/web-root/restricted/default.aspx?loginname=543cb1d8ce3a9087c1c86c51f512a08d
         processResults(noResultGames, userHash);
         logOut(userHash);
         ConsoleLogger.endMessage(LogType.BLOCK_END);
@@ -81,7 +82,8 @@ public class ResultScanner {
             createStatisticsFile();
             logger.endLogMessage(LogType.NO_GAMES, 0);
             ConsoleLogger.endMessage(LogType.BLOCK_END);
-            return Collections.emptyList();
+        } else {
+            logger.noResultGamesFound(noResultGames.size());
         }
         return noResultGames;
     }
@@ -91,7 +93,7 @@ public class ResultScanner {
             if (gameRepository.createStatisticsFile(LocalDate.now().minusDays(1))) {
                 logger.fileCreatedSuccessfully(LogType.OKAY);
             } else {
-                logger.fileCreatedSuccessfully(LogType.ERROR);
+                logger.fileCreatedSuccessfully(LogType.FILE_EXISTS);
             }
         }
     }
@@ -129,7 +131,9 @@ public class ResultScanner {
             Alert alert = (new WebDriverWait(driver, 5))
                     .until(ExpectedConditions.alertIsPresent());
             alert.accept();
+            logger.logIn(LogType.OKAY);
         } catch (WebDriverException ignore) {
+            logger.logIn(LogType.ERROR);
         }
         return driver.getCurrentUrl().split("ballchockdee")[0];
     }
@@ -146,21 +150,19 @@ public class ResultScanner {
         }
         return false;
     }
-//    <input id="fromdate" name="fromdate" size="11" type="text" readonly="readonly" value="02/02/2020" class="DisplayOptions hasDatepicker">
 
     private void navigateToYesterdayResultTab() {
         webDriverUtil.waitElement(By::name, "Yesterday").click();
         while (true) {
             try {
-                String day = driver.findElement(By.id("fromdate")).getText().split("/")[1];
+                String day = driver.findElement(By.id("fromdate")).getAttribute("value").split("/")[1];
                 if (Integer.parseInt(day) == LocalDate.now().minusDays(1).getDayOfMonth()) {
                     break;
                 } else {
-                    Thread.sleep(500);
+                    Thread.sleep(300);
                 }
             } catch (InterruptedException ignore) {
             }
-
         }
     }
 
@@ -209,8 +211,14 @@ public class ResultScanner {
     }
 
     private void logOut(String userHash) {
-        driver.navigate().to(userHash + "ballchockdee.com/");
-        webDriverUtil.waitElement(By::className, "sign-out")
-                .findElement(By.tagName("a")).click();
+        try {
+            driver.navigate().to(userHash + "ballchockdee.com/");
+            webDriverUtil.waitElement(By::className, "sign-out")
+                    .findElement(By.tagName("a")).click();
+            logger.logOut(LogType.OKAY);
+        } catch (WebDriverException e) {
+            logger.logOut(LogType.ERROR);
+            ConsoleLogger.writeErrorMessage(e.getMessage());
+        }
     }
 }
