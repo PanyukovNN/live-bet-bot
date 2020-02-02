@@ -8,7 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
@@ -16,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
@@ -50,16 +53,37 @@ public class GameRepository {
         return query.getResultList();
     }
 
-    public void save(Game game) {
-        session.beginTransaction();
-        session.save(game);
-        session.getTransaction().commit();
+    @Transactional
+    public Game save(Game game) {
+        Game retreatedGame = get(game);
+        if (retreatedGame.getLink() == null) {
+            session.beginTransaction();
+            Long id = (Long) session.save(game);
+            game.setId(id);
+            session.getTransaction().commit();
+            return game;
+        } else {
+            return retreatedGame;
+        }
     }
 
-    public void save(List<Game> games) {
-        session.beginTransaction();
-        games.forEach(session::save);
-        session.getTransaction().commit();
+    @Transactional
+    public List<Game> save(List<Game> games) {
+        List<Game> savedGames = new ArrayList<>();
+        games.forEach(game -> savedGames.add(save(game)));
+        return savedGames;
+    }
+
+    @Transactional
+    public Game get(Game game) {
+        Query query = session.createQuery("FROM Game WHERE ruleNumber = :ruleNumber AND link = :link");
+        query.setParameter("ruleNumber", game.getRuleNumber());
+        query.setParameter("link", game.getLink());
+        try {
+            return (Game) query.getSingleResult();
+        } catch (NoResultException e) {
+            return new Game();
+        }
     }
 
     public boolean createStatisticsFile(LocalDate date) {
