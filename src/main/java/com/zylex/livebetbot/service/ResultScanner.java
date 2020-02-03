@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -67,19 +67,20 @@ public class ResultScanner {
         if (noResultGames.isEmpty()) {
             return;
         }
-        String userHash = logIn();
-        //TODO add to userHash
-//        http://t0x313uroa0e.asia.ballchockdee.com/web-root/restricted/default.aspx?loginname=543cb1d8ce3a9087c1c86c51f512a08d
+        String userHomeLink = logIn();
+        String userHash = userHomeLink.split("ballchockdee")[0];
         processResults(noResultGames, userHash);
-        logOut(userHash);
+//        logOut(userHomeLink);
         ConsoleLogger.endMessage(LogType.BLOCK_END);
     }
 
     private List<Game> findNoResultGames() {
-        List<Game> yesterdayGames = gameRepository.getByDate(LocalDate.now().minusDays(1));
-        List<Game> noResultGames = removeGamesWithResult(yesterdayGames);
+        List<Game> sinceYesterdayGames = gameRepository.getFromDate(LocalDate.now().minusDays(1));
+        List<Game> noResultGames = removeGamesWithResult(sinceYesterdayGames);
+        noResultGames = removeEarlyGames(noResultGames);
         if (noResultGames.isEmpty()) {
-            createStatisticsFile();
+            createStatisticsFiles(LocalDate.now().minusDays(1));
+            createStatisticsFiles(LocalDate.now());
             logger.endLogMessage(LogType.NO_GAMES, 0);
             ConsoleLogger.endMessage(LogType.BLOCK_END);
         } else {
@@ -88,13 +89,11 @@ public class ResultScanner {
         return noResultGames;
     }
 
-    private void createStatisticsFile() {
-        if (LocalTime.now().isAfter(LocalTime.of(2, 59))) {
-            if (gameRepository.createStatisticsFile(LocalDate.now().minusDays(1))) {
-                logger.fileCreatedSuccessfully(LogType.OKAY);
-            } else {
-                logger.fileCreatedSuccessfully(LogType.FILE_EXISTS);
-            }
+    private void createStatisticsFiles(LocalDate date) {
+        if (gameRepository.createStatisticsFile(date)) {
+            logger.fileCreatedSuccessfully(LogType.OKAY, date);
+        } else {
+            logger.fileCreatedSuccessfully(LogType.NO_GAMES, date);
         }
     }
 
@@ -103,6 +102,12 @@ public class ResultScanner {
                 .filter(game -> game.getFinalScore() == null ||
                         game.getFinalScore().isEmpty() ||
                         game.getFinalScore().equals("-1:-1"))
+                .collect(Collectors.toList());
+    }
+
+    private List<Game> removeEarlyGames(List<Game> games) {
+        return games.stream()
+                .filter(game -> game.getDateTime().isBefore(LocalDateTime.now().minusHours(1)))
                 .collect(Collectors.toList());
     }
 
@@ -128,14 +133,17 @@ public class ResultScanner {
             if (driver.getCurrentUrl().startsWith("https://www.sbobet-pay.com/")) {
                 webDriverUtil.waitElement(By::className, "DWHomeBtn").click();
             }
-            Alert alert = (new WebDriverWait(driver, 5))
-                    .until(ExpectedConditions.alertIsPresent());
-            alert.accept();
             logger.logIn(LogType.OKAY);
+            try {
+                Alert alert = (new WebDriverWait(driver, 2))
+                        .until(ExpectedConditions.alertIsPresent());
+                alert.accept();
+            } catch (WebDriverException ignore) {
+            }
         } catch (WebDriverException ignore) {
             logger.logIn(LogType.ERROR);
         }
-        return driver.getCurrentUrl().split("ballchockdee")[0];
+        return driver.getCurrentUrl();
     }
 
     private boolean navigateToResultTab(String userHash) {
@@ -159,7 +167,7 @@ public class ResultScanner {
                 if (Integer.parseInt(day) == LocalDate.now().minusDays(1).getDayOfMonth()) {
                     break;
                 } else {
-                    Thread.sleep(300);
+                    Thread.sleep(1000);
                 }
             } catch (InterruptedException ignore) {
             }
@@ -186,7 +194,7 @@ public class ResultScanner {
             if (gameOptional.isPresent()) {
                 Game game = gameOptional.get();
                 game.setFinalScore(score);
-                gameRepository.save(game);
+                gameRepository.update(game);
                 gamesResultNumber++;
             }
         }
@@ -210,9 +218,9 @@ public class ResultScanner {
         return "";
     }
 
-    private void logOut(String userHash) {
+    private void logOut(String userHomeLink) {
         try {
-            driver.navigate().to(userHash + "ballchockdee.com/");
+            driver.navigate().to(userHomeLink);
             webDriverUtil.waitElement(By::className, "sign-out")
                     .findElement(By.tagName("a")).click();
             logger.logOut(LogType.OKAY);

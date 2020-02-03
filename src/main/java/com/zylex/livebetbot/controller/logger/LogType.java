@@ -9,6 +9,5 @@ public enum LogType {
     BLOCK_END,
     BOT_END,
     ERROR,
-    OKAY,
-    FILE_EXISTS
+    OKAY
 }

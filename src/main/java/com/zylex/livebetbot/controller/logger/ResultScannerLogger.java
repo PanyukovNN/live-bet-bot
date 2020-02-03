@@ -3,6 +3,9 @@ package com.zylex.livebetbot.controller.logger;
 import com.zylex.livebetbot.service.ResultScanner;
 import org.apache.log4j.Logger;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class ResultScannerLogger extends ConsoleLogger {
 
     private final static Logger LOG = Logger.getLogger(ResultScanner.class);
@@ -25,7 +28,6 @@ public class ResultScannerLogger extends ConsoleLogger {
             output = "Error while scanning";
         }
         writeInLine("\n" + output);
-        writeLineSeparator();
         LOG.info(output);
     }
 
@@ -52,15 +54,13 @@ public class ResultScannerLogger extends ConsoleLogger {
         LOG.info(output);
     }
 
-    public void fileCreatedSuccessfully(LogType type) {
+    public void fileCreatedSuccessfully(LogType type, LocalDate date) {
+        DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         String output = "";
         if (type == LogType.OKAY) {
-            output = "Statistics file: created successfully";
-        } else if (type == LogType.FILE_EXISTS) {
-            output = "Statistics file: already exist or no games to save";
+            output = String.format("Statistics file (%s): created successfully", DATE_FORMATTER.format(date));
         } else if (type == LogType.NO_GAMES) {
-            //TODO add logic
-            output = "Statistics file: no games to save";
+            output = String.format("Statistics file (%s): no games to save", DATE_FORMATTER.format(date));
         }
         writeInLine("\n" + output);
         writeLineSeparator();

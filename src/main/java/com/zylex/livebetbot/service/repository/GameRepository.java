@@ -53,6 +53,13 @@ public class GameRepository {
         return query.getResultList();
     }
 
+    public List<Game> getFromDate(LocalDate date) {
+        LocalDateTime dayStart = LocalDateTime.of(date, LocalTime.MIN);
+        Query query = session.createQuery("FROM Game WHERE dateTime >= :dayStart");
+        query.setParameter("dayStart", dayStart);
+        return query.getResultList();
+    }
+
     @Transactional
     public Game save(Game game) {
         Game retreatedGame = get(game);
@@ -75,6 +82,13 @@ public class GameRepository {
     }
 
     @Transactional
+    public void update(Game game) {
+        session.beginTransaction();
+        session.update(game);
+        session.getTransaction().commit();
+    }
+
+    @Transactional
     public Game get(Game game) {
         Query query = session.createQuery("FROM Game WHERE ruleNumber = :ruleNumber AND link = :link");
         query.setParameter("ruleNumber", game.getRuleNumber());
@@ -93,9 +107,7 @@ public class GameRepository {
         }
         DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         String fileName = String.format("statistics/%s.csv", DATE_FORMATTER.format(date));
-        if (!createFile(fileName)) {
-            return false;
-        }
+        createFile(fileName);
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName, false), StandardCharsets.UTF_8))) {
             String GAME_BODY_FORMAT = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n";
             for (Game game : games) {
@@ -130,15 +142,13 @@ public class GameRepository {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private boolean createFile(String fileName) {
+    private void createFile(String fileName) {
         try {
             new File("statistics").mkdir();
             File file = new File(fileName);
             if (!file.exists()) {
                 file.createNewFile();
-                return true;
             }
-            return false;
         } catch (IOException e) {
             throw new GameRepositoryException(e.getMessage(), e);
         }

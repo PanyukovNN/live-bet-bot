@@ -32,7 +32,7 @@ VALUES (default, 'Ставки на фактический исход'),
        (default, 'Romania Liga 1'),
        (default, 'Northern Ireland Danske Bank Premiership'),
        (default, 'ФРАНЦУЗСКАЯ ЛИГА 1'),
-       (default, 'FRANCE DOMINO S LIGUE 2'), -----
+       (default, 'FRANCE DOMINO''S LIGUE 2'),
        (default, 'Croatia Prva Liga'),
        (default, 'Czech Republic First League'),
        (default, 'Chile Primera Division'),
@@ -100,7 +100,7 @@ VALUES (default, 'Ставки на фактический исход'),
 --
 -- Северная Ирландия › Northern Ireland Danske Bank Premiership
 -- Франция › ФРАНЦУЗСКАЯ ЛИГА 1
--- Франция › FRANCE DOMINO S LIGUE 2 -----
+-- Франция › FRANCE DOMINO''S LIGUE 2
 -- Хорватия › Croatia Prva Liga
 -- Чехия › Czech Republic First League
 --
