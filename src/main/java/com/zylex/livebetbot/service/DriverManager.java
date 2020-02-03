@@ -4,8 +4,8 @@ import com.zylex.livebetbot.controller.logger.DriverConsoleLogger;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -47,11 +47,11 @@ public class DriverManager {
         int attempts = 3;
         while (attempts-- > 0) {
             try {
-                WebDriverManager.chromedriver().setup();
+                WebDriverManager.firefoxdriver().setup();
                 setUpLogging();
                 driver = headless
-                        ? new ChromeDriver(new ChromeOptions().addArguments("--headless"))
-                        : new ChromeDriver();
+                        ? new FirefoxDriver(new FirefoxOptions().addArguments("--headless"))
+                        : new FirefoxDriver();
                 manageDriver();
                 logger.logDriver();
                 break;
@@ -68,9 +68,9 @@ public class DriverManager {
     }
 
     private void setUpLogging() {
-        System.setProperty("webdriver.chrome.silentOutput", "true");
-//        System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true");
-//        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
+//        System.setProperty("webdriver.chrome.silentOutput", "true");
+        System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true");
+        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
         Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
         logger.startLogMessage();
     }

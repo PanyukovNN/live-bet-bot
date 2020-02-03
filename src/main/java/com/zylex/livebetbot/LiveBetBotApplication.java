@@ -24,11 +24,15 @@ public class LiveBetBotApplication {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context =
                 new AnnotationConfigApplicationContext(LiveBetBotApplication.class);
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            scheduler.shutdownNow();
+            context.close();
+        }));
         Thread parsingTask = context.getBean(ScheduledParsingTask.class);
         Thread resultScanningTask = context.getBean(ScheduledResultScanningTask.class);
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-//        scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(resultScanningTask, 0, 1440, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(resultScanningTask, countDelay(LocalTime.of(3, 0)), 1440, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(resultScanningTask, countDelay(LocalTime.of(6, 0)), 1440, TimeUnit.MINUTES);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             while (!reader.readLine().equalsIgnoreCase("exit")) {
@@ -36,8 +40,8 @@ public class LiveBetBotApplication {
         } catch (IOException e) {
             throw new LiveBetBotException(e.getMessage(), e);
         } finally {
-            scheduler.shutdownNow();
             ConsoleLogger.endMessage(LogType.BOT_END);
+            System.exit(0);
         }
     }
 
