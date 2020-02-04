@@ -1,5 +1,6 @@
-package com.zylex.livebetbot.service;
+package com.zylex.livebetbot.service.util;
 
+import com.zylex.livebetbot.service.DriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;

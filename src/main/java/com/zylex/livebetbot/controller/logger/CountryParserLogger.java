@@ -28,9 +28,9 @@ public class CountryParserLogger extends ConsoleLogger {
         LOG.info("Processing countries");
     }
 
-    public void logCountriesFound(LogType type, int countriesCount) {
+    public void logCountriesFound(LogType type) {
         if (type == LogType.OKAY) {
-            writeInLine(String.format("\b\b\bcomplete (found %d countries)", countriesCount));
+            writeInLine("\b\b\bcomplete");
             LOG.info("Countries found");
         } else if (type == LogType.NO_COUNTRIES) {
             writeInLine("\b\b\bcomplete (no countries)");

@@ -3,6 +3,7 @@ package com.zylex.livebetbot.service.repository;
 import com.zylex.livebetbot.exception.GameRepositoryException;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
+import com.zylex.livebetbot.service.util.HibernateUtil;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 

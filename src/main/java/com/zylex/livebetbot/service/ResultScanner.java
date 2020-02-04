@@ -5,11 +5,16 @@ import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ResultScannerLogger;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.repository.GameRepository;
+import com.zylex.livebetbot.service.util.AttemptsUtil;
+import com.zylex.livebetbot.service.util.WebDriverUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.*;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,14 +94,6 @@ public class ResultScanner {
         return noResultGames;
     }
 
-    private void createStatisticsFiles(LocalDate date) {
-        if (gameRepository.createStatisticsFile(date)) {
-            logger.fileCreatedSuccessfully(LogType.OKAY, date);
-        } else {
-            logger.fileCreatedSuccessfully(LogType.NO_GAMES, date);
-        }
-    }
-
     private List<Game> removeGamesWithResult(List<Game> noResultGames) {
         return noResultGames.stream()
                 .filter(game -> game.getFinalScore() == null ||
@@ -111,14 +108,11 @@ public class ResultScanner {
                 .collect(Collectors.toList());
     }
 
-    private void processResults(List<Game> noResultGames, String userHash) {
-        if (navigateToResultTab(userHash)) {
-            findingResults(noResultGames);
-            navigateToYesterdayResultTab();
-            findingResults(noResultGames);
-            logger.endLogMessage(LogType.OKAY, gamesResultNumber);
+    private void createStatisticsFiles(LocalDate date) {
+        if (gameRepository.createStatisticsFile(date)) {
+            logger.fileCreatedSuccessfully(LogType.OKAY, date);
         } else {
-            logger.endLogMessage(LogType.ERROR, 0);
+            logger.fileCreatedSuccessfully(LogType.NO_GAMES, date);
         }
     }
 
@@ -146,17 +140,20 @@ public class ResultScanner {
         return driver.getCurrentUrl();
     }
 
-    private boolean navigateToResultTab(String userHash) {
-        int attempts = 3;
-        while (attempts-- > 0) {
-            try {
-                driver.navigate().to(userHash + "ballchockdee.com/web-root/restricted/result/results-more.aspx");
-                webDriverUtil.waitElement(By::className, "ContentTable");
-                return true;
-            } catch (NoSuchElementException | TimeoutException | UnhandledAlertException ignore) {
-            }
+    private void processResults(List<Game> noResultGames, String userHash) {
+        if (AttemptsUtil.attempt(this::navigateToResultTab, userHash, 3)) {
+            findingResults(noResultGames);
+            navigateToYesterdayResultTab();
+            findingResults(noResultGames);
+            logger.endLogMessage(LogType.OKAY, gamesResultNumber);
+        } else {
+            logger.endLogMessage(LogType.ERROR, 0);
         }
-        return false;
+    }
+
+    private void navigateToResultTab(String userHash) {
+        driver.navigate().to(userHash + "ballchockdee.com/web-root/restricted/result/results-more.aspx");
+        webDriverUtil.waitElement(By::className, "ContentTable");
     }
 
     private void navigateToYesterdayResultTab() {

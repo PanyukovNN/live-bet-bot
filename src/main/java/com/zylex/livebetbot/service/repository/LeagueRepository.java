@@ -1,6 +1,7 @@
 package com.zylex.livebetbot.service.repository;
 
 import com.zylex.livebetbot.model.League;
+import com.zylex.livebetbot.service.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;

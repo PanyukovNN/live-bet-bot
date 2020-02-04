@@ -5,7 +5,7 @@ import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
 import com.zylex.livebetbot.service.DriverManager;
-import com.zylex.livebetbot.service.WebDriverUtil;
+import com.zylex.livebetbot.service.util.WebDriverUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

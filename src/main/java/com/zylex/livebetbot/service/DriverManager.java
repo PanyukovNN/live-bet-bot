@@ -1,6 +1,7 @@
 package com.zylex.livebetbot.service;
 
 import com.zylex.livebetbot.controller.logger.DriverConsoleLogger;
+import com.zylex.livebetbot.service.util.AttemptsUtil;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -30,7 +31,7 @@ public class DriverManager {
 
     @PostConstruct
     private void postConstruct() {
-        initiateDriver(true);
+        AttemptsUtil.attempt(this::initiateDriver, true, 3);
     }
 
     @PreDestroy
@@ -44,20 +45,13 @@ public class DriverManager {
      */
     private void initiateDriver(boolean headless) {
         quitDriver();
-        int attempts = 3;
-        while (attempts-- > 0) {
-            try {
-                WebDriverManager.firefoxdriver().setup();
-                setUpLogging();
-                driver = headless
-                        ? new FirefoxDriver(new FirefoxOptions().addArguments("--headless"))
-                        : new FirefoxDriver();
-                manageDriver();
-                logger.logDriver();
-                break;
-            } catch (Exception ignore) {
-            }
-        }
+        WebDriverManager.firefoxdriver().setup();
+        setUpLogging();
+        driver = headless
+                ? new FirefoxDriver(new FirefoxOptions().addArguments("--headless"))
+                : new FirefoxDriver();
+        manageDriver();
+        logger.logDriver();
     }
 
     private void manageDriver() {
