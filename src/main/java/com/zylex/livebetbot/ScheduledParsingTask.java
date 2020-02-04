@@ -1,6 +1,7 @@
 package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.model.Game;
+import com.zylex.livebetbot.service.DriverManager;
 import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.parser.ParseProcessor;
 import com.zylex.livebetbot.service.rule.RuleNumber;
@@ -14,6 +15,8 @@ import java.util.Map;
 @Service
 public class ScheduledParsingTask extends Thread {
 
+    private DriverManager driverManager;
+
     private ParseProcessor parseProcessor;
 
     private RuleProcessor ruleProcessor;
@@ -21,9 +24,11 @@ public class ScheduledParsingTask extends Thread {
     private Saver saver;
 
     @Autowired
-    public ScheduledParsingTask(ParseProcessor parseProcessor,
+    public ScheduledParsingTask(DriverManager driverManager,
+                                ParseProcessor parseProcessor,
                                 RuleProcessor ruleProcessor,
                                 Saver saver) {
+        this.driverManager = driverManager;
         this.parseProcessor = parseProcessor;
         this.ruleProcessor = ruleProcessor;
         this.saver = saver;
@@ -37,6 +42,7 @@ public class ScheduledParsingTask extends Thread {
             saver.save(ruleGames);
         } catch (Throwable t) {
             t.printStackTrace();
+            driverManager.refreshDriver();
         }
     }
 }

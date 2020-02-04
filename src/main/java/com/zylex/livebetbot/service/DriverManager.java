@@ -84,4 +84,8 @@ public class DriverManager {
             driver = null;
         }
     }
+
+    public void refreshDriver() {
+        initiateDriver(true);
+    }
 }

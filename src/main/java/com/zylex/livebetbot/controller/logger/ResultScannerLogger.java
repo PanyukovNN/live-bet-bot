@@ -22,36 +22,40 @@ public class ResultScannerLogger extends ConsoleLogger {
             output = gamesNumber > 0
                     ? String.format("Scanning complete: found %d results", gamesNumber)
                     : "Scanning complete: no results found";
+            LOG.info(output);
         } else if (type == LogType.NO_GAMES) {
             output = "Scanning complete: no games to scan";
+            LOG.info(output);
         } else if (type == LogType.ERROR) {
             output = "Error while scanning";
+            LOG.warn(output);
         }
         writeInLine("\n" + output);
-        LOG.info(output);
     }
 
     public void logIn(LogType type) {
         String output = "";
         if (type == LogType.OKAY) {
             output = "Logged in successful";
+            LOG.info(output);
         } else if (type == LogType.ERROR) {
             output = "Error while logging in";
+            LOG.warn(output);
         }
         writeInLine("\n" + output);
         writeLineSeparator();
-        LOG.info(output);
     }
 
     public void logOut(LogType type) {
         String output = "";
         if (type == LogType.OKAY) {
             output = "Logged out successful";
+            LOG.info(output);
         } else if (type == LogType.ERROR) {
             output = "Error while logging out";
+            LOG.warn(output);
         }
         writeInLine("\n" + output);
-        LOG.info(output);
     }
 
     public void fileCreatedSuccessfully(LogType type, LocalDate date) {

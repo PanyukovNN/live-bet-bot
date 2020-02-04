@@ -25,7 +25,7 @@ public class GameParserLogger extends ConsoleLogger {
         if (type == LogType.OKAY) {
             totalGames = arg;
             String output = String.format("\nProcessing games: 0/%d (0.0%%)", arg);
-            currentLength = output.length();
+            currentLength = output.length() - 19;
             writeInLine(output);
             LOG.info("Processing games");
         } else if (type == LogType.NO_GAMES) {
@@ -37,7 +37,7 @@ public class GameParserLogger extends ConsoleLogger {
 
     public synchronized void logGame(LogType type) {
         if (type == LogType.OKAY) {
-            String output = String.format("Processing games: %d/%d (%s%%)",
+            String output = String.format("%d/%d (%s%%)",
                     processedGames.incrementAndGet(),
                     totalGames,
                     new DecimalFormat("#0.0").format(((double) processedGames.get() / (double) totalGames) * 100).replace(",", "."));

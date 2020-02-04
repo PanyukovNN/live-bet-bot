@@ -23,7 +23,7 @@ public class CountryParserLogger extends ConsoleLogger {
         processedCountries = new AtomicInteger();
         processedErrorCountries = new AtomicInteger();
         String output = String.format("\nProcessing countries: 0/%d (0.0%%)", countriesCount);
-        currentLength = output.length();
+        currentLength = output.length() - 23;
         writeInLine(output);
         LOG.info("Processing countries");
     }
@@ -43,7 +43,7 @@ public class CountryParserLogger extends ConsoleLogger {
         if (type == LogType.ERROR) {
             processedErrorCountries.incrementAndGet();
         } else if (type == LogType.OKAY) {
-            String output = String.format("Processing countries: %d/%d (%s%%)",
+            String output = String.format("%d/%d (%s%%)",
                     processedCountries.incrementAndGet(),
                     totalCountries,
                     new DecimalFormat("#0.0").format(((double) processedCountries.get() / (double) totalCountries) * 100).replace(",", "."));
