@@ -1,7 +1,6 @@
 package com.zylex.livebetbot.controller.logger;
 
 import com.zylex.livebetbot.service.DriverManager;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -23,9 +22,8 @@ public class DriverConsoleLogger extends ConsoleLogger {
      * Log driver start.
      */
     public void logDriver() {
-        String output = "Starting web driver: complete";
         LOG.info("Driver started");
-        writeInLine(StringUtils.repeat("\b", output.length()) + output);
+        writeInLine("\b\b\bcomplete");
         writeLineSeparator();
     }
 }

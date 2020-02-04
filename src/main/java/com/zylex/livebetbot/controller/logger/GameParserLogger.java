@@ -16,13 +16,17 @@ public class GameParserLogger extends ConsoleLogger {
 
     private AtomicInteger processedErrorGames;
 
+    private int currentLength;
+
     public void startLogMessage(LogType type, int arg) {
         totalGames = 0;
         processedGames = new AtomicInteger();
         processedErrorGames = new AtomicInteger();
         if (type == LogType.OKAY) {
             totalGames = arg;
-            writeInLine(String.format("\nProcessing games: 0/%d (0.0%%)", arg));
+            String output = String.format("\nProcessing games: 0/%d (0.0%%)", arg);
+            currentLength = output.length();
+            writeInLine(output);
             LOG.info("Processing games");
         } else if (type == LogType.NO_GAMES) {
             writeInLine("\nProcessing games: no HT games");
@@ -37,7 +41,8 @@ public class GameParserLogger extends ConsoleLogger {
                     processedGames.incrementAndGet(),
                     totalGames,
                     new DecimalFormat("#0.0").format(((double) processedGames.get() / (double) totalGames) * 100).replace(",", "."));
-            writeInLine(StringUtils.repeat("\b", output.length()) + output);
+            writeInLine(StringUtils.repeat("\b", currentLength) + output);
+            currentLength = output.length();
         } else if (type == LogType.ERROR) {
             processedErrorGames.incrementAndGet();
         }

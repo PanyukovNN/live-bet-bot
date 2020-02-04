@@ -61,10 +61,10 @@ public class CountryParser {
             driver = driverManager.getDriver();
             Set<Country> countries = parseCountryLinks();
             if (countries.isEmpty()) {
-                logger.logCountriesFound(LogType.NO_COUNTRIES);
+                logger.logCountriesFound(LogType.NO_COUNTRIES, 0);
                 return new ArrayList<>();
             }
-            logger.logCountriesFound(LogType.OKAY);
+            logger.logCountriesFound(LogType.OKAY, countries.size());
             logger.startLogMessage(countries.size());
             return findBreakGames(countries);
         } catch (IOException e) {

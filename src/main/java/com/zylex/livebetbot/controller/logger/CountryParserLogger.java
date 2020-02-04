@@ -16,22 +16,24 @@ public class CountryParserLogger extends ConsoleLogger {
 
     private AtomicInteger processedErrorCountries;
 
+    private int currentLength;
+
     public void startLogMessage(int countriesCount) {
         totalCountries = countriesCount;
         processedCountries = new AtomicInteger();
         processedErrorCountries = new AtomicInteger();
-        writeInLine(String.format("\nProcessing countries: 0/%d (0.0%%)", countriesCount));
+        String output = String.format("\nProcessing countries: 0/%d (0.0%%)", countriesCount);
+        currentLength = output.length();
+        writeInLine(output);
         LOG.info("Processing countries");
     }
 
-    public void logCountriesFound(LogType type) {
+    public void logCountriesFound(LogType type, int countriesCount) {
         if (type == LogType.OKAY) {
-            String output = "Finding countries: complete";
-            writeInLine(StringUtils.repeat("\b", output.length()) + output);
+            writeInLine(String.format("\b\b\bcomplete (found %d countries)", countriesCount));
             LOG.info("Countries found");
         } else if (type == LogType.NO_COUNTRIES) {
-            String output = "Finding countries: complete (no countries)";
-            writeInLine(StringUtils.repeat("\b", output.length()) + output);
+            writeInLine("\b\b\bcomplete (no countries)");
             LOG.info("No countries found");
         }
         writeLineSeparator();
@@ -45,7 +47,8 @@ public class CountryParserLogger extends ConsoleLogger {
                     processedCountries.incrementAndGet(),
                     totalCountries,
                     new DecimalFormat("#0.0").format(((double) processedCountries.get() / (double) totalCountries) * 100).replace(",", "."));
-            writeInLine(StringUtils.repeat("\b", output.length()) + output);
+            writeInLine(StringUtils.repeat("\b", currentLength) + output);
+            currentLength = output.length();
         }
         if (processedCountries.get() + processedErrorCountries.get() == totalCountries) {
             if (processedErrorCountries.get() > 0) {
