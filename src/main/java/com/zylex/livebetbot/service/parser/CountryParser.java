@@ -17,16 +17,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @SuppressWarnings("WeakerAccess")
 @Service
@@ -98,10 +95,7 @@ public class CountryParser {
         List<Game> games = new ArrayList<>();
         List<Game> noResultGames = gameRepository.getWithoutResult();
         for (Country country : countries) {
-            if (AttemptsUtil.attempt(this::openHandicapTab, country.getLink(), 2)) {
-                logger.logCountry(LogType.OKAY);
-            } else {
-                logger.logCountry(LogType.ERROR);
+            if (!openHandicapTab(country.getLink())) {
                 continue;
             }
             Document document = Jsoup.parse(driver.getPageSource());
@@ -112,10 +106,11 @@ public class CountryParser {
                 Elements gameElements = leagueGamesElements.get(i).select("tbody > tr");
                 List<Game> extractedGames = extractGames(games, gameElements, noResultGames);
                 establishDependencies(country, league, extractedGames);
-                //TODO check correctness
-                games.addAll(extractedGames.stream()
-                                .filter(game -> !games.contains(game))
-                                .collect(Collectors.toList()));
+                for (Game game : extractedGames) {
+                    if (!games.contains(game)) {
+                        games.add(game);
+                    }
+                }
             }
         }
         return games;
@@ -159,9 +154,17 @@ public class CountryParser {
         return extractedGames;
     }
 
-    private void openHandicapTab(String countryLink) {
+    private boolean openHandicapTab(String countryLink) {
         driver.navigate().to("http://ballchockdee.com" + countryLink);
-        webDriverUtil.waitElement(By::id, "bu:od:go:mt:2").click();
-        webDriverUtil.waitElement(By::className, "Hdp");
+        Optional<WebElement> handicapTab = webDriverUtil.waitElement(By::id, "bu:od:go:mt:2");
+        if (handicapTab.isPresent()) {
+            handicapTab.get().click();
+            webDriverUtil.waitElement(By::className, "Hdp");
+            logger.logCountry(LogType.OKAY);
+            return true;
+        } else {
+            logger.logCountry(LogType.ERROR);
+            return false;
+        }
     }
 }

@@ -1,16 +1,14 @@
 package com.zylex.livebetbot.service.util;
 
 import com.zylex.livebetbot.service.DriverManager;
-import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Optional;
 
 @Service
 public class WebDriverUtil {
@@ -32,10 +30,14 @@ public class WebDriverUtil {
         wait = new WebDriverWait(driver, 5);
     }
 
-    public WebElement waitElement(ByFunction byFunction, String elementName) {
-        wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(byFunction.get(elementName)));
-        return driver.findElement(byFunction.get(elementName));
+    public Optional<WebElement> waitElement(ByFunction byFunction, String elementName) {
+        try {
+            wait.ignoring(StaleElementReferenceException.class)
+                    .until(ExpectedConditions.presenceOfElementLocated(byFunction.get(elementName)));
+            return Optional.of(driver.findElement(byFunction.get(elementName)));
+        } catch (WebDriverException e) {
+            return Optional.empty();
+        }
     }
 
     @FunctionalInterface

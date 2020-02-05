@@ -1,5 +1,6 @@
 package com.zylex.livebetbot;
 
+import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.DriverManager;
 import com.zylex.livebetbot.service.Saver;
@@ -42,6 +43,7 @@ public class ScheduledParsingTask extends Thread {
             saver.save(ruleGames);
         } catch (Throwable t) {
             t.printStackTrace();
+            ConsoleLogger.writeErrorMessage(t.getMessage());
             driverManager.refreshDriver();
         }
     }

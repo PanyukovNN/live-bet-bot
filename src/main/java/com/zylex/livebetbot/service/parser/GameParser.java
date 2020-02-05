@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
@@ -61,10 +62,10 @@ public class GameParser {
     }
 
     private String findScore() {
-        try {
-            WebElement scoreElement = webDriverUtil.waitElement(By::className, "Score");
-            return scoreElement.getText();
-        } catch (StaleElementReferenceException | TimeoutException e) {
+        Optional<WebElement> scoreElement = webDriverUtil.waitElement(By::className, "Score");
+        if (scoreElement.isPresent()) {
+            return scoreElement.get().getText();
+        } else {
             return "-1:-1";
         }
     }

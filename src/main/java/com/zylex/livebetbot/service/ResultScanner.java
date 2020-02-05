@@ -11,22 +11,19 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -65,7 +62,7 @@ public class ResultScanner {
         }
     }
 
-    private void processScanning() throws IOException {
+    private void processScanning() {
         driver = driverManager.getDriver();
         logger.startLogMessage();
         List<Game> noResultGames = findNoResultGames();
@@ -116,16 +113,16 @@ public class ResultScanner {
         }
     }
 
-    private String logIn() throws IOException {
+    private String logIn() {
         driver.navigate().to("http://ballchockdee.com");
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("LiveBetBotAuth.properties")) {
             Properties property = new Properties();
             property.load(inputStream);
-            webDriverUtil.waitElement(By::id, "username").sendKeys(property.getProperty("LiveBetBot.login"));
-            webDriverUtil.waitElement(By::id, "password").sendKeys(property.getProperty("LiveBetBot.password"));
-            webDriverUtil.waitElement(By::className, "sign-in").click();
+            webDriverUtil.waitElement(By::id, "username").ifPresent(element -> element.sendKeys(property.getProperty("LiveBetBot.login")));
+            webDriverUtil.waitElement(By::id, "password").ifPresent(element -> element.sendKeys(property.getProperty("LiveBetBot.password")));
+            webDriverUtil.waitElement(By::className, "sign-in").ifPresent(WebElement::click);
             if (driver.getCurrentUrl().startsWith("https://www.sbobet-pay.com/")) {
-                webDriverUtil.waitElement(By::className, "DWHomeBtn").click();
+                webDriverUtil.waitElement(By::className, "DWHomeBtn").ifPresent(WebElement::click);
             }
             logger.logIn(LogType.OKAY);
             try {
@@ -134,7 +131,7 @@ public class ResultScanner {
                 alert.accept();
             } catch (WebDriverException ignore) {
             }
-        } catch (WebDriverException ignore) {
+        } catch (Exception e) {
             logger.logIn(LogType.ERROR);
         }
         return driver.getCurrentUrl();
@@ -157,18 +154,17 @@ public class ResultScanner {
     }
 
     private void navigateToYesterdayResultTab() {
-        webDriverUtil.waitElement(By::name, "Yesterday").click();
-        while (true) {
+        webDriverUtil.waitElement(By::name, "Yesterday");
+        Consumer<Object> consumer = (obj) -> {
             try {
                 String day = driver.findElement(By.id("fromdate")).getAttribute("value").split("/")[1];
-                if (Integer.parseInt(day) == LocalDate.now().minusDays(1).getDayOfMonth()) {
-                    break;
-                } else {
+                if (Integer.parseInt(day) != LocalDate.now().minusDays(1).getDayOfMonth()) {
                     Thread.sleep(1000);
                 }
             } catch (InterruptedException ignore) {
             }
-        }
+        };
+        AttemptsUtil.attempt(consumer, 0, 2);
     }
 
     private void findingResults(List<Game> noResultGames) {
@@ -219,7 +215,7 @@ public class ResultScanner {
         try {
             driver.navigate().to(userHomeLink);
             webDriverUtil.waitElement(By::className, "sign-out")
-                    .findElement(By.tagName("a")).click();
+                    .ifPresent(element -> element.findElement(By.tagName("a")).click());
             logger.logOut(LogType.OKAY);
         } catch (WebDriverException e) {
             logger.logOut(LogType.ERROR);

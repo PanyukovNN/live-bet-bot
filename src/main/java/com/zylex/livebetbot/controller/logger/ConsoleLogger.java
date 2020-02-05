@@ -30,7 +30,7 @@ public abstract class ConsoleLogger {
     public synchronized static void endMessage(LogType type) {
         if (type == LogType.BOT_END) {
             String output = "\nBot work completed in " + computeTime(programStartTime.get())
-            + "\n" + StringUtils.repeat("*", 50);
+            + "\n" + StringUtils.repeat("*", 50) + "\n";
             writeInLine(output);
             LOG.info("Bot work completed");
         } else if (type == LogType.BLOCK_END) {
@@ -45,8 +45,9 @@ public abstract class ConsoleLogger {
         writeInLine(line);
     }
 
-    public static synchronized void writeErrorMessage(String line) {
-        System.err.print(line);
+    public static synchronized void writeErrorMessage(String message) {
+        System.err.print(message);
+        LOG.error(message);
     }
 
     static synchronized void writeInLine(String line) {
