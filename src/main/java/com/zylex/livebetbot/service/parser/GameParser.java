@@ -5,12 +5,14 @@ import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
 import com.zylex.livebetbot.service.DriverManager;
-import com.zylex.livebetbot.service.util.WebDriverUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,14 +29,11 @@ public class GameParser {
 
     private DriverManager driverManager;
 
-    private WebDriverUtil webDriverUtil;
-
     private GameParserLogger logger = new GameParserLogger();
 
     @Autowired
-    public GameParser(DriverManager driverManager, WebDriverUtil webDriverUtil) {
+    public GameParser(DriverManager driverManager) {
         this.driverManager = driverManager;
-        this.webDriverUtil = webDriverUtil;
     }
 
     public List<Game> parse(List<Game> games) {
@@ -62,7 +61,7 @@ public class GameParser {
     }
 
     private String findScore() {
-        Optional<WebElement> scoreElement = webDriverUtil.waitElement(By::className, "Score");
+        Optional<WebElement> scoreElement = driverManager.waitElement(By::className, "Score");
         if (scoreElement.isPresent()) {
             return scoreElement.get().getText();
         } else {
@@ -71,7 +70,7 @@ public class GameParser {
     }
 
     private List<OverUnder> findOverUnder() {
-        webDriverUtil.waitElement(By::className, "MarketT");
+        driverManager.waitElement(By::className, "MarketT");
         Document document = Jsoup.parse(driver.getPageSource());
         Elements marketElements = document.select("div.MarketT");
         List<Element> overUnderMarketElements = marketElements.stream()

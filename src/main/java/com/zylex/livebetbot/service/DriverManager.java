@@ -3,14 +3,16 @@ package com.zylex.livebetbot.service;
 import com.zylex.livebetbot.controller.logger.DriverConsoleLogger;
 import com.zylex.livebetbot.service.util.AttemptsUtil;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,6 +26,8 @@ public class DriverManager {
     private DriverConsoleLogger logger = new DriverConsoleLogger();
 
     private WebDriver driver;
+
+    private WebDriverWait wait;
 
     public WebDriver getDriver() {
         return driver;
@@ -51,6 +55,7 @@ public class DriverManager {
                 ? new FirefoxDriver(new FirefoxOptions().addArguments("--headless"))
                 : new FirefoxDriver();
         manageDriver();
+        wait = new WebDriverWait(driver, 5);
         logger.logDriver();
     }
 
@@ -81,5 +86,16 @@ public class DriverManager {
 
     public void refreshDriver() {
         initiateDriver(true);
+    }
+
+    public Optional<WebElement> waitElement(ByFunction byFunction, String elementName) {
+        wait.ignoring(StaleElementReferenceException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(byFunction.get(elementName)));
+        return Optional.of(driver.findElement(byFunction.get(elementName)));
+    }
+
+    @FunctionalInterface
+    public interface ByFunction {
+        By get(String input);
     }
 }

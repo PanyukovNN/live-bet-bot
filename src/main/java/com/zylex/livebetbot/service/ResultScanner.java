@@ -6,7 +6,6 @@ import com.zylex.livebetbot.controller.logger.ResultScannerLogger;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import com.zylex.livebetbot.service.util.AttemptsUtil;
-import com.zylex.livebetbot.service.util.WebDriverUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -32,8 +31,6 @@ public class ResultScanner {
 
     private ResultScannerLogger logger = new ResultScannerLogger();
 
-    private WebDriverUtil webDriverUtil;
-
     private WebDriver driver;
 
     private GameRepository gameRepository;
@@ -43,10 +40,9 @@ public class ResultScanner {
     private DriverManager driverManager;
 
     @Autowired
-    public ResultScanner(DriverManager driverManager, GameRepository gameRepository, WebDriverUtil webDriverUtil) {
+    public ResultScanner(DriverManager driverManager, GameRepository gameRepository) {
         this.driverManager = driverManager;
         this.gameRepository = gameRepository;
-        this.webDriverUtil = webDriverUtil;
     }
 
     public void scan() {
@@ -118,11 +114,11 @@ public class ResultScanner {
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("LiveBetBotAuth.properties")) {
             Properties property = new Properties();
             property.load(inputStream);
-            webDriverUtil.waitElement(By::id, "username").ifPresent(element -> element.sendKeys(property.getProperty("LiveBetBot.login")));
-            webDriverUtil.waitElement(By::id, "password").ifPresent(element -> element.sendKeys(property.getProperty("LiveBetBot.password")));
-            webDriverUtil.waitElement(By::className, "sign-in").ifPresent(WebElement::click);
+            driverManager.waitElement(By::id, "username").ifPresent(element -> element.sendKeys(property.getProperty("LiveBetBot.login")));
+            driverManager.waitElement(By::id, "password").ifPresent(element -> element.sendKeys(property.getProperty("LiveBetBot.password")));
+            driverManager.waitElement(By::className, "sign-in").ifPresent(WebElement::click);
             if (driver.getCurrentUrl().startsWith("https://www.sbobet-pay.com/")) {
-                webDriverUtil.waitElement(By::className, "DWHomeBtn").ifPresent(WebElement::click);
+                driverManager.waitElement(By::className, "DWHomeBtn").ifPresent(WebElement::click);
             }
             logger.logIn(LogType.OKAY);
             try {
@@ -150,11 +146,11 @@ public class ResultScanner {
 
     private void navigateToResultTab(String userHash) {
         driver.navigate().to(userHash + "ballchockdee.com/web-root/restricted/result/results-more.aspx");
-        webDriverUtil.waitElement(By::className, "ContentTable");
+        driverManager.waitElement(By::className, "ContentTable");
     }
 
     private void navigateToYesterdayResultTab() {
-        webDriverUtil.waitElement(By::name, "Yesterday");
+        driverManager.waitElement(By::name, "Yesterday");
         Consumer<Object> consumer = (obj) -> {
             try {
                 String day = driver.findElement(By.id("fromdate")).getAttribute("value").split("/")[1];
@@ -214,7 +210,7 @@ public class ResultScanner {
     private void logOut(String userHomeLink) {
         try {
             driver.navigate().to(userHomeLink);
-            webDriverUtil.waitElement(By::className, "sign-out")
+            driverManager.waitElement(By::className, "sign-out")
                     .ifPresent(element -> element.findElement(By.tagName("a")).click());
             logger.logOut(LogType.OKAY);
         } catch (WebDriverException e) {

@@ -10,7 +10,6 @@ import com.zylex.livebetbot.service.repository.CountryRepository;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import com.zylex.livebetbot.service.repository.LeagueRepository;
 import com.zylex.livebetbot.service.util.AttemptsUtil;
-import com.zylex.livebetbot.service.util.WebDriverUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,19 +38,15 @@ public class CountryParser {
 
     private LeagueRepository leagueRepository;
 
-    private WebDriverUtil webDriverUtil;
-
     private CountryParserLogger logger = new CountryParserLogger();
 
     @Autowired
     public CountryParser(DriverManager driverManager, GameRepository gameRepository,
-                         CountryRepository countryRepository, LeagueRepository leagueRepository,
-                         WebDriverUtil webDriverUtil) {
+                         CountryRepository countryRepository, LeagueRepository leagueRepository) {
         this.driverManager = driverManager;
         this.gameRepository = gameRepository;
         this.countryRepository = countryRepository;
         this.leagueRepository = leagueRepository;
-        this.webDriverUtil = webDriverUtil;
     }
 
     public List<Game> parse() {
@@ -156,10 +151,10 @@ public class CountryParser {
 
     private boolean openHandicapTab(String countryLink) {
         driver.navigate().to("http://ballchockdee.com" + countryLink);
-        Optional<WebElement> handicapTab = webDriverUtil.waitElement(By::id, "bu:od:go:mt:2");
+        Optional<WebElement> handicapTab = driverManager.waitElement(By::id, "bu:od:go:mt:2");
         if (handicapTab.isPresent()) {
             handicapTab.get().click();
-            webDriverUtil.waitElement(By::className, "Hdp");
+            driverManager.waitElement(By::className, "Hdp");
             logger.logCountry(LogType.OKAY);
             return true;
         } else {
