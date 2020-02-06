@@ -15,14 +15,20 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("WeakerAccess")
 @Service
@@ -31,6 +37,8 @@ public class CountryParser {
     private DriverManager driverManager;
 
     private WebDriver driver;
+
+    private WebDriverWait wait;
 
     private GameRepository gameRepository;
 
@@ -51,6 +59,7 @@ public class CountryParser {
 
     public List<Game> parse() {
         driver = driverManager.getDriver();
+        wait = new WebDriverWait(driver, 5);
         Set<Country> countries = parseCountryLinks();
         if (countries.isEmpty()) {
             logger.logCountriesFound(LogType.NO_COUNTRIES);
@@ -150,16 +159,27 @@ public class CountryParser {
     }
 
     private boolean openHandicapTab(String countryLink) {
-        driver.navigate().to("http://ballchockdee.com" + countryLink);
-        Optional<WebElement> handicapTab = driverManager.waitElement(By::id, "bu:od:go:mt:2");
-        if (handicapTab.isPresent()) {
-            handicapTab.get().click();
-            driverManager.waitElement(By::className, "Hdp");
+        try {
+            driver.navigate().to("http://ballchockdee.com" + countryLink);
+            waitElement(By::id, "bu:od:go:mt:2").click();
+            waitElement(By::className, "Hdp");
             logger.logCountry(LogType.OKAY);
             return true;
-        } else {
+            //TODO find better way
+        } catch (Exception e) {
             logger.logCountry(LogType.ERROR);
             return false;
         }
+    }
+
+    private WebElement waitElement(ByFunction byFunction, String elementName) {
+        wait.ignoring(StaleElementReferenceException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(byFunction.get(elementName)));
+        return driver.findElement(byFunction.get(elementName));
+    }
+
+    @FunctionalInterface
+    public interface ByFunction {
+        By get(String input);
     }
 }

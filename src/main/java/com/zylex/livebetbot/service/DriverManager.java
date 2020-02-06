@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,8 +50,10 @@ public class DriverManager {
         quitDriver();
         WebDriverManager.firefoxdriver().setup();
         setUpLogging();
+        FirefoxOptions options = new FirefoxOptions();
+        options.addPreference("general.useragent.override", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36 OPR/60.0.3255.170");
         driver = headless
-                ? new FirefoxDriver(new FirefoxOptions().addArguments("--headless"))
+                ? new FirefoxDriver(options.addArguments("--headless"))
                 : new FirefoxDriver();
         manageDriver();
         wait = new WebDriverWait(driver, 5);
@@ -61,7 +62,7 @@ public class DriverManager {
 
     private void manageDriver() {
         driver.manage().window().setSize(new Dimension(1920, 1080));
-        driver.manage().timeouts().pageLoadTimeout(600, TimeUnit.SECONDS);
+//        driver.manage().timeouts().pageLoadTimeout(600, TimeUnit.SECONDS);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
     }
@@ -88,10 +89,10 @@ public class DriverManager {
         initiateDriver(true);
     }
 
-    public Optional<WebElement> waitElement(ByFunction byFunction, String elementName) {
+    private WebElement waitElement(ByFunction byFunction, String elementName) {
         wait.ignoring(StaleElementReferenceException.class)
                 .until(ExpectedConditions.presenceOfElementLocated(byFunction.get(elementName)));
-        return Optional.of(driver.findElement(byFunction.get(elementName)));
+        return driver.findElement(byFunction.get(elementName));
     }
 
     @FunctionalInterface

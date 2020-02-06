@@ -9,16 +9,15 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
@@ -26,6 +25,8 @@ import java.util.stream.Collectors;
 public class GameParser {
 
     private WebDriver driver;
+
+    private WebDriverWait wait;
 
     private DriverManager driverManager;
 
@@ -38,6 +39,7 @@ public class GameParser {
 
     public List<Game> parse(List<Game> games) {
         driver = driverManager.getDriver();
+        wait = new WebDriverWait(driver, 5);
         if (games.isEmpty()) {
             logger.startLogMessage(LogType.NO_GAMES, 0);
             return games;
@@ -61,16 +63,15 @@ public class GameParser {
     }
 
     private String findScore() {
-        Optional<WebElement> scoreElement = driverManager.waitElement(By::className, "Score");
-        if (scoreElement.isPresent()) {
-            return scoreElement.get().getText();
-        } else {
+        try {
+            return waitElement(By::className, "Score").getText();
+        } catch (NoSuchElementException e) {
             return "-1:-1";
         }
     }
 
     private List<OverUnder> findOverUnder() {
-        driverManager.waitElement(By::className, "MarketT");
+        waitElement(By::className, "MarketT");
         Document document = Jsoup.parse(driver.getPageSource());
         Elements marketElements = document.select("div.MarketT");
         List<Element> overUnderMarketElements = marketElements.stream()
@@ -96,5 +97,16 @@ public class GameParser {
         double underSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsM").text());
         double underCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabR > span.OddsR").text());
         overUnderList.add(new OverUnder(OverUnder.Type.UNDER.toString(), underSize, underCoefficient));
+    }
+
+    private WebElement waitElement(ByFunction byFunction, String elementName) {
+        wait.ignoring(StaleElementReferenceException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(byFunction.get(elementName)));
+        return driver.findElement(byFunction.get(elementName));
+    }
+
+    @FunctionalInterface
+    public interface ByFunction {
+        By get(String input);
     }
 }
