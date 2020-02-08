@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS game CASCADE;
 CREATE TABLE IF NOT EXISTS game (
     id                BIGSERIAL NOT NULL PRIMARY KEY,
     date_time         TIMESTAMP NOT NULL,
-    game_time         VARCHAR(15),
+--     game_time         VARCHAR(15),
     country_id        BIGSERIAL,
     league_id         BIGSERIAL,
     first_team        VARCHAR(50) NOT NULL,
