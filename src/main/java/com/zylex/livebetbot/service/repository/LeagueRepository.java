@@ -1,41 +1,32 @@
 package com.zylex.livebetbot.service.repository;
 
 import com.zylex.livebetbot.model.League;
-import com.zylex.livebetbot.service.util.HibernateUtil;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 
 @Repository
 public class LeagueRepository {
 
-    private Session session;
+    private SessionFactory sessionFactory;
 
-    @PostConstruct
-    private void postConstruct() {
-        session = HibernateUtil.getSession();
-    }
-
-    @PreDestroy
-    private void preDestroy() {
-        if (session.isOpen()) {
-            session.close();
-        }
+    @Autowired
+    public LeagueRepository(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     @Transactional
     public League save(League league) {
+        Session session = sessionFactory.getCurrentSession();
         League retreatedLeague = get(league);
         if (retreatedLeague.getName() == null) {
-            session.beginTransaction();
             Long id = (Long) session.save(league);
             league.setId(id);
-            session.getTransaction().commit();
             return league;
         } else {
             return retreatedLeague;
@@ -44,6 +35,7 @@ public class LeagueRepository {
 
     @Transactional
     public League get(League league) {
+        Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM League WHERE name = :leagueName");
         query.setParameter("leagueName", league.getName());
         try {

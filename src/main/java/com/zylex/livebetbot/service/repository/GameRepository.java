@@ -3,12 +3,11 @@ package com.zylex.livebetbot.service.repository;
 import com.zylex.livebetbot.exception.GameRepositoryException;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
-import com.zylex.livebetbot.service.util.HibernateUtil;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
@@ -26,36 +25,35 @@ import java.util.List;
 @Repository
 public class GameRepository {
 
-    private Session session;
+    private SessionFactory sessionFactory;
 
-    @PostConstruct
-    private void postConstruct() {
-        session = HibernateUtil.getSession();
+    @Autowired
+    public GameRepository(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
-    @PreDestroy
-    private void preDestroy() {
-        if (session.isOpen()) {
-            session.close();
-        }
-    }
-
+    @Transactional
     public List<Game> getWithoutResult() {
+        Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM Game WHERE finalScore IS NULL OR finalScore = '-1:-1'");
         return query.getResultList();
     }
 
+    @Transactional
     public List<Game> getByDate(LocalDate date) {
         LocalDateTime dayStart = LocalDateTime.of(date, LocalTime.MIN);
         LocalDateTime dayEnd = LocalDateTime.of(date, LocalTime.MAX);
+        Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM Game WHERE dateTime >= :dayStart AND dateTime <= :dayEnd");
         query.setParameter("dayStart", dayStart);
         query.setParameter("dayEnd", dayEnd);
         return query.getResultList();
     }
 
+    @Transactional
     public List<Game> getFromDate(LocalDate date) {
         LocalDateTime dayStart = LocalDateTime.of(date, LocalTime.MIN);
+        Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM Game WHERE dateTime >= :dayStart");
         query.setParameter("dayStart", dayStart);
         return query.getResultList();
@@ -63,12 +61,11 @@ public class GameRepository {
 
     @Transactional
     public Game save(Game game) {
+        Session session = sessionFactory.getCurrentSession();
         Game retreatedGame = get(game);
         if (retreatedGame.getLink() == null) {
-            session.beginTransaction();
             Long id = (Long) session.save(game);
             game.setId(id);
-            session.getTransaction().commit();
             return game;
         } else {
             return retreatedGame;
@@ -84,13 +81,13 @@ public class GameRepository {
 
     @Transactional
     public void update(Game game) {
-        session.beginTransaction();
+        Session session = sessionFactory.getCurrentSession();
         session.update(game);
-        session.getTransaction().commit();
     }
 
     @Transactional
     public Game get(Game game) {
+        Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM Game WHERE ruleNumber = :ruleNumber AND link = :link");
         query.setParameter("ruleNumber", game.getRuleNumber());
         query.setParameter("link", game.getLink());

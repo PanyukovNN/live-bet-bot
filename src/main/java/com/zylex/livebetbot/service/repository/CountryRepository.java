@@ -1,12 +1,11 @@
 package com.zylex.livebetbot.service.repository;
 
 import com.zylex.livebetbot.model.Country;
-import com.zylex.livebetbot.service.util.HibernateUtil;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
@@ -16,28 +15,20 @@ import java.util.Set;
 @Repository
 public class CountryRepository {
 
-    private Session session;
+    private final SessionFactory sessionFactory;
 
-    @PostConstruct
-    private void postConstruct() {
-        session = HibernateUtil.getSession();
-    }
-
-    @PreDestroy
-    private void preDestroy() {
-        if (session.isOpen()) {
-            session.close();
-        }
+    @Autowired
+    public CountryRepository(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     @Transactional
     public Country save(Country country) {
+        Session session = sessionFactory.getCurrentSession();
         Country retreatedCountry = get(country);
         if (retreatedCountry.getName() == null) {
-            session.beginTransaction();
             Long id = (Long) session.save(country);
             country.setId(id);
-            session.getTransaction().commit();
             return country;
         } else {
             return retreatedCountry;
@@ -53,6 +44,7 @@ public class CountryRepository {
 
     @Transactional
     public Country get(Country country) {
+        Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM Country WHERE name = :countryName");
         query.setParameter("countryName", country.getName());
         try {
