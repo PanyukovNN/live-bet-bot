@@ -1,4 +1,4 @@
-package com.zylex.livebetbot.service.util;
+package com.zylex.livebetbot.service.conf;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,10 +44,8 @@ public class HibernateConf {
         return transactionManager;
     }
 
-    private final Properties hibernateProperties() {
+    private Properties hibernateProperties() {
         Properties hibernateProperties = new Properties();
-//        hibernateProperties.setProperty(
-//                "hibernate.hbm2ddl.auto", "create-drop");
         hibernateProperties.setProperty(
                 "hibernate.dialect", "org.hibernate.dialect.PostgreSQL10Dialect");
 
