@@ -2,26 +2,28 @@ package com.zylex.livebetbot.controller.logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Service
 public class GameParserLogger extends ConsoleLogger {
 
     private final static Logger LOG = Logger.getLogger(GameParserLogger.class);
 
     private int totalGames;
 
-    private AtomicInteger processedGames;
+    private AtomicInteger processedGames = new AtomicInteger();
 
-    private AtomicInteger processedErrorGames;
+    private AtomicInteger processedErrorGames = new AtomicInteger();
 
     private int currentLength;
 
     public void startLogMessage(LogType type, int arg) {
         totalGames = 0;
-        processedGames = new AtomicInteger();
-        processedErrorGames = new AtomicInteger();
+        processedGames.set(0);
+        processedErrorGames.set(0);
         if (type == LogType.OKAY) {
             totalGames = arg;
             String output = String.format("\nProcessing games: 0/%d (0.0%%)", arg);

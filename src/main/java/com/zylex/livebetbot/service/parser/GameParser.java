@@ -11,35 +11,28 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("WeakerAccess")
 @Service
 public class GameParser {
 
-    private WebDriver driver;
-
-    private WebDriverWait wait;
+    private GameParserLogger logger;
 
     private DriverManager driverManager;
 
-    private GameParserLogger logger = new GameParserLogger();
-
     @Autowired
-    public GameParser(DriverManager driverManager) {
+    public GameParser(GameParserLogger logger, DriverManager driverManager) {
+        this.logger = logger;
         this.driverManager = driverManager;
     }
 
     public List<Game> parse(List<Game> games) {
-        driver = driverManager.getDriver();
-        wait = new WebDriverWait(driver, 5);
         if (games.isEmpty()) {
             logger.startLogMessage(LogType.NO_GAMES, 0);
             return games;
@@ -51,7 +44,7 @@ public class GameParser {
 
     private void parseSingleGame(Game game) {
         try {
-            driver.navigate().to("http://ballchockdee.com" + game.getLink());
+            driverManager.getDriver().navigate().to("http://ballchockdee.com" + game.getLink());
             game.setHalfTimeScore(findScore());
             List<OverUnder> overUnderList = findOverUnder();
             game.setOverUnderList(overUnderList);
@@ -65,14 +58,14 @@ public class GameParser {
     private String findScore() {
         try {
             return waitElement(By::className, "Score").getText();
-        } catch (NoSuchElementException e) {
+        } catch (Exception e) {
             return "-1:-1";
         }
     }
 
     private List<OverUnder> findOverUnder() {
         waitElement(By::className, "MarketT");
-        Document document = Jsoup.parse(driver.getPageSource());
+        Document document = Jsoup.parse(driverManager.getDriver().getPageSource());
         Elements marketElements = document.select("div.MarketT");
         List<Element> overUnderMarketElements = marketElements.stream()
                 .filter(market -> market.select("div.SubHead > span").text().contains("Over Under"))
@@ -99,14 +92,9 @@ public class GameParser {
         overUnderList.add(new OverUnder(OverUnder.Type.UNDER.toString(), underSize, underCoefficient));
     }
 
-    private WebElement waitElement(ByFunction byFunction, String elementName) {
-        wait.ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(byFunction.get(elementName)));
-        return driver.findElement(byFunction.get(elementName));
-    }
-
-    @FunctionalInterface
-    public interface ByFunction {
-        By get(String input);
+    private WebElement waitElement(Function<String, By> byFunction, String elementName) {
+        driverManager.getWait().ignoring(StaleElementReferenceException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(byFunction.apply(elementName)));
+        return driverManager.getDriver().findElement(byFunction.apply(elementName));
     }
 }

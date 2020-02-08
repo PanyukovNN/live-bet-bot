@@ -4,10 +4,12 @@ import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.rule.RuleNumber;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class SaverLogger extends ConsoleLogger {
 
     private final static Logger LOG = Logger.getLogger(Saver.class);

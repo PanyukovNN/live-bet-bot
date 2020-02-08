@@ -15,12 +15,13 @@ import java.util.Map;
 @Service
 public class Saver {
 
-    private SaverLogger logger = new SaverLogger();
+    private SaverLogger logger;
 
     private GameRepository gameRepository;
 
     @Autowired
-    public Saver(GameRepository gameRepository) {
+    public Saver(SaverLogger logger, GameRepository gameRepository) {
+        this.logger = logger;
         this.gameRepository = gameRepository;
     }
 

@@ -2,19 +2,21 @@ package com.zylex.livebetbot.controller.logger;
 
 import com.zylex.livebetbot.service.parser.ParseProcessor;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Service
 public class ParseProcessorLogger extends ConsoleLogger {
 
     private final static Logger LOG = Logger.getLogger(ParseProcessor.class);
 
-    private AtomicLong parsingStartTime;
+    private AtomicLong parsingStartTime = new AtomicLong(System.currentTimeMillis());
 
     public void startLogMessage() {
-        parsingStartTime = new AtomicLong(System.currentTimeMillis());
+        parsingStartTime.set(System.currentTimeMillis());
         DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a dd.MM.yyyy");
         writeInLine("\nParsing started at " + LocalDateTime.now().format(DATE_TIME_FORMATTER));
         writeInLine("\nFinding countries: ...");
