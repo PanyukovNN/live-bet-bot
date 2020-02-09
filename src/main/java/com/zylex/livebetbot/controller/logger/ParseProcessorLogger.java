@@ -1,7 +1,8 @@
 package com.zylex.livebetbot.controller.logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.zylex.livebetbot.service.parser.ParseProcessor;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Service
 public class ParseProcessorLogger extends ConsoleLogger {
 
-    private final static Logger LOG = Logger.getLogger(ParseProcessor.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ParseProcessor.class);
 
     private AtomicLong parsingStartTime = new AtomicLong(System.currentTimeMillis());
 

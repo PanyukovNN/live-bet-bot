@@ -1,0 +1,32 @@
+<configuration>
+
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+<!--    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">-->
+<!--        <encoder>-->
+<!--            <charset>UTF-8</charset>-->
+<!--            <pattern>%d{yy/MM/dd HH:mm:ss} %p %c{20}: %m%n</pattern>-->
+<!--        </encoder>-->
+<!--    </appender>-->
+
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <file>log.txt</file>
+        <append>true</append>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>%d{yy/MM/dd HH:mm:ss} %p %c{2}: %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--<logger name="org.postgresql" level="debug"/>-->
+    <!--<logger name="org.springframework.jdbc" level="debug"/>-->
+
+    <logger name="com.zylex.livebetbot" level="info"/>
+
+    <root level="INFO">
+<!--        <appender-ref ref="console"/>-->
+        <appender-ref ref="file"/>
+    </root>
+</configuration>

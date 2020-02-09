@@ -38,7 +38,6 @@ public abstract class DriverManager {
 
     protected void manageDriver() {
         driver.manage().window().setSize(new Dimension(1024, 768));
-//        driver.manage().timeouts().pageLoadTimeout(600, TimeUnit.SECONDS);
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         driver.manage().timeouts().setScriptTimeout(5, TimeUnit.SECONDS);
     }

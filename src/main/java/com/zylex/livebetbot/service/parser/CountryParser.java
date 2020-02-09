@@ -6,7 +6,7 @@ import com.zylex.livebetbot.exception.CountryParserException;
 import com.zylex.livebetbot.model.Country;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.League;
-import com.zylex.livebetbot.service.DriverManager;
+import com.zylex.livebetbot.service.driver.DriverManager;
 import com.zylex.livebetbot.service.repository.CountryRepository;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import com.zylex.livebetbot.service.repository.LeagueRepository;
@@ -16,6 +16,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ import java.util.function.Function;
 @Service
 public class CountryParser {
 
+    private static final CountryParserLogger logger = new CountryParserLogger();
+
     private DriverManager driverManager;
 
     private GameRepository gameRepository;
@@ -37,12 +40,9 @@ public class CountryParser {
 
     private LeagueRepository leagueRepository;
 
-    private CountryParserLogger logger;
-
     @Autowired
-    public CountryParser(CountryParserLogger logger, DriverManager driverManager, GameRepository gameRepository,
+    public CountryParser(DriverManager driverManager, GameRepository gameRepository,
                          CountryRepository countryRepository, LeagueRepository leagueRepository) {
-        this.logger = logger;
         this.driverManager = driverManager;
         this.gameRepository = gameRepository;
         this.countryRepository = countryRepository;
@@ -72,13 +72,12 @@ public class CountryParser {
     private Set<Country> extractCountryLinks() throws IOException {
         Set<Country> countries = new LinkedHashSet<>();
         Document document = Jsoup.connect("http://www.ballchockdee.com/euro/live-betting/football")
-//                .userAgent("Chrome/4.0.249.0 Safari/532.5")
                 .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36 OPR/60.0.3255.170")
                 .referrer("http://www.google.com")
                 .get();
         Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
         for (Element element : elements) {
-            String countryName = element.select("div").first().text().replaceFirst("\\d+", "");
+            String countryName = element.select("div").first().text().replace("\\d+", "");
             String countryLink = element.attr("href");
             Country country = new Country(countryName, countryLink);
             countries.add(country);
@@ -156,8 +155,7 @@ public class CountryParser {
             waitElement(By::className, "Hdp");
             logger.logCountry(LogType.OKAY);
             return true;
-            //TODO find better way
-        } catch (Exception e) {
+        } catch (WebDriverException e) {
             logger.logCountry(LogType.ERROR);
             return false;
         }

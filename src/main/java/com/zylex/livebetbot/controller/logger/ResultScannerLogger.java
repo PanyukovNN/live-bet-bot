@@ -1,7 +1,8 @@
 package com.zylex.livebetbot.controller.logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.zylex.livebetbot.service.ResultScanner;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -10,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class ResultScannerLogger extends ConsoleLogger {
 
-    private final static Logger LOG = Logger.getLogger(ResultScanner.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ResultScanner.class);
 
     public synchronized void startLogMessage() {
         writeInLine("\nResult scanning started");

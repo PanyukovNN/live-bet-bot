@@ -11,15 +11,14 @@ import java.util.List;
 @Service
 public class ParseProcessor {
 
-    private ParseProcessorLogger logger;
+    private static final ParseProcessorLogger logger = new ParseProcessorLogger();
 
     private CountryParser countryParser;
 
     private GameParser gameParser;
 
     @Autowired
-    public ParseProcessor(ParseProcessorLogger logger, CountryParser countryParser, GameParser gameParser) {
-        this.logger = logger;
+    public ParseProcessor(CountryParser countryParser, GameParser gameParser) {
         this.countryParser = countryParser;
         this.gameParser = gameParser;
     }

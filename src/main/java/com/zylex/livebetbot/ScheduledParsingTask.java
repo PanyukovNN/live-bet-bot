@@ -2,7 +2,7 @@ package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.model.Game;
-import com.zylex.livebetbot.service.DriverManager;
+import com.zylex.livebetbot.service.driver.DriverManager;
 import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.parser.ParseProcessor;
 import com.zylex.livebetbot.service.rule.RuleNumber;

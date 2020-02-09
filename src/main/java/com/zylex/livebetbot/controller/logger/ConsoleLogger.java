@@ -1,8 +1,8 @@
 package com.zylex.livebetbot.controller.logger;
 
-import com.zylex.livebetbot.LiveBetBotApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,11 +14,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class ConsoleLogger {
 
-    private final static Logger LOG = Logger.getLogger(LiveBetBotApplication.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ConsoleLogger.class);
 
     private static AtomicLong programStartTime = new AtomicLong(System.currentTimeMillis());
 
-    static {
+    public static void startMessage() {
         DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a dd.MM.yyyy");
         String output = StringUtils.repeat("*", 50) + "\n"
                 + String.format("Bot started at: %s", LocalDateTime.now().format(DATE_TIME_FORMATTER))

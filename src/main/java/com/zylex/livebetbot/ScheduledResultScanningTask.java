@@ -1,7 +1,7 @@
 package com.zylex.livebetbot;
 
 import com.zylex.livebetbot.controller.logger.ConsoleLogger;
-import com.zylex.livebetbot.service.DriverManager;
+import com.zylex.livebetbot.service.driver.DriverManager;
 import com.zylex.livebetbot.service.ResultScanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

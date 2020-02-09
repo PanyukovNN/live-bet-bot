@@ -6,7 +6,7 @@ Live-bet-bot includes three modules:
 
 #### **Used tecnologies:**
 - Spring framework
-- Hibernate, JPA
+- JPA (Hibernate) 
 - PostgreSQL
 - Maven
 - Selenium

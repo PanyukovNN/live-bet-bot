@@ -4,6 +4,7 @@ import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ResultScannerLogger;
 import com.zylex.livebetbot.model.Game;
+import com.zylex.livebetbot.service.driver.DriverManager;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

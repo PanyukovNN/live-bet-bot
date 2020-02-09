@@ -1,7 +1,8 @@
 package com.zylex.livebetbot.controller.logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
@@ -10,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class GameParserLogger extends ConsoleLogger {
 
-    private final static Logger LOG = Logger.getLogger(GameParserLogger.class);
+    private final static Logger LOG = LoggerFactory.getLogger(GameParserLogger.class);
 
     private int totalGames;
 

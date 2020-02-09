@@ -1,7 +1,8 @@
 package com.zylex.livebetbot.controller.logger;
 
-import com.zylex.livebetbot.service.DriverManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.zylex.livebetbot.service.driver.DriverManager;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DriverConsoleLogger extends ConsoleLogger {
 
-    private final static Logger LOG = Logger.getLogger(DriverManager.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DriverManager.class);
 
     /**
      * Log start message.

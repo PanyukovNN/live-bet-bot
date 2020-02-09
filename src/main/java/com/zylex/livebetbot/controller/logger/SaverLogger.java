@@ -1,9 +1,10 @@
 package com.zylex.livebetbot.controller.logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.Saver;
 import com.zylex.livebetbot.service.rule.RuleNumber;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.Map;
 @Service
 public class SaverLogger extends ConsoleLogger {
 
-    private final static Logger LOG = Logger.getLogger(Saver.class);
+    private final static Logger LOG = LoggerFactory.getLogger(Saver.class);
 
     public void logRuleGames(Map<RuleNumber, List<Game>> ruleGames) {
         for (Map.Entry<RuleNumber, List<Game>> entry : ruleGames.entrySet()) {

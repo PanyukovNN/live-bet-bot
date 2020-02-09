@@ -3,6 +3,7 @@ package com.zylex.livebetbot;
 import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.exception.LiveBetBotException;
+import com.zylex.livebetbot.service.driver.DriverManager;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class LiveBetBotApplication {
 
     public static void main(String[] args) {
+        ConsoleLogger.startMessage();
         AnnotationConfigApplicationContext context =
                 new AnnotationConfigApplicationContext(LiveBetBotApplication.class);
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -29,6 +31,7 @@ public class LiveBetBotApplication {
             scheduler.shutdownNow();
             context.close();
         }));
+        context.getBean(DriverManager.class).initiateDriver(false);
         Thread parsingTask = context.getBean(ScheduledParsingTask.class);
         Thread resultScanningTask = context.getBean(ScheduledResultScanningTask.class);
         scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);

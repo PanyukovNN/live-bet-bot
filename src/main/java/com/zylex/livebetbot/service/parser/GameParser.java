@@ -4,7 +4,7 @@ import com.zylex.livebetbot.controller.logger.GameParserLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
-import com.zylex.livebetbot.service.DriverManager;
+import com.zylex.livebetbot.service.driver.DriverManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,13 +22,12 @@ import java.util.stream.Collectors;
 @Service
 public class GameParser {
 
-    private GameParserLogger logger;
+    private static final GameParserLogger logger = new GameParserLogger();
 
     private DriverManager driverManager;
 
     @Autowired
-    public GameParser(GameParserLogger logger, DriverManager driverManager) {
-        this.logger = logger;
+    public GameParser(DriverManager driverManager) {
         this.driverManager = driverManager;
     }
 
