@@ -9,9 +9,9 @@ import java.text.DecimalFormat;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
-public class GameParserLogger extends ConsoleLogger {
+public class OverUnderParserLogger extends ConsoleLogger {
 
-    private final static Logger LOG = LoggerFactory.getLogger(GameParserLogger.class);
+    private final static Logger LOG = LoggerFactory.getLogger(OverUnderParserLogger.class);
 
     private int totalGames;
 

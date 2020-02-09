@@ -20,9 +20,7 @@ public class ParseProcessorLogger extends ConsoleLogger {
         parsingStartTime.set(System.currentTimeMillis());
         DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a dd.MM.yyyy");
         writeInLine("\nParsing started at " + LocalDateTime.now().format(DATE_TIME_FORMATTER));
-        writeInLine("\nFinding countries: ...");
         LOG.info("Parsing started");
-        LOG.info("Finding countries");
     }
 
     public void parsingComplete(LogType type) {

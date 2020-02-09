@@ -1,6 +1,6 @@
 package com.zylex.livebetbot.service.parser;
 
-import com.zylex.livebetbot.controller.logger.GameParserLogger;
+import com.zylex.livebetbot.controller.logger.OverUnderParserLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
@@ -20,14 +20,14 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 @Service
-public class GameParser {
+public class OverUnderParser {
 
-    private static final GameParserLogger logger = new GameParserLogger();
+    private static final OverUnderParserLogger logger = new OverUnderParserLogger();
 
     private DriverManager driverManager;
 
     @Autowired
-    public GameParser(DriverManager driverManager) {
+    public OverUnderParser(DriverManager driverManager) {
         this.driverManager = driverManager;
     }
 
@@ -44,7 +44,6 @@ public class GameParser {
     private void parseSingleGame(Game game) {
         try {
             driverManager.getDriver().navigate().to("http://ballchockdee.com" + game.getLink());
-//            game.setHalfTimeScore(findScore());
             List<OverUnder> overUnderList = findOverUnder();
             game.setOverUnderList(overUnderList);
             overUnderList.forEach(o -> o.setGame(game));
@@ -54,16 +53,7 @@ public class GameParser {
         }
     }
 
-//    private String findScore() {
-//        try {
-//            return waitElement(By::className, "Score").getText();
-//        } catch (Exception e) {
-//            return "-1:-1";
-//        }
-//    }
-
     private List<OverUnder> findOverUnder() {
-        //TODO check correctness of removing this line
         driverManager.waitElement(By::className, "MarketT");
         Document document = Jsoup.parse(driverManager.getDriver().getPageSource());
         Elements marketElements = document.select("div.MarketT");
