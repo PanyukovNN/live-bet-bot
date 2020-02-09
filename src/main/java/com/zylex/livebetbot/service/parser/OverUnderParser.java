@@ -46,7 +46,7 @@ public class OverUnderParser {
             driverManager.getDriver().navigate().to("http://ballchockdee.com" + game.getLink());
             List<OverUnder> overUnderList = findOverUnder();
             game.setOverUnderList(overUnderList);
-            overUnderList.forEach(o -> o.setGame(game));
+            overUnderList.forEach(overUnder -> overUnder.setGame(game));
             logger.logGame(LogType.OKAY);
         } catch (TimeoutException e) {
             logger.logGame(LogType.ERROR);
@@ -63,17 +63,15 @@ public class OverUnderParser {
         List<OverUnder> overUnderList = new ArrayList<>();
         for (Element marketElement : overUnderMarketElements) {
             Elements overUnderElements = marketElement.select("table > tbody > tr");
-            for (Element overUnderElement : overUnderElements) {
-                if (overUnderElement.className().equals("OddsClosed")) {
-                    continue;
-                }
-                extractOverUnder(overUnderList, overUnderElement);
-            }
+            overUnderElements.forEach(overUnderElement -> extractOverUnder(overUnderList, overUnderElement));
         }
         return overUnderList;
     }
 
     private void extractOverUnder(List<OverUnder> overUnderList, Element overUnderElement) {
+        if (overUnderElement.className().equals("OddsClosed")) {
+            return;
+        }
         double overSize = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsM").text());
         double overCoefficient = Double.parseDouble(overUnderElement.selectFirst("td > a.OddsTabL > span.OddsR").text());
         overUnderList.add(new OverUnder(OverUnder.Type.OVER.toString(), overSize, overCoefficient));

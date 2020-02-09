@@ -8,7 +8,6 @@ import com.zylex.livebetbot.model.League;
 import com.zylex.livebetbot.service.driver.DriverManager;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import com.zylex.livebetbot.service.repository.LeagueRepository;
-import com.zylex.livebetbot.service.rule.RuleNumber;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -72,28 +71,13 @@ public class CountryParser {
             League league = extractLeague(country, leagueTitleElements.get(i));
             Elements gameElements = leagueGamesElements.get(i).select("tbody > tr");
             List<Game> extractedGames = extractGames(games, gameElements, noResultGames);
-            List<Game> appropriateGames = filterByRules(extractedGames);
-            establishDependencies(country, league, appropriateGames);
-            for (Game game : appropriateGames) {
+            establishDependencies(country, league, extractedGames);
+            for (Game game : extractedGames) {
                 if (!games.contains(game)) {
                     games.add(game);
                 }
             }
         }
-    }
-
-    private List<Game> filterByRules(List<Game> extractedGames) {
-        List<Game> appropriateGames = new ArrayList<>();
-        for (Game game : extractedGames) {
-            for (RuleNumber ruleNumber : RuleNumber.values()) {
-                if (ruleNumber.gameTime.checkTime(game.getGameTime())) {
-                    if (ruleNumber.score.equals(game.getScanTimeScore())) {
-                        appropriateGames.add(game);
-                    }
-                }
-            }
-        }
-        return appropriateGames;
     }
 
     private League extractLeague(Country country, Element leagueTitleElement) {

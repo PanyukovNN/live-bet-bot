@@ -30,8 +30,7 @@ public class CountryFinder {
 
     public Set<Country> findCountries() {
         try {
-            Set<Country> countries = extractCountryLinks();
-            countries = countryRepository.save(countries);
+            Set<Country> countries = countryRepository.save(extractCountryLinks());
             if (countries.isEmpty()) {
                 logger.logCountriesFound(LogType.NO_COUNTRIES);
                 return Collections.emptySet();

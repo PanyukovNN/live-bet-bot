@@ -16,12 +16,12 @@
         <append>true</append>
         <immediateFlush>true</immediateFlush>
         <encoder>
-            <pattern>%d{yy/MM/dd HH:mm:ss} %p %.30c{2}: %m%n</pattern>
+            <pattern>%d{yy/MM/dd HH:mm:ss} %-6.6p %-20.20c: %m%n</pattern>
         </encoder>
     </appender>
 
-    <!--<logger name="org.postgresql" level="debug"/>-->
-    <!--<logger name="org.springframework.jdbc" level="debug"/>-->
+    <logger name="org.postgresql" level="error"/>
+    <logger name="org.springframework" level="error"/>
 
     <logger name="com.zylex.livebetbot" level="info"/>
 
