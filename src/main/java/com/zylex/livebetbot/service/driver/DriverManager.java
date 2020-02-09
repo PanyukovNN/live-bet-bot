@@ -1,17 +1,19 @@
 package com.zylex.livebetbot.service.driver;
 
 import com.zylex.livebetbot.controller.logger.DriverConsoleLogger;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * Managing web drivers.
  */
+@SuppressWarnings("WeakerAccess")
 @Service
 public abstract class DriverManager {
 
@@ -38,8 +40,8 @@ public abstract class DriverManager {
 
     protected void manageDriver() {
         driver.manage().window().setSize(new Dimension(1024, 768));
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-        driver.manage().timeouts().setScriptTimeout(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
     }
 
     /**
@@ -57,6 +59,12 @@ public abstract class DriverManager {
     }
 
     public WebDriverWait getWait() {
-        return wait;
+        return this.wait;
+    }
+
+    public WebElement waitElement(Function<String, By> byFunction, String elementName) {
+        wait.ignoring(StaleElementReferenceException.class)
+                .until(ExpectedConditions.presenceOfElementLocated(byFunction.apply(elementName)));
+        return driver.findElement(byFunction.apply(elementName));
     }
 }

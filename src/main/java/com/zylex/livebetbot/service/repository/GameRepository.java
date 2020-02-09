@@ -118,7 +118,7 @@ public class GameRepository {
                         game.getCountry().getName(),
                         game.getLeague().getName(),
                         game.getFirstTeam(), game.getSecondTeam(),
-                        game.getHalfTimeScore(), game.getFinalScore(),
+                        game.getScanTimeScore(), game.getFinalScore(),
                         game.getRuleNumber(), over10, over15, under10, under15);
                 writer.write(output);
             }

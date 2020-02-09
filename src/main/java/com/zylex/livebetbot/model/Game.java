@@ -20,6 +20,9 @@ public class Game implements Serializable {
     @Column(name = "date_time")
     private LocalDateTime dateTime;
 
+    @Column(name = "game_time")
+    private String gameTime;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
     private Country country;
@@ -34,8 +37,8 @@ public class Game implements Serializable {
     @Column(name = "second_team")
     private String secondTeam;
 
-    @Column(name = "half_time_score")
-    private String halfTimeScore = "-1:-1";
+    @Column(name = "scan_time_score")
+    private String scanTimeScore;
 
     @Column(name = "final_score")
     private String finalScore = "-1:-1";
@@ -49,10 +52,12 @@ public class Game implements Serializable {
     @Column(name = "rule_number")
     private String ruleNumber;
 
-    public Game(LocalDateTime dateTime, String firstTeam, String secondTeam, String link) {
+    public Game(LocalDateTime dateTime, String gameTime, String firstTeam, String secondTeam, String scanTimeScore, String link) {
         this.dateTime = dateTime;
+        this.gameTime = gameTime;
         this.firstTeam = firstTeam;
         this.secondTeam = secondTeam;
+        this.scanTimeScore = scanTimeScore;
         this.link = link;
     }
 
@@ -73,6 +78,14 @@ public class Game implements Serializable {
 
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public String getGameTime() {
+        return gameTime;
+    }
+
+    public void setGameTime(String gameTime) {
+        this.gameTime = gameTime;
     }
 
     public Country getCountry() {
@@ -107,12 +120,12 @@ public class Game implements Serializable {
         this.secondTeam = secondTeam;
     }
 
-    public String getHalfTimeScore() {
-        return halfTimeScore;
+    public String getScanTimeScore() {
+        return scanTimeScore;
     }
 
-    public void setHalfTimeScore(String halfTimeScore) {
-        this.halfTimeScore = halfTimeScore;
+    public void setScanTimeScore(String halfTimeScore) {
+        this.scanTimeScore = halfTimeScore;
     }
 
     public String getFinalScore() {
@@ -164,13 +177,14 @@ public class Game implements Serializable {
     @Override
     public String toString() {
         DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a yyyy.MM.dd");
-        return String.format("%s %s %s \"%s\" - \"%s\" (%s) (%s) (%s)",
+        return String.format("%s %s %s \"%s\" - \"%s\" (%s \"%s\") (%s) (%s)",
                 DATE_TIME_FORMATTER.format(dateTime),
                 country.getName(),
                 league.getName(),
                 firstTeam,
                 secondTeam,
-                halfTimeScore,
+                scanTimeScore,
+                gameTime,
                 finalScore,
                 (ruleNumber == null
                         ? "NO_RULE"

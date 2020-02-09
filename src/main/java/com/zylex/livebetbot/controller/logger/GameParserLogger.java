@@ -32,9 +32,9 @@ public class GameParserLogger extends ConsoleLogger {
             writeInLine(output);
             LOG.info("Processing games");
         } else if (type == LogType.NO_GAMES) {
-            writeInLine("\nProcessing games: no HT games");
+            writeInLine("\nProcessing games: no appropriate games");
             writeLineSeparator();
-            LOG.info("No HT games");
+            LOG.info("No appropriate games");
         }
     }
 

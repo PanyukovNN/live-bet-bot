@@ -24,7 +24,7 @@ public class FirefoxManager extends DriverManager {
                 ? new FirefoxDriver(options.addArguments("--headless"))
                 : new FirefoxDriver();
         manageDriver();
-        wait = new WebDriverWait(driver, 2);
+        wait = new WebDriverWait(driver, 5);
         logger.logDriver();
     }
 

@@ -10,23 +10,21 @@ import com.zylex.livebetbot.service.driver.DriverManager;
 import com.zylex.livebetbot.service.repository.CountryRepository;
 import com.zylex.livebetbot.service.repository.GameRepository;
 import com.zylex.livebetbot.service.repository.LeagueRepository;
+import com.zylex.livebetbot.service.rule.RuleNumber;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 
+@SuppressWarnings("WeakerAccess")
 @Service
 public class CountryParser {
 
@@ -77,7 +75,7 @@ public class CountryParser {
                 .get();
         Elements elements = document.select("ul#ms-live-res-ul-1 > li.Unsel > a");
         for (Element element : elements) {
-            String countryName = element.select("div").first().text().replace("\\d+", "");
+            String countryName = element.select("div").first().text().replaceAll("\\d+", "");
             String countryLink = element.attr("href");
             Country country = new Country(countryName, countryLink);
             countries.add(country);
@@ -99,8 +97,9 @@ public class CountryParser {
                 League league = extractLeague(country, leagueTitleElements.get(i));
                 Elements gameElements = leagueGamesElements.get(i).select("tbody > tr");
                 List<Game> extractedGames = extractGames(games, gameElements, noResultGames);
-                establishDependencies(country, league, extractedGames);
-                for (Game game : extractedGames) {
+                List<Game> appropriateGames = filterByRules(extractedGames);
+                establishDependencies(country, league, appropriateGames);
+                for (Game game : appropriateGames) {
                     if (!games.contains(game)) {
                         games.add(game);
                     }
@@ -108,6 +107,20 @@ public class CountryParser {
             }
         }
         return games;
+    }
+
+    private List<Game> filterByRules(List<Game> extractedGames) {
+        List<Game> appropriateGames = new ArrayList<>();
+        for (Game game : extractedGames) {
+            for (RuleNumber ruleNumber : RuleNumber.values()) {
+                if (ruleNumber.gameTime.checkTime(game.getGameTime())) {
+                    if (ruleNumber.score.equals(game.getScanTimeScore())) {
+                        appropriateGames.add(game);
+                    }
+                }
+            }
+        }
+        return appropriateGames;
     }
 
     private League extractLeague(Country country, Element leagueTitleElement) {
@@ -128,22 +141,22 @@ public class CountryParser {
     private List<Game> extractGames(List<Game> games, Elements gameElements, List<Game> noResultGames) {
         List<Game> extractedGames = new ArrayList<>();
         for (Element gameElement : gameElements) {
-            Element dateTimeText = gameElement.selectFirst("div.DateTimeTxt");
-            if (dateTimeText.text().contains("HT")) {
-                Element firstTeamElement = gameElement.selectFirst("td > a.OddsTabL > span.OddsL");
-                Element secondTeamElement = gameElement.selectFirst("td > a.OddsTabR > span.OddsL");
-                if (firstTeamElement == null || secondTeamElement == null) {
-                    continue;
-                }
-                String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
-                boolean noResultContains = noResultGames.stream().anyMatch(g -> g.getLink().equals(gameLink));
-                boolean gamesContains = games.stream().anyMatch(g -> g.getLink().equals(gameLink));
-                if (noResultContains || gamesContains) {
-                    continue;
-                }
-                Game game = new Game(LocalDateTime.now(), firstTeamElement.text(), secondTeamElement.text(), gameLink);
-                extractedGames.add(game);
+            String[] scoreTimeTest = gameElement.selectFirst("div.DateTimeTxt").text().split(" ", 2);
+            String scanTimeScore = scoreTimeTest[0].replace("-", ":");
+            String gameTime = scoreTimeTest[1];
+            Element firstTeamElement = gameElement.selectFirst("td > a.OddsTabL > span.OddsL");
+            Element secondTeamElement = gameElement.selectFirst("td > a.OddsTabR > span.OddsL");
+            if (firstTeamElement == null || secondTeamElement == null) {
+                continue;
             }
+            String gameLink = gameElement.selectFirst("td.Icons > a.IconMarkets").attr("href");
+            boolean noResultContains = noResultGames.stream().anyMatch(g -> g.getLink().equals(gameLink));
+            boolean gamesContains = games.stream().anyMatch(g -> g.getLink().equals(gameLink));
+            if (noResultContains || gamesContains) {
+                continue;
+            }
+            Game game = new Game(LocalDateTime.now(), gameTime, firstTeamElement.text(), secondTeamElement.text(), scanTimeScore, gameLink);
+            extractedGames.add(game);
         }
         return extractedGames;
     }
@@ -151,19 +164,13 @@ public class CountryParser {
     private boolean openHandicapTab(String countryLink) {
         try {
             driverManager.getDriver().navigate().to("http://ballchockdee.com" + countryLink);
-            waitElement(By::id, "bu:od:go:mt:2").click();
-            waitElement(By::className, "Hdp");
+            driverManager.waitElement(By::id, "bu:od:go:mt:2").click();
+            driverManager.waitElement(By::className, "Hdp");
             logger.logCountry(LogType.OKAY);
             return true;
         } catch (WebDriverException e) {
             logger.logCountry(LogType.ERROR);
             return false;
         }
-    }
-
-    private WebElement waitElement(Function<String, By> byFunction, String elementName) {
-        driverManager.getWait().ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(byFunction.apply(elementName)));
-        return driverManager.getDriver().findElement(byFunction.apply(elementName));
     }
 }

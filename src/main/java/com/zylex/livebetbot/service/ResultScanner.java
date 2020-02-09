@@ -10,7 +10,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.*;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -109,11 +110,11 @@ public class ResultScanner {
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("LiveBetBotAuth.properties")) {
             Properties property = new Properties();
             property.load(inputStream);
-            waitElement(By::id, "username").sendKeys(property.getProperty("LiveBetBot.login"));
-            waitElement(By::id, "password").sendKeys(property.getProperty("LiveBetBot.password"));
-            waitElement(By::className, "sign-in").click();
+            driverManager.waitElement(By::id, "username").sendKeys(property.getProperty("LiveBetBot.login"));
+            driverManager.waitElement(By::id, "password").sendKeys(property.getProperty("LiveBetBot.password"));
+            driverManager.waitElement(By::className, "sign-in").click();
             if (driverManager.getDriver().getCurrentUrl().startsWith("https://www.sbobet-pay.com/")) {
-                waitElement(By::className, "DWHomeBtn").click();
+                driverManager.waitElement(By::className, "DWHomeBtn").click();
             }
             logger.logIn(LogType.OKAY);
             try {
@@ -141,11 +142,11 @@ public class ResultScanner {
 
     private void navigateToResultTab(String userHash) {
         driverManager.getDriver().navigate().to(userHash + "ballchockdee.com/web-root/restricted/result/results-more.aspx");
-        waitElement(By::className, "ContentTable");
+        driverManager.waitElement(By::className, "ContentTable");
     }
 
     private void navigateToYesterdayResultTab() {
-        waitElement(By::name, "Yesterday");
+        driverManager.waitElement(By::name, "Yesterday");
         int attempts = 2;
         while (attempts-- > 0) {
             try {
@@ -207,17 +208,11 @@ public class ResultScanner {
     private void logOut(String userHomeLink) {
         try {
             driverManager.getDriver().navigate().to(userHomeLink);
-            waitElement(By::className, "sign-out").findElement(By.tagName("a")).click();
+            driverManager.waitElement(By::className, "sign-out").findElement(By.tagName("a")).click();
             logger.logOut(LogType.OKAY);
         } catch (WebDriverException e) {
             logger.logOut(LogType.ERROR);
             ConsoleLogger.writeErrorMessage(e.getMessage());
         }
-    }
-
-    private WebElement waitElement(Function<String, By> byFunction, String elementName) {
-        driverManager.getWait().ignoring(StaleElementReferenceException.class)
-                .until(ExpectedConditions.presenceOfElementLocated(byFunction.apply(elementName)));
-        return driverManager.getDriver().findElement(byFunction.apply(elementName));
     }
 }
