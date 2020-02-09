@@ -30,6 +30,7 @@ public class CountryFinder {
 
     public Set<Country> findCountries() {
         try {
+            logger.startLogMessage();
             Set<Country> countries = countryRepository.save(extractCountryLinks());
             if (countries.isEmpty()) {
                 logger.logCountriesFound(LogType.NO_COUNTRIES);

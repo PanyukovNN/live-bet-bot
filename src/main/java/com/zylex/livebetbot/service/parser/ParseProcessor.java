@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -47,11 +46,17 @@ public class ParseProcessor {
 
     private List<Game> filterByRules(List<Game> extractedGames) {
         List<Game> appropriateGames = new ArrayList<>();
-        extractedGames.forEach(game -> Arrays.stream(RuleNumber.values())
-                .filter(ruleNumber -> ruleNumber.gameTime.checkTime(game.getGameTime()))
-                .filter(ruleNumber -> ruleNumber.score.equals(game.getScanTimeScore()))
-                .map(ruleNumber -> game)
-                .forEach(appropriateGames::add));
+        for (Game game : extractedGames) {
+            for (RuleNumber ruleNumber : RuleNumber.values()) {
+                if (ruleNumber.gameTime.checkTime(game.getGameTime())) {
+                    if (ruleNumber.score.equals(game.getScanTimeScore())) {
+                        if (!appropriateGames.contains(game)) {
+                            appropriateGames.add(game);
+                        }
+                    }
+                }
+            }
+        }
         return appropriateGames;
     }
 }
