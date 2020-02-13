@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("WeakerAccess")
 @Service
 public class CountryParser {
 
@@ -82,7 +81,7 @@ public class CountryParser {
 
     private League extractLeague(Country country, Element leagueTitleElement) {
         String leagueName = leagueTitleElement.select("div.MarketLea > div.SubHeadT").first().text();
-        League league = new League(leagueName);
+        League league = new League(leagueName, true);
         league.setCountry(country);
         return leagueRepository.save(league);
     }

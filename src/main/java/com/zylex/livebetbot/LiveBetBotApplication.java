@@ -3,7 +3,6 @@ package com.zylex.livebetbot;
 import com.zylex.livebetbot.controller.logger.ConsoleLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.exception.LiveBetBotException;
-import com.zylex.livebetbot.service.driver.DriverManager;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
@@ -22,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @ComponentScan
 public class LiveBetBotApplication {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         ConsoleLogger.startMessage();
         AnnotationConfigApplicationContext context =
                 new AnnotationConfigApplicationContext(LiveBetBotApplication.class);
@@ -31,15 +30,18 @@ public class LiveBetBotApplication {
             scheduler.shutdownNow();
             context.close();
         }));
-        context.getBean(DriverManager.class).initiateDriver(false);
-        Thread parsingTask = context.getBean(ScheduledParsingTask.class);
+//        context.getBean(DriverManager.class).initiateDriver(true);
+//        Thread parsingTask = context.getBean(ScheduledParsingTask.class);
         Thread resultScanningTask = context.getBean(ScheduledResultScanningTask.class);
-        scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(resultScanningTask, countDelay(LocalTime.of(3, 0)), 1440, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(resultScanningTask, countDelay(LocalTime.of(6, 0)), 1440, TimeUnit.MINUTES);
+        resultScanningTask.start();
+        resultScanningTask.join();
+//        scheduler.scheduleAtFixedRate(resultScanningTask, 0, 10, TimeUnit.MINUTES);
+//        scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
+//        scheduler.scheduleAtFixedRate(resultScanningTask, countDelay(LocalTime.of(3, 0)), 1440, TimeUnit.MINUTES);
+//        scheduler.scheduleAtFixedRate(resultScanningTask, countDelay(LocalTime.of(6, 0)), 1440, TimeUnit.MINUTES);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            while (!reader.readLine().equalsIgnoreCase("exit")) {
-            }
+//            while (!reader.readLine().equalsIgnoreCase("exit")) {
+//            }
         } catch (IOException e) {
             throw new LiveBetBotException(e.getMessage(), e);
         } finally {

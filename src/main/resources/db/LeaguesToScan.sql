@@ -69,5 +69,49 @@ VALUES (default, 'Ставки на фактический исход'),
        (default, 'Turkey 1st Lig'),
        (default, 'UAE Arabian Gulf League'),
        (default, 'Venezuela Primera Division'),
-       (default, 'Qatar QNB Stars League');
+       (default, 'Qatar QNB Stars League'),
 
+        (default, 'SPAIN LA LIGA 2'),
+        (default, 'Costa Rica Campeonato Primera Division'),
+        (default, 'Poland Ekstraklasa'),
+        (default, 'Netherlands Eerste Divisie'),
+
+        (default, 'Bahrain Premier League'),
+        (default, 'Belgium First Division B'),
+        (default, 'Colombia Primera B'),
+        (default, 'Cyprus 1st Div'),
+        (default, 'India Super League'),
+
+        (default, 'India I-League'),
+        (default, 'Iran Pro League'),
+        (default, 'Morocco Botola Pro'),
+        (default, 'Saudi Arabia Pro League'),
+
+        (default, 'UAE Arabian Gulf League'),
+        (default, 'Swiss Challenge League'),
+        (default, 'South Africa ABSA Premiership'),
+        (default, 'Portugal Ledman LigaPro'),
+        (default, 'Mexico Liga de Ascenso'),
+        (default, 'Kuwait Premier League'),
+
+        (default, 'Chile Primera Division'),
+
+        (default, 'Azerbaijan Premier League'),
+        (default, 'Israel Liga Leumit'),
+        (default, 'Kenya Premier League'),
+        (default, 'Turkey 1st Lig'),
+
+        (default, 'Oman Professional League'),
+        (default, 'Paraguay Primera Division'),
+        (default, 'Peru Liga 1'),
+        (default, 'Venezuela Primera Division'),
+        (default, 'Argentina Primera B Nacional'),
+        (default, 'Greece Super League 2'),
+
+        (default, 'Venezuela Primera Division'),
+        (default, 'Wales Premier League Playoff'),
+        (default, 'Albania Superliga'),
+        (default, 'Bolivia Professional Football League'),
+        (default, 'Greece Football League'),
+        (default, 'Malta BOV Premier League'),
+        (default, 'Myanmar National League');

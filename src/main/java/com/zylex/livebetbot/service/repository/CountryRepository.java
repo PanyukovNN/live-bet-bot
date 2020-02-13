@@ -13,6 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Repository
+@Transactional
 public class CountryRepository {
 
     private final SessionFactory sessionFactory;
@@ -22,7 +23,6 @@ public class CountryRepository {
         this.sessionFactory = sessionFactory;
     }
 
-    @Transactional
     public Country save(Country country) {
         Session session = sessionFactory.getCurrentSession();
         Country retreatedCountry = get(country);
@@ -35,14 +35,12 @@ public class CountryRepository {
         }
     }
 
-    @Transactional
     public Set<Country> save(Set<Country> countries) {
         Set<Country> savedCountries = new LinkedHashSet<>();
         countries.forEach(country -> savedCountries.add(save(country)));
         return savedCountries;
     }
 
-    @Transactional
     public Country get(Country country) {
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM Country WHERE name = :countryName");

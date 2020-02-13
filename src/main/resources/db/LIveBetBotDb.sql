@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS league (
     id          BIGSERIAL PRIMARY KEY,
     country_id  BIGSERIAL,
     name        VARCHAR(300) NOT NULL,
+    is_new      BOOLEAN,
     FOREIGN KEY (country_id) REFERENCES country(id) ON DELETE SET NULL,
     CONSTRAINT UC_league UNIQUE (country_id, name)
 );

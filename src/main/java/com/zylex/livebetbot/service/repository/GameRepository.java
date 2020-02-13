@@ -23,6 +23,7 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 @Repository
+@Transactional
 public class GameRepository {
 
     private SessionFactory sessionFactory;
@@ -32,25 +33,22 @@ public class GameRepository {
         this.sessionFactory = sessionFactory;
     }
 
-    @Transactional
     public List<Game> getWithoutResult() {
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM Game WHERE finalScore IS NULL OR finalScore = '-1:-1'");
         return query.getResultList();
     }
 
-    @Transactional
     public List<Game> getByDate(LocalDate date) {
+        Session session = sessionFactory.getCurrentSession();
         LocalDateTime dayStart = LocalDateTime.of(date, LocalTime.MIN);
         LocalDateTime dayEnd = LocalDateTime.of(date, LocalTime.MAX);
-        Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM Game WHERE dateTime >= :dayStart AND dateTime <= :dayEnd");
         query.setParameter("dayStart", dayStart);
         query.setParameter("dayEnd", dayEnd);
         return query.getResultList();
     }
 
-    @Transactional
     public List<Game> getFromDate(LocalDate date) {
         LocalDateTime dayStart = LocalDateTime.of(date, LocalTime.MIN);
         Session session = sessionFactory.getCurrentSession();
@@ -59,7 +57,6 @@ public class GameRepository {
         return query.getResultList();
     }
 
-    @Transactional
     public Game save(Game game) {
         Session session = sessionFactory.getCurrentSession();
         Game retreatedGame = get(game);
@@ -72,20 +69,17 @@ public class GameRepository {
         }
     }
 
-    @Transactional
     public List<Game> save(List<Game> games) {
         List<Game> savedGames = new ArrayList<>();
         games.forEach(game -> savedGames.add(save(game)));
         return savedGames;
     }
 
-    @Transactional
     public void update(Game game) {
         Session session = sessionFactory.getCurrentSession();
         session.update(game);
     }
 
-    @Transactional
     public Game get(Game game) {
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM Game WHERE ruleNumber = :ruleNumber AND link = :link");

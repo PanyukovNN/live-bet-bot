@@ -22,7 +22,6 @@ public class HibernateConf {
         sessionFactory.setPackagesToScan(
                 "com.zylex.livebetbot.model");
         sessionFactory.setHibernateProperties(hibernateProperties());
-
         return sessionFactory;
     }
 
@@ -48,7 +47,6 @@ public class HibernateConf {
         Properties hibernateProperties = new Properties();
         hibernateProperties.setProperty(
                 "hibernate.dialect", "org.hibernate.dialect.PostgreSQL10Dialect");
-
         return hibernateProperties;
     }
 }

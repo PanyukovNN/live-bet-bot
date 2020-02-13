@@ -14,13 +14,13 @@ public class CountryFinderLogger extends ConsoleLogger {
         LOG.info("Finding countries");
     }
 
-    public void logCountriesFound(LogType type) {
+    public void logCountriesFound(LogType type, int countryNumber) {
         if (type == LogType.OKAY) {
             writeInLine("\b\b\bcomplete");
-            LOG.info("Countries found");
+            LOG.info(String.format("Finding countries: complete (%d)", countryNumber));
         } else if (type == LogType.NO_COUNTRIES) {
             writeInLine("\b\b\bcomplete (no countries)");
-            LOG.info("No countries found");
+            LOG.info("Finding countries: no countries");
         }
         writeLineSeparator();
     }

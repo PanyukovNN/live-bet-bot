@@ -33,10 +33,10 @@ public class CountryFinder {
             logger.startLogMessage();
             Set<Country> countries = countryRepository.save(extractCountryLinks());
             if (countries.isEmpty()) {
-                logger.logCountriesFound(LogType.NO_COUNTRIES);
+                logger.logCountriesFound(LogType.NO_COUNTRIES, 0);
                 return Collections.emptySet();
             }
-            logger.logCountriesFound(LogType.OKAY);
+            logger.logCountriesFound(LogType.OKAY, countries.size());
             return countries;
         } catch (IOException e) {
             throw new CountryFinderException(e.getMessage(), e);

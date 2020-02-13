@@ -19,8 +19,12 @@ public class League implements Serializable {
     @Column(name = "name")
     private String name;
 
-    public League(String name) {
+    @Column(name = "is_new")
+    private boolean isNew;
+
+    public League(String name, boolean isNew) {
         this.name = name;
+        this.isNew = isNew;
     }
 
     public League() {
@@ -48,6 +52,14 @@ public class League implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean aNew) {
+        isNew = aNew;
     }
 
     @Override

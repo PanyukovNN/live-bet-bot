@@ -11,6 +11,7 @@ import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 
 @Repository
+@Transactional
 public class LeagueRepository {
 
     private SessionFactory sessionFactory;
@@ -20,7 +21,6 @@ public class LeagueRepository {
         this.sessionFactory = sessionFactory;
     }
 
-    @Transactional
     public League save(League league) {
         Session session = sessionFactory.getCurrentSession();
         League retreatedLeague = get(league);
@@ -33,7 +33,6 @@ public class LeagueRepository {
         }
     }
 
-    @Transactional
     public League get(League league) {
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM League WHERE name = :leagueName");
