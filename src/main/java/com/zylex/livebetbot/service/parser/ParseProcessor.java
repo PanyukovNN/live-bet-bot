@@ -4,11 +4,14 @@ import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.ParseProcessorLogger;
 import com.zylex.livebetbot.model.Country;
 import com.zylex.livebetbot.model.Game;
+import com.zylex.livebetbot.model.LeagueToScan;
+import com.zylex.livebetbot.service.repository.LeagueRepository;
 import com.zylex.livebetbot.service.rule.RuleNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -22,25 +25,28 @@ public class ParseProcessor {
 
     private OverUnderParser overUnderParser;
 
+    private LeagueRepository leagueRepository;
+
     @Autowired
-    public ParseProcessor(CountryFinder countryFinder, CountryParser countryParser, OverUnderParser overUnderParser) {
+    public ParseProcessor(CountryFinder countryFinder, CountryParser countryParser, OverUnderParser overUnderParser, LeagueRepository leagueRepository) {
         this.countryFinder = countryFinder;
         this.countryParser = countryParser;
         this.overUnderParser = overUnderParser;
+        this.leagueRepository = leagueRepository;
     }
 
     public Set<Game> process() {
         logger.startLogMessage();
         Set<Country> countries = countryFinder.findCountries();
         Set<Game> games = countryParser.parse(countries);
-        //TODO think about low coupling
-        Set<Game> appropriateGames = filterByRules(games);
-        appropriateGames = overUnderParser.parse(appropriateGames);
-        LogType logType = appropriateGames.isEmpty()
+        games = filterByRules(games);
+        games = filterByLeagues(games);
+        games = overUnderParser.parse(games);
+        LogType logType = games.isEmpty()
                 ? LogType.NO_GAMES
                 : LogType.OKAY;
         logger.parsingComplete(logType);
-        return appropriateGames;
+        return games;
     }
 
     private Set<Game> filterByRules(Set<Game> extractedGames) {
@@ -50,11 +56,19 @@ public class ParseProcessor {
                 if (ruleNumber.gameTime.checkTime(game.getGameTime())) {
                     if (ruleNumber.score.equals(game.getScanTimeScore())) {
                         appropriateGames.add(game);
-//                        if (!appropriateGames.contains(game)) {
-//                            appropriateGames.add(game);
-//                        }
                     }
                 }
+            }
+        }
+        return appropriateGames;
+    }
+
+    private Set<Game> filterByLeagues(Set<Game> games) {
+        List<LeagueToScan> leaguesToScan = leagueRepository.getLeaguesToScan();
+        Set<Game> appropriateGames = new LinkedHashSet<>();
+        for (Game game : games) {
+            if (leaguesToScan.stream().anyMatch(lts -> lts.getName().equals(game.getLeague().getName()))) {
+                appropriateGames.add(game);
             }
         }
         return appropriateGames;

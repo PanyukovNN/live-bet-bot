@@ -68,11 +68,6 @@ public class CountryParser {
             Set<Game> extractedGames = extractGames(games, gameElements, noResultGames);
             establishDependencies(country, league, extractedGames);
             games.addAll(extractedGames);
-//            for (Game game : extractedGames) {
-//                if (!games.contains(game)) {
-//                    games.add(game);
-//                }
-//            }
         }
     }
 
