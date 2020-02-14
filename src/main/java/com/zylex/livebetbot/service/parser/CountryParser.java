@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CountryParser {
@@ -41,17 +38,16 @@ public class CountryParser {
         this.leagueRepository = leagueRepository;
     }
 
-    public List<Game> parse(Set<Country> countries) {
+    public Set<Game> parse(Set<Country> countries) {
         if (countries.isEmpty()) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
         logger.startLogMessage(countries.size());
         return parseCountries(countries);
     }
 
-    private List<Game> parseCountries(Set<Country> countries) {
-        //TODO remake to LinkedHashSet
-        List<Game> games = new ArrayList<>();
+    private Set<Game> parseCountries(Set<Country> countries) {
+        Set<Game> games = new LinkedHashSet<>();
         List<Game> noResultGames = gameRepository.getWithoutResult();
         for (Country country : countries) {
             if (!openHandicapTab(country.getLink())) {
@@ -62,20 +58,21 @@ public class CountryParser {
         return games;
     }
 
-    private void parseLeagues(List<Game> games, List<Game> noResultGames, Country country) {
+    private void parseLeagues(Set<Game> games, List<Game> noResultGames, Country country) {
         Document document = Jsoup.parse(driverManager.getDriver().getPageSource());
         Elements leagueTitleElements = document.select("div.MarketLea");
         Elements leagueGamesElements = document.select("table.Hdp");
         for (int i = 0; i < leagueGamesElements.size(); i++) {
             League league = extractLeague(country, leagueTitleElements.get(i));
             Elements gameElements = leagueGamesElements.get(i).select("tbody > tr");
-            List<Game> extractedGames = extractGames(games, gameElements, noResultGames);
+            Set<Game> extractedGames = extractGames(games, gameElements, noResultGames);
             establishDependencies(country, league, extractedGames);
-            for (Game game : extractedGames) {
-                if (!games.contains(game)) {
-                    games.add(game);
-                }
-            }
+            games.addAll(extractedGames);
+//            for (Game game : extractedGames) {
+//                if (!games.contains(game)) {
+//                    games.add(game);
+//                }
+//            }
         }
     }
 
@@ -86,15 +83,15 @@ public class CountryParser {
         return leagueRepository.save(league);
     }
 
-    private void establishDependencies(Country country, League league, List<Game> extractedGames) {
+    private void establishDependencies(Country country, League league, Set<Game> extractedGames) {
         extractedGames.forEach(game -> {
             game.setCountry(country);
             game.setLeague(league);
         });
     }
 
-    private List<Game> extractGames(List<Game> games, Elements gameElements, List<Game> noResultGames) {
-        List<Game> extractedGames = new ArrayList<>();
+    private Set<Game> extractGames(Set<Game> games, Elements gameElements, List<Game> noResultGames) {
+        Set<Game> extractedGames = new LinkedHashSet<>();
         for (Element gameElement : gameElements) {
             String[] scoreTimeTest = gameElement.selectFirst("div.DateTimeTxt").text().split(" ", 2);
             String scanTimeScore = scoreTimeTest[0].replace("-", ":");

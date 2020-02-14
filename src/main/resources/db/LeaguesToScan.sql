@@ -1,9 +1,8 @@
+DROP TABLE IF EXISTS league_to_scan CASCADE;
 CREATE TABLE IF NOT EXISTS league_to_scan (
     id      BIGSERIAL PRIMARY KEY,
     league  VARCHAR(300) NOT NULL
 );
-
-DROP TABLE IF EXISTS league_to_scan CASCADE;
 INSERT INTO league_to_scan (id, league)
 VALUES (default, 'Ставки на фактический исход'),
        (default, 'Algeria Professional Ligue 1'),

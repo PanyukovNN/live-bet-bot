@@ -8,8 +8,7 @@ import com.zylex.livebetbot.service.rule.RuleNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Service
@@ -30,12 +29,12 @@ public class ParseProcessor {
         this.overUnderParser = overUnderParser;
     }
 
-    public List<Game> process() {
+    public Set<Game> process() {
         logger.startLogMessage();
         Set<Country> countries = countryFinder.findCountries();
-        List<Game> games = countryParser.parse(countries);
+        Set<Game> games = countryParser.parse(countries);
         //TODO think about low coupling
-        List<Game> appropriateGames = filterByRules(games);
+        Set<Game> appropriateGames = filterByRules(games);
         appropriateGames = overUnderParser.parse(appropriateGames);
         LogType logType = appropriateGames.isEmpty()
                 ? LogType.NO_GAMES
@@ -44,15 +43,16 @@ public class ParseProcessor {
         return appropriateGames;
     }
 
-    private List<Game> filterByRules(List<Game> extractedGames) {
-        List<Game> appropriateGames = new ArrayList<>();
+    private Set<Game> filterByRules(Set<Game> extractedGames) {
+        Set<Game> appropriateGames = new LinkedHashSet<>();
         for (Game game : extractedGames) {
             for (RuleNumber ruleNumber : RuleNumber.values()) {
                 if (ruleNumber.gameTime.checkTime(game.getGameTime())) {
                     if (ruleNumber.score.equals(game.getScanTimeScore())) {
-                        if (!appropriateGames.contains(game)) {
-                            appropriateGames.add(game);
-                        }
+                        appropriateGames.add(game);
+//                        if (!appropriateGames.contains(game)) {
+//                            appropriateGames.add(game);
+//                        }
                     }
                 }
             }

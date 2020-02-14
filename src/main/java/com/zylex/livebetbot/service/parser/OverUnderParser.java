@@ -1,7 +1,7 @@
 package com.zylex.livebetbot.service.parser;
 
-import com.zylex.livebetbot.controller.logger.OverUnderParserLogger;
 import com.zylex.livebetbot.controller.logger.LogType;
+import com.zylex.livebetbot.controller.logger.OverUnderParserLogger;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.model.OverUnder;
 import com.zylex.livebetbot.service.driver.DriverManager;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
@@ -31,7 +32,7 @@ public class OverUnderParser {
         this.driverManager = driverManager;
     }
 
-    public List<Game> parse(List<Game> games) {
+    public Set<Game> parse(Set<Game> games) {
         if (games.isEmpty()) {
             logger.startLogMessage(LogType.NO_GAMES, 0);
             return games;

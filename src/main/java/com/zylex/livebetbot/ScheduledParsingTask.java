@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class ScheduledParsingTask extends Thread {
@@ -38,7 +39,7 @@ public class ScheduledParsingTask extends Thread {
     @Override
     public void run() {
         try {
-            List<Game> appropriateGames = parseProcessor.process();
+            Set<Game> appropriateGames = parseProcessor.process();
             Map<RuleNumber, List<Game>> ruleGames = ruleProcessor.process(appropriateGames);
             saver.save(ruleGames);
         } catch (Throwable t) {
