@@ -48,6 +48,17 @@ public class LeagueRepository {
     }
 
     @SuppressWarnings("unchecked")
+    public List<League> getNewLeagues() {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM League WHERE isNew = true");
+        try {
+            return query.getResultList();
+        } catch (NoResultException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public List<LeagueToScan> getLeaguesToScan() {
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM LeagueToScan");
@@ -56,5 +67,10 @@ public class LeagueRepository {
         } catch (NoResultException e) {
             return Collections.emptyList();
         }
+    }
+
+    public void update(League league) {
+        Session session = sessionFactory.getCurrentSession();
+        session.update(league);
     }
 }

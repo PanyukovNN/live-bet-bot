@@ -1,4 +1,4 @@
-package com.zylex.livebetbot.service;
+package com.zylex.livebetbot.service.filecreator;
 
 import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.StatisticsFileCreatorLogger;
@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
+//@ComponentScan
 public class StatisticsFileCreator {
 
     private static final StatisticsFileCreatorLogger logger = new StatisticsFileCreatorLogger();

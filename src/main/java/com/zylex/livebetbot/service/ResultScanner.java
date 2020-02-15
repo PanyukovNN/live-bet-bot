@@ -73,8 +73,8 @@ public class ResultScanner {
         List<Game> noResultGames = removeGamesWithResult(sinceYesterdayGames);
         noResultGames = removeEarlyGames(noResultGames);
         if (noResultGames.isEmpty()) {
-            createStatisticsFiles(LocalDate.now().minusDays(1));
-            createStatisticsFiles(LocalDate.now());
+//            createStatisticsFiles(LocalDate.now().minusDays(1));
+//            createStatisticsFiles(LocalDate.now());
             logger.endLogMessage(LogType.NO_GAMES, 0);
             ConsoleLogger.endMessage(LogType.BLOCK_END);
         } else {
@@ -97,13 +97,13 @@ public class ResultScanner {
                 .collect(Collectors.toList());
     }
 
-    private void createStatisticsFiles(LocalDate date) {
-        if (gameRepository.createStatisticsFile(date)) {
-            logger.fileCreatedSuccessfully(LogType.OKAY, date);
-        } else {
-            logger.fileCreatedSuccessfully(LogType.NO_GAMES, date);
-        }
-    }
+//    private void createStatisticsFiles(LocalDate date) {
+//        if (gameRepository.createStatisticsFile(date)) {
+//            logger.fileCreatedSuccessfully(LogType.OKAY, date);
+//        } else {
+//            logger.fileCreatedSuccessfully(LogType.NO_GAMES, date);
+//        }
+//    }
 
     private String logIn() {
         driverManager.getDriver().navigate().to("http://ballchockdee.com");

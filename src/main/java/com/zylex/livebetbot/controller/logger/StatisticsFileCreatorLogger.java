@@ -1,6 +1,6 @@
 package com.zylex.livebetbot.controller.logger;
 
-import com.zylex.livebetbot.service.StatisticsFileCreator;
+import com.zylex.livebetbot.service.filecreator.StatisticsFileCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -13,9 +13,11 @@ public class StatisticsFileCreatorLogger extends ConsoleLogger {
     public void log(LogType type) {
         String output = "";
         if (type == LogType.OKAY) {
-            output = "Statistics file(-s) creation: completed";
+            output = "Statistics file creation: completed";
         } else if (type == LogType.ERROR) {
-            output = "Statistics file(-s) creation: error";
+            output = "Statistics file creation: error";
+        } else if (type == LogType.NO_GAMES) {
+            output = "Statistics file creation: no games";
         }
         writeInLine("\n" + output);
         writeLineSeparator();
