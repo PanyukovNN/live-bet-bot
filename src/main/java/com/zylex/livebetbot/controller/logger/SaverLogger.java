@@ -30,6 +30,5 @@ public class SaverLogger extends ConsoleLogger {
                 LOG.info(String.format("%d) %s", i, game));
             }
         }
-        endMessage(LogType.BLOCK_END);
     }
 }

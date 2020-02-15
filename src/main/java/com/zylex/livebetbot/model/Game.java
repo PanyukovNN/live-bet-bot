@@ -176,7 +176,7 @@ public class Game implements Serializable {
 
     @Override
     public String toString() {
-        DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a yyyy.MM.dd");
+        DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm yyyy.MM.dd");
         return String.format("%s %s %s \"%s\" - \"%s\" (%s \"%s\") (%s) (%s)",
                 DATE_TIME_FORMATTER.format(dateTime),
                 country.getName(),

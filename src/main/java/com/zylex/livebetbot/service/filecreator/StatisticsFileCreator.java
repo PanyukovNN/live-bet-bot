@@ -43,7 +43,7 @@ public class StatisticsFileCreator {
         if (games.isEmpty()) {
             return;
         }
-        DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm");
+        DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         String fileName = String.format("statistics/%s.csv", DATE_FORMATTER.format(date));
         createFile(fileName);
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName, false), StandardCharsets.UTF_8))) {

@@ -19,10 +19,10 @@ public abstract class ConsoleLogger {
     private static AtomicLong programStartTime = new AtomicLong(System.currentTimeMillis());
 
     public static void startMessage() {
-        DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a dd.MM.yyyy");
+        DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
         String output = StringUtils.repeat("*", 50) + "\n"
                 + String.format("Bot started at: %s", LocalDateTime.now().format(DATE_TIME_FORMATTER))
-                + " (ver.0.07)";
+                + " (ver.0.08)";
         System.out.print(output);
         writeLineSeparator();
         LOG.info("Bot started");

@@ -18,7 +18,7 @@ public class ParseProcessorLogger extends ConsoleLogger {
 
     public void startLogMessage() {
         parsingStartTime.set(System.currentTimeMillis());
-        DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a dd.MM.yyyy");
+        DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
         writeInLine("\nParsing started at " + LocalDateTime.now().format(DATE_TIME_FORMATTER));
         writeLineSeparator();
         LOG.info("Parsing started");
