@@ -33,10 +33,9 @@ public class LiveBetBotApplication {
         }));
         context.getBean(DriverManager.class).initiateDriver(true);
         Thread parsingTask = context.getBean(ScheduledParsingTask.class);
-        Thread resultScanningTask = context.getBean(ScheduledResultScanningTask.class);
+        Thread statisticsFileCreatingTask = context.getBean(ScheduledStatisticsFileCreatingTask.class);
         scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(resultScanningTask, countDelay(LocalTime.of(3, 0)), 1440, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(resultScanningTask, countDelay(LocalTime.of(6, 0)), 1440, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(statisticsFileCreatingTask, countDelay(LocalTime.of(6, 0)), 1440, TimeUnit.MINUTES);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             while (!reader.readLine().equalsIgnoreCase("exit")) {
             }
