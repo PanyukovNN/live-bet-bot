@@ -20,7 +20,6 @@ public class LeagueFileCreatorLogger extends ConsoleLogger {
             output = "League file creation: no new leagues";
         }
         writeInLine("\n" + output);
-        writeLineSeparator();
         LOG.info(output);
     }
 }

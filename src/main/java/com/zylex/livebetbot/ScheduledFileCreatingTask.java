@@ -23,7 +23,7 @@ public class ScheduledFileCreatingTask extends Thread {
     @Override
     public void run() {
         try {
-//            statisticsFileCreator.create();
+            statisticsFileCreator.create();
             leagueFileCreator.create();
             ConsoleLogger.endMessage(LogType.BLOCK_END);
         } catch (Throwable t) {

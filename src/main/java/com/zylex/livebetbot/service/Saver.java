@@ -1,7 +1,5 @@
 package com.zylex.livebetbot.service;
 
-import com.zylex.livebetbot.controller.logger.ConsoleLogger;
-import com.zylex.livebetbot.controller.logger.LogType;
 import com.zylex.livebetbot.controller.logger.SaverLogger;
 import com.zylex.livebetbot.model.Game;
 import com.zylex.livebetbot.service.repository.GameRepository;
@@ -27,7 +25,6 @@ public class Saver {
 
     public void save(Map<RuleNumber, List<Game>> ruleGames) {
         if (ruleGames.isEmpty()) {
-            ConsoleLogger.endMessage(LogType.BLOCK_END);
             return;
         }
         logger.logRuleGames(ruleGames);

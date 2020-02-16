@@ -9,6 +9,7 @@ import com.zylex.livebetbot.service.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
@@ -29,12 +30,9 @@ public class StatisticsFileCreator {
         this.gameRepository = gameRepository;
     }
 
+    @Transactional
     public void create() {
-        for (LocalDate day = LocalDate.now().minusDays(2);
-             day == LocalDate.now().plusDays(1);
-             day = day.plusDays(1)) {
-            createStatisticsFile(day);
-        }
+        createStatisticsFile(LocalDate.now().minusDays(1));
         logger.log(LogType.OKAY);
     }
 
@@ -43,8 +41,9 @@ public class StatisticsFileCreator {
         if (games.isEmpty()) {
             return;
         }
+        DateTimeFormatter FILE_NAME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        String fileName = String.format("statistics/%s.csv", FILE_NAME_FORMATTER.format(date));
         DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-        String fileName = String.format("statistics/%s.csv", DATE_FORMATTER.format(date));
         createFile(fileName);
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName, false), StandardCharsets.UTF_8))) {
             String GAME_BODY_FORMAT = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n";
