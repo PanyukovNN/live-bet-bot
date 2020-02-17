@@ -77,3 +77,16 @@ VALUES (default, 'Albania Superliga'),
        (default, 'Qatar QNB Stars League'),
        (default, 'Venezuela Primera Division'),
        (default, 'Wales Premier League Playoff');
+
+INSERT INTO league_to_scan (id, name)
+VALUES (default, 'New Zealand ISPS Handa Premiership'),
+       (default, 'Bulgaria Second Professional Football League'),
+       (default, 'Thailand League 1'),
+       (default, 'Thailand League 2'),
+       (default, 'Bulgaria First Professional Football League'),
+       (default, 'Republic of North Macedonia Prva Liga'),
+       (default, 'Slovakia Super League'),
+       (default, 'Serbia Superliga'),
+       (default, 'Ireland SSE Airtricity Premier Division'),
+       (default, 'Uruguay Primera Division'),
+       (default, 'Ecuador Liga Pro Serie A');

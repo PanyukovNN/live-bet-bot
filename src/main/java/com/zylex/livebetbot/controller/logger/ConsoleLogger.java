@@ -22,7 +22,7 @@ public abstract class ConsoleLogger {
         DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
         String output = StringUtils.repeat("*", 50) + "\n"
                 + String.format("Bot started at: %s", LocalDateTime.now().format(DATE_TIME_FORMATTER))
-                + " (ver.0.08)";
+                + " (ver.0.11)";
         System.out.print(output);
         writeLineSeparator();
         LOG.info("Bot started");
@@ -46,9 +46,9 @@ public abstract class ConsoleLogger {
         writeInLine(line);
     }
 
-    public static synchronized void writeErrorMessage(String message) {
+    public static synchronized void writeErrorMessage(String message, Throwable t) {
         System.err.print(message);
-        LOG.error(message);
+        LOG.error(message, t);
     }
 
     static synchronized void writeInLine(String line) {

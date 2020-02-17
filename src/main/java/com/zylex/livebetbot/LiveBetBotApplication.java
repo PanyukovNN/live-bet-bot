@@ -35,7 +35,7 @@ public class LiveBetBotApplication {
         Thread parsingTask = context.getBean(ScheduledParsingTask.class);
         Thread fileCreatingTask = context.getBean(ScheduledFileCreatingTask.class);
         scheduler.scheduleAtFixedRate(parsingTask, 0, 10, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(fileCreatingTask, countDelay(LocalTime.of(6, 0)), 1440, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(fileCreatingTask, countDelay(LocalTime.of(1, 0)), 1440, TimeUnit.MINUTES);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             while (!reader.readLine().equalsIgnoreCase("exit")) {
             }

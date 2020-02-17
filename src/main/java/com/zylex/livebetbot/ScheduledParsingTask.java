@@ -39,15 +39,18 @@ public class ScheduledParsingTask extends Thread {
 
     @Override
     public void run() {
-        try {
-            Set<Game> appropriateGames = parseProcessor.process();
-            Map<RuleNumber, List<Game>> ruleGames = ruleProcessor.process(appropriateGames);
-            saver.save(ruleGames);
-            ConsoleLogger.endMessage(LogType.BLOCK_END);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            ConsoleLogger.writeErrorMessage(t.getMessage());
-            driverManager.refreshDriver();
+        while (true) {
+            try {
+                Set<Game> appropriateGames = parseProcessor.process();
+                Map<RuleNumber, List<Game>> ruleGames = ruleProcessor.process(appropriateGames);
+                saver.save(ruleGames);
+                ConsoleLogger.endMessage(LogType.BLOCK_END);
+                break;
+            } catch (Throwable t) {
+                t.printStackTrace();
+                ConsoleLogger.writeErrorMessage(t.getMessage(), t);
+                driverManager.refreshDriver();
+            }
         }
     }
 }

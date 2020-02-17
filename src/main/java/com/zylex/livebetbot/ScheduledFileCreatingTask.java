@@ -28,7 +28,7 @@ public class ScheduledFileCreatingTask extends Thread {
             ConsoleLogger.endMessage(LogType.BLOCK_END);
         } catch (Throwable t) {
             t.printStackTrace();
-            ConsoleLogger.writeErrorMessage(t.getMessage());
+            ConsoleLogger.writeErrorMessage(t.getMessage(), t);
         }
     }
 }

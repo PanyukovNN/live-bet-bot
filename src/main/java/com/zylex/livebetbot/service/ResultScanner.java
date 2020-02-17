@@ -50,7 +50,7 @@ public class ResultScanner {
                 break;
             } catch (Exception e) {
                 e.printStackTrace();
-                ConsoleLogger.writeErrorMessage(e.getMessage());
+                ConsoleLogger.writeErrorMessage(e.getMessage(), e);
             }
         }
     }
@@ -212,7 +212,7 @@ public class ResultScanner {
             logger.logOut(LogType.OKAY);
         } catch (WebDriverException e) {
             logger.logOut(LogType.ERROR);
-            ConsoleLogger.writeErrorMessage(e.getMessage());
+            ConsoleLogger.writeErrorMessage(e.getMessage(), e);
         }
     }
 }
