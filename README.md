@@ -1,6 +1,6 @@
 ## **Live-Bet-Bot**
 Live-bet-bot includes three modules: 
-1. Scanning ballchockdee.com every 10 minutes, and finding live football games that appropriate for special rules (Code of rules hide from Git).
+1. Scanning ballchockdee.com every 10 minutes and finding live football games that appropriate by special rules (Code of rules hidden from Git).
 1. Collecting games results.
 1. Export statistics to file and also displays it to console. 
 
