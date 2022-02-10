@@ -23,7 +23,7 @@
         <webdrivermanager.version>3.7.1</webdrivermanager.version>
         <postgresql.version>42.2.8.jre7</postgresql.version>
         <jstl.version>1.2</jstl.version>
-        <hibernate.version>5.4.10.Final</hibernate.version>
+        <hibernate.version>5.4.24.Final</hibernate.version>
         <spring.version>5.2.3.RELEASE</spring.version>
         <logback-classic.version>1.2.3</logback-classic.version>
         <junit.version>4.12</junit.version>
